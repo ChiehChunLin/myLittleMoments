@@ -1,4 +1,4 @@
 node_modules/
-sever/.env.template
+sever/.env
 server/logs/
 server/downloaded/*
