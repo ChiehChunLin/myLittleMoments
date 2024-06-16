@@ -35,6 +35,7 @@ app.use("/", userRoute);
 app.use("/admin", adminRoute);
 app.use("/timeline", timelineRoute);
 app.use("/public", express.static("../client"));
+
 // app.use(errorHandler);
 app.use((err, req, res, next) => {
   console.log(err);

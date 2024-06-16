@@ -14,4 +14,11 @@ const testS3Controller = async (req, res, next) => {
   }
 };
 
-module.exports = { testS3Controller };
+const testTimelineController = async (req, res, next) => {
+  try {
+    res.status(200).render("timelineSample");
+  } catch (error) {
+    next(error);
+  }
+};
+module.exports = { testS3Controller, testTimelineController };

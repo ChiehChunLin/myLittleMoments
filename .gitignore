@@ -1,4 +1,5 @@
 node_modules/
+temp/
 sever/.env
 server/logs/
 server/downloaded/*

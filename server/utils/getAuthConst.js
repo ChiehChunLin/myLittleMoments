@@ -4,12 +4,7 @@ const authProvider = {
 };
 const authRole = {
   USER: "user",
-  ADMIN: "admin",
-  VISITOR: "visitor"
-};
-const babyGender = {
-  GIRL: "girl",
-  BOY: "boy"
+  ADMIN: "admin"
 };
 
-module.exports = { authProvider, authRole, babyGender };
+module.exports = { authProvider, authRole };

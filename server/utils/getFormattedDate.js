@@ -1,3 +1,9 @@
+const moment = require("moment");
+
+function getUTCTime() {
+  //1718482477069
+  return new Date().getTime();
+}
 function getFormattedDate() {
   //YYYY-MM-DD
   return new Date().toISOString().slice(0, 10);
@@ -12,29 +18,22 @@ function getLogTimeFormat() {
   //YYYY-MM-DD HH:mm:ss
   return new Date().toLocaleString("af-ZA", { hour12: false });
 }
-function getCalendarDate() {
-  //Oct 12. 2023
-  const date = new Date();
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec"
-  ];
-  const month = monthNames[date.getMonth()];
-  const day = date.getDate();
-  const year = date.getFullYear();
-  const formattedDate = `${month} ${day}. ${year}`;
-
-  return formattedDate;
+function getCalendarDate(date) {
+  return moment(date).format("MMM Do YY");
 }
-
-module.exports = { getFormattedDate };
+function getWeekNumberByDate(date) {
+  return moment(date, "YYYY-MM-DD").week();
+}
+function getDateDifference(date1, date2) {
+  const diff = moment.preciseDiff(date1, date2, true);
+  return `${diff.years}Y-${diff.monthd}M-${diff.days}D old`;
+}
+module.exports = {
+  getUTCTime,
+  getFormattedDate,
+  getSerialTimeFormat,
+  getLogTimeFormat,
+  getCalendarDate,
+  getWeekNumberByDate,
+  getDateDifference
+};
