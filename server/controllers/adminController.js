@@ -16,7 +16,11 @@ const testS3Controller = async (req, res, next) => {
 
 const testTimelineController = async (req, res, next) => {
   try {
-    res.status(200).render("timelineSample");
+    const babyId = "1682294400000";
+    const directory = "2024-06-16";
+    const filename = "512921638023987330";
+    const imgUrl = getImageCDN(`${babyId}/${directory}/${filename}`);
+    res.status(200).render("timelineSample", { imgUrl });
   } catch (error) {
     next(error);
   }

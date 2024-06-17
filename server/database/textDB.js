@@ -10,12 +10,8 @@ async function setText(conn, userId, babyId, content, date = "") {
     `,
     [userId, babyId, content, textDate]
   );
-  // console.log("setImage:" + JSON.stringify(rows));
-  if (rows.length == 0 || !rows.insertId) {
-    return undefined;
-  } else {
-    return rows.insertId;
-  }
+  // console.log("setText:" + JSON.stringify(rows));
+  return rows.insertId;
 }
 async function getTextByMonth(conn, babyId, date) {
   const addMonth = moment(date).add(1, "M").format("YYYY-MM-DD");
@@ -27,11 +23,8 @@ async function getTextByMonth(conn, babyId, date) {
     `,
     [babyId, `${date} 00:00:00`, `${addMonth} 00:00:00`]
   );
-  if (rows.length == 0) {
-    return undefined;
-  } else {
-    return rows;
-  }
+  // console.log("getTextByMonth:" + JSON.stringify(rows));
+  return rows;
 }
 async function getTextByDate(conn, babyId, date) {
   const [rows] = await conn.query(
@@ -42,11 +35,8 @@ async function getTextByDate(conn, babyId, date) {
     `,
     [babyId, `${date} 00:00:00`, `${date} 23:59:59`]
   );
-  if (rows.length == 0) {
-    return undefined;
-  } else {
-    return rows;
-  }
+  // console.log("getTextByDate:" + JSON.stringify(rows));
+  return rows;
 }
 module.exports = {
   setText,

@@ -14,11 +14,7 @@ async function newBaby(conn, name, gender, birthday, id = 0) {
     [babyId, name, gender, birthday]
   );
   // console.log("newBaby:" + JSON.stringify(rows));
-  if (rows.length == 0 || !rows.insertId) {
-    return undefined;
-  } else {
-    return getBaby(rows.insertId);
-  }
+  return await getBaby(conn, babyId);
 }
 async function getBaby(conn, id) {
   const [rows] = await conn.query(
@@ -27,11 +23,8 @@ async function getBaby(conn, id) {
     `,
     [id]
   );
-  if (rows.length == 0) {
-    return undefined;
-  } else {
-    return rows[0];
-  }
+  // console.log("getBaby:" + JSON.stringify(rows[0]));
+  return rows[0];
 }
 
 async function setBabyDaily(conn, userId, babyId, activity, quantity, date) {
@@ -44,12 +37,8 @@ async function setBabyDaily(conn, userId, babyId, activity, quantity, date) {
     `,
     [userId, babyId, week, activity, quantity, activityDate]
   );
-  // console.log("newBabyDaily:" + JSON.stringify(rows));
-  if (rows.length == 0 || !rows.insertId) {
-    return undefined;
-  } else {
-    return rows.insertId;
-  }
+  // console.log("setBabyDaily:" + JSON.stringify(rows));
+  return rows.insertId;
 }
 async function getBabyDailyWeek(conn, babyId, date) {
   const week = getWeekNumberByDate(date);
@@ -61,11 +50,8 @@ async function getBabyDailyWeek(conn, babyId, date) {
     `,
     [babyId, week]
   );
-  if (rows.length == 0) {
-    return undefined;
-  } else {
-    return rows;
-  }
+  // console.log("getBabyDailyWeek:" + JSON.stringify(rows));
+  return rows;
 }
 async function getBabyWeightData(conn, babyId) {
   const [rows] = await conn.query(
@@ -75,11 +61,8 @@ async function getBabyWeightData(conn, babyId) {
     `,
     [babyId]
   );
-  if (rows.length == 0) {
-    return undefined;
-  } else {
-    return rows[0];
-  }
+  // console.log("getBabyWeightData:" + JSON.stringify(rows));
+  return rows;
 }
 async function getBabyHeightData(conn, babyId) {
   const [rows] = await conn.query(
@@ -89,15 +72,13 @@ async function getBabyHeightData(conn, babyId) {
     `,
     [babyId]
   );
-  if (rows.length == 0) {
-    return undefined;
-  } else {
-    return rows[0];
-  }
+  // console.log("getBabyHeightData:" + JSON.stringify(rows));
+  return rows;
 }
 module.exports = {
   newBaby,
   getBaby,
+  setBabyDaily,
   getBabyDailyWeek,
   getBabyWeightData,
   getBabyHeightData

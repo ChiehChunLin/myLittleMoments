@@ -1,13 +1,16 @@
 const mysql = require("mysql2");
 const dotenv = require("dotenv").config();
-const { babyGender, babyRole } = require("./utils/getBabyConst");
+const { babyGender, babyRole, babyActivity } = require("./utils/getBabyConst");
 const pool = require("./database/connDB");
 const {
   newNativeUser,
   newLineUser,
   setUserFollowBaby
 } = require("./database/userDB");
-const { newBaby } = require("./database/babyDB");
+const { newBaby, setBabyDaily } = require("./database/babyDB");
+
+const cherryId = 657590400000;
+const puffId = 1682294400000;
 
 async function createUserTable() {
   const userTable = await pool.query(
@@ -23,7 +26,9 @@ async function createUserTable() {
                 \`timestamp\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
               );`
   );
-  if (userTable) console.log("userTable is ready for service.");
+  if (userTable) {
+    return "userTable ok";
+  }
 }
 async function createBabyTable() {
   const babyTable = await pool.query(
@@ -37,7 +42,9 @@ async function createBabyTable() {
                 \`timestamp\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
               );`
   );
-  if (babyTable) console.log("babyTable is ready for service.");
+  if (babyTable) {
+    return "babyTable ok";
+  }
 }
 async function createFollowTable() {
   const followTable = await pool.query(
@@ -46,11 +53,13 @@ async function createFollowTable() {
                 \`userId\` BIGINT UNSIGNED NOT NULL COMMENT 'User id',
                 \`babyId\` BIGINT UNSIGNED NOT NULL COMMENT 'Baby id',
                 \`babyRole\` VARCHAR(255) NOT NULL COMMENT 'Baby role',
-                \`relation\` BIGINT UNSIGNED NOT NULL COMMENT 'Baby relation',
+                \`relation\` VARCHAR(255) NOT NULL COMMENT 'Baby relation',
                 UNIQUE KEY (userId, babyId)
               );`
   );
-  if (followTable) console.log("followTable is ready for service.");
+  if (followTable) {
+    return "followTable ok";
+  }
 }
 async function createImageTable() {
   const imageTable = await pool.query(
@@ -65,7 +74,9 @@ async function createImageTable() {
                   UNIQUE KEY (babyId, filename)
                 );`
   );
-  if (imageTable) console.log("imageTable is ready for service.");
+  if (imageTable) {
+    return "imageTable ok";
+  }
 }
 async function createTextTable() {
   const textTable = await pool.query(
@@ -77,7 +88,9 @@ async function createTextTable() {
                   \`timestamp\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Text date'
                 );`
   );
-  if (textTable) console.log("textTable is ready for service.");
+  if (textTable) {
+    return "textTable ok";
+  }
 }
 async function createBabyDailyTable() {
   const babyDailyTable = await pool.query(
@@ -87,27 +100,28 @@ async function createBabyDailyTable() {
                   \`babyId\` BIGINT UNSIGNED NOT NULL COMMENT 'Baby id',
                   \`week\` INT NOT NULL COMMENT 'Activity week',
                   \`activity\` VARCHAR(255) NOT NULL COMMENT 'Baby activity',
-                  \`quantity\` INT NOT NULL COMMENT 'Baby quantity',
+                  \`quantity\` FLOAT NOT NULL COMMENT 'Baby quantity',
                   \`timestamp\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Living date'
                 );`
   );
-  if (babyDailyTable) console.log("babyDailyTable is ready for service.");
+  if (babyDailyTable) {
+    return "babyDailyTable ok";
+  }
 }
-createUserTable();
-createBabyTable();
-createFollowTable();
-createImageTable();
-createTextTable();
-createBabyDailyTable();
 
 const commands = [
+  createUserTable(),
+  createBabyTable(),
+  createFollowTable(),
+  createImageTable(),
+  createTextTable(),
+  createBabyDailyTable(),
   newNativeUser(
     pool,
     "aaa123456",
     "aaa123456@fakemail.com",
     "$2b$10$tzcVE8bVVv6k151knLPC1.xuA5GbFpuRtDO3ekKhDsiu85td5i6by",
-    true,
-    0
+    true
   ),
   newLineUser(
     pool,
@@ -116,10 +130,23 @@ const commands = [
     "justme11012@gmail.com",
     "moonday0815",
     true,
-    657590400000
+    cherryId
   ),
-  newBaby(pool, "puff", babyGender.GIRL, "2024-03-24", 1682294400000),
-  setUserFollowBaby(pool, 657590400000, 1682294400000, babyRole.MANAGER, "mama")
+  newBaby(pool, "puff", babyGender.GIRL, "2024-03-24", puffId),
+  setUserFollowBaby(pool, cherryId, puffId, babyRole.MANAGER, "mama"),
+  setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 51, "2023-05-01"),
+  setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 63, "2023-10-02"),
+  setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 63, "2023-10-02"),
+  setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 63, "2023-11-02"),
+  setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 65.5, "2024-01-06"),
+  setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 69, "2024-06-08"),
+  setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 3.6, "2023-05-01"),
+  setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 5.6, "2023-10-02"),
+  setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 6.3, "2023-11-02"),
+  setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 6.3, "2023-12-11"),
+  setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 6.6, "2024-01-06"),
+  setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 7.1, "2024-05-01"),
+  setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 7.5, "2024-06-08")
 ];
 Promise.all(commands)
   .then((result) => {

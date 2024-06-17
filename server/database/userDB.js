@@ -18,13 +18,8 @@ async function newNativeUser(
     `,
     [userId, authProvider.NATIVE, role, name, email, password]
   );
-  // console.log("newUser:" + JSON.stringify(rows));
-  if (rows.length == 0 || !rows.insertId) {
-    return undefined;
-  } else {
-    const user_id = rows.insertId;
-    return getUser(user_id);
-  }
+  // console.log("newNativeUser:" + JSON.stringify(rows));
+  return await getUser(conn, userId);
 }
 async function newLineUser(
   conn,
@@ -44,13 +39,8 @@ async function newLineUser(
     `,
     [userId, lineId, authProvider.LINE, role, name, email, password]
   );
-  // console.log("newUser:" + JSON.stringify(rows));
-  if (rows.length == 0 || !rows.insertId) {
-    return undefined;
-  } else {
-    const user_id = rows.insertId;
-    return getUser(user_id);
-  }
+  // console.log("newLineUser:" + JSON.stringify(rows));
+  return await getUser(conn, userId);
 }
 async function getUser(conn, id) {
   const [rows] = await conn.query(
@@ -59,11 +49,8 @@ async function getUser(conn, id) {
     `,
     [id]
   );
-  if (rows.length == 0) {
-    return undefined;
-  } else {
-    return rows[0];
-  }
+  // console.log("getUser:" + JSON.stringify(rows[0]));
+  return rows[0];
 }
 async function getUserByEmail(conn, email) {
   const [rows] = await conn.query(
@@ -72,11 +59,8 @@ async function getUserByEmail(conn, email) {
     `,
     [email]
   );
-  if (rows.length == 0) {
-    return undefined;
-  } else {
-    return rows[0];
-  }
+  // console.log("getUserByEmail:" + JSON.stringify(rows[0]));
+  return rows[0];
 }
 async function setUserFollowBaby(conn, userId, babyId, babyRole, relation) {
   const [rows] = await conn.query(
@@ -87,11 +71,7 @@ async function setUserFollowBaby(conn, userId, babyId, babyRole, relation) {
     [userId, babyId, babyRole, relation]
   );
   // console.log("setUserFollowBaby:" + JSON.stringify(rows));
-  if (rows.length == 0 || !rows.insertId) {
-    return undefined;
-  } else {
-    return rows.insertId;
-  }
+  return rows.insertId;
 }
 module.exports = {
   newNativeUser,
