@@ -8,6 +8,7 @@ const {
   setUserFollowBaby
 } = require("./database/userDB");
 const { newBaby, setBabyDaily } = require("./database/babyDB");
+const { setImage } = require("./database/imageDB");
 
 const cherryId = 657590400000;
 const puffId = 1682294400000;
@@ -109,30 +110,58 @@ async function createBabyDailyTable() {
   }
 }
 
-const commands = [
-  createUserTable(),
-  createBabyTable(),
-  createFollowTable(),
-  createImageTable(),
-  createTextTable(),
-  createBabyDailyTable(),
-  newNativeUser(
-    pool,
-    "aaa123456",
-    "aaa123456@fakemail.com",
-    "$2b$10$tzcVE8bVVv6k151knLPC1.xuA5GbFpuRtDO3ekKhDsiu85td5i6by",
-    true
-  ),
-  newLineUser(
-    pool,
-    "U1e7165f3c3db2ce3142eb75643c61ec6",
-    "林潔君",
-    "justme11012@gmail.com",
-    "moonday0815",
-    true,
-    cherryId
-  ),
-  newBaby(pool, "puff", babyGender.GIRL, "2024-03-24", puffId),
+// const commands = [
+//   createUserTable(),
+//   createBabyTable(),
+//   createFollowTable(),
+//   createImageTable(),
+//   createTextTable(),
+//   createBabyDailyTable(),
+//   newNativeUser(
+//     pool,
+//     "aaa123456",
+//     "aaa123456@fakemail.com",
+//     "$2b$10$tzcVE8bVVv6k151knLPC1.xuA5GbFpuRtDO3ekKhDsiu85td5i6by",
+//     true
+//   ),
+//   newLineUser(
+//     pool,
+//     "U1e7165f3c3db2ce3142eb75643c61ec6",
+//     "林潔君",
+//     "justme11012@gmail.com",
+//     "moonday0815",
+//     true,
+//     cherryId
+//   ),
+//   newBaby(pool, "puff", babyGender.GIRL, "2023-03-24", puffId)
+// ];
+
+// const imgCommands = [
+//   setImage(
+//     pool,
+//     cherryId,
+//     puffId,
+//     "image",
+//     "2024-06-16/512921638023987330",
+//     "2024-06-16"
+//   ),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998677590573377"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998677724528990"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998677808414950"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998678194553318"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998678597206593"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998678865904098"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998678949527845"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998679453106439"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998679989453174"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998680409145637"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998752417218933"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998752886456578"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998753222001107"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998753674985572"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998753708539975")
+// ];
+const dailyCommands = [
   setUserFollowBaby(pool, cherryId, puffId, babyRole.MANAGER, "mama"),
   setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 51, "2023-05-01"),
   setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 63, "2023-10-02"),
@@ -148,7 +177,7 @@ const commands = [
   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 7.1, "2024-05-01"),
   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 7.5, "2024-06-08")
 ];
-Promise.all(commands)
+Promise.all(dailyCommands)
   .then((result) => {
     console.log("result %j", result);
   })

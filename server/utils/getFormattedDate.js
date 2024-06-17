@@ -24,9 +24,13 @@ function getCalendarDate(date) {
 function getWeekNumberByDate(date) {
   return moment(date, "YYYY-MM-DD").week();
 }
-function getDateDifference(date1, date2) {
-  const diff = moment.preciseDiff(date1, date2, true);
-  return `${diff.years}Y-${diff.monthd}M-${diff.days}D old`;
+function getDateDifference(date) {
+  const todays = getFormattedDate().split("-");
+  const dates = date.split("-");
+  const today = moment([todays[0], todays[1], todays[2]]);
+  const dateBirth = moment([dates[0], dates[1], dates[2]]);
+  const diffDuration = moment.duration(today.diff(dateBirth));
+  return `${diffDuration.years()}Y-${diffDuration.months()}M-${diffDuration.days()}D old`;
 }
 module.exports = {
   getUTCTime,

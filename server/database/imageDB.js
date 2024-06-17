@@ -28,14 +28,29 @@ async function getImageByMonth(conn, babyId, date) {
   const addMonth = moment(date).add(1, "M").format("YYYY-MM-DD");
   const [rows] = await conn.query(
     `
-     SELECT * FROM images 
-     WHERE babyId = ? AND timestamp >= ? AND timestamp <= ?
-     ORDER BY timestamp DESC
+      SELECT
+        JSON_ARRAYAGG(
+          JSON_OBJECT(
+            'date', date,
+            'images', images
+          )
+        ) AS data
+      FROM (
+        SELECT
+          DATE(timestamp) as date,
+          JSON_ARRAYAGG(filename) as images
+        FROM
+          images
+        WHERE
+          babyId= ? AND timestamp BETWEEN ? AND ?
+        GROUP BY
+          date
+      ) subquery;
     `,
     [babyId, `${date} 00:00:00`, `${addMonth} 00:00:00`]
   );
-  // console.log("getImageByMonth:" + JSON.stringify(rows));
-  return rows;
+  // console.log("getImageByMonth:" + JSON.stringify(rows[0]));
+  return rows[0];
 }
 async function getImageByDate(conn, babyId, date) {
   const [rows] = await conn.query(

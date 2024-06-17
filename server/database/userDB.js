@@ -55,7 +55,24 @@ async function getUser(conn, id) {
 async function getUserByEmail(conn, email) {
   const [rows] = await conn.query(
     `
-      SELECT * FROM users where email = ?
+      SELECT 
+        u.id AS id,
+        u.lineId AS lineId,
+        u.authRole AS authRole,
+        u.email AS userEmail,
+        u.password AS password,
+        u.picture AS picture,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'id', b.id,
+                'name', b.name,
+                'headshot', b.headshot
+            )
+        ) AS follows
+        FROM users u
+        JOIN follows f ON u.id = f.userId
+        JOIN babys b ON f.babyId = b.id
+        WHERE u.email = ?;
     `,
     [email]
   );
@@ -73,6 +90,7 @@ async function setUserFollowBaby(conn, userId, babyId, babyRole, relation) {
   // console.log("setUserFollowBaby:" + JSON.stringify(rows));
   return rows.insertId;
 }
+
 module.exports = {
   newNativeUser,
   newLineUser,
