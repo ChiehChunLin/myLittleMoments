@@ -1,16 +1,11 @@
 const router = require("express").Router();
-const {
-  homeRender,
-  loginRender,
-  loginController,
-  signupController,
-  logoutController
-} = require("../controllers/userController");
+const userControl = require("../controllers/userController");
 
-router.get("/", homeRender);
-router.get("/login", loginRender);
-router.get("/logout", logoutController);
-router.post("/login", loginController);
-router.post("/signup", signupController);
+router.get("/", userControl.homeRender);
+router.get("/lineCallback", userControl.lineCallback);
+router.get("/login", userControl.loginRender);
+router.get("/logout", userControl.logoutController);
+router.post("/login", userControl.loginController);
+router.post("/signup", userControl.signupController);
 
 module.exports = router;
