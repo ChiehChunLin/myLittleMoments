@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <%- include ("partials/head") %>
+    <title>myLittleMoments | Login</title>
+  </head>
+  <body>
+    <%- include ("partials/nav")%>
+    <main>
+      <div class="home">
+        <div class="home-col1">
+          <!-- baby video or animation -->
+          <img src="/public/images/homePage.jpg" alt="homePage" />
+        </div>
+        <div class="vLine"></div>
+        <div class="home-col2">
+          <div class="fromGroup">
+            <div class="icon" style="padding: 0.75rem">
+              <img
+                src="/public/images/child-head.png"
+                alt="baby"
+                style="width: 60px; height: 60px"
+              />
+            </div>
+            <hr style="width: 80%; margin: auto" />
+            <!-- user login -->
+            <%- include ("partials/userLogin")%>
+            <!-- user signup -->
+            <%- include ("partials/userSignup")%>
+          </div>
+        </div>
+      </div>
+    </main>
+    <%- include ("partials/footer") %>
+  </body>
+</html>

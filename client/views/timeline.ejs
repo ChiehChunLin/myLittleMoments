@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include ("partials/head") %>
+    <title>myLittleMoments | Timeline</title>
+  </head>
+  <body>
+    <%- include ("partials/nav") %>
+    <div class="container-fluid">
+      <div class="row h-100">
+        <!-- baby followed list -->
+        <%- include ("partials/babyList", { follows }) %>
+        <div class="post-content">
+          <!-- babyProfile: babyCover, babyHeadshot, babyInfo -->
+          <%- include ("partials/babyProfile", { babyData }) %>
+          <!-- babyNav: Timeline, Diary, Tags, Health -->
+          <%- include ("partials/babyNav") %>
+
+          <div class="posts" id="postsContainer">
+            <% if(data) { %>
+            <!-- data: date, images, urls -->
+            <%- include ("partials/babyImageBlock", { data }) %>
+            <!-- imageBlock for display -->
+            <% }%>
+          </div>
+        </div>
+        <%- include ("partials/babyAgeTree") %>
+      </div>
+    </div>
+  </body>
+</html>

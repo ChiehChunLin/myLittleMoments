@@ -1,0 +1,20 @@
+<!-- input: images array  -->
+<% for(let i=0; i< data.length; i++){ %>
+<div class="post card my-3">
+  <div class="card-body">
+    <p class="post-time">Posted on <%= data[i].date %></p>
+    <% for(let j=0; j< data[i].images.length; j++){ %>
+    <img
+      src="<%=data[i].images[j] %> "
+      alt="Post Image <%=j%>"
+      class="img-fluid"
+    />
+    <% }%>
+  </div>
+  <div class="card-footer" style="text-align: right">
+    <span>Photo <%=data[i].images.length%></span>
+    <span>·</span>
+    <span>View all ></span>
+  </div>
+</div>
+<% }%>

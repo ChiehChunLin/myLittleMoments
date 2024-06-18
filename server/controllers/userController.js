@@ -13,7 +13,10 @@ const homeRender = async (req, res, next) => {
 };
 const lineCallback = async (req, res, next) => {
   const { code } = req.query;
-  console.log(req.query);
+  // {
+  //   code: '2NIQOipvfxePtTfyYALZ',             // deliver by LINE
+  //   state: 'e83212f595634b668df31795f701bee8' //according to the req from client
+  // }
   try {
     // Request an access token
     const tokenResponse = await axios.post(
@@ -31,9 +34,8 @@ const lineCallback = async (req, res, next) => {
         }
       }
     );
-
     const { access_token } = tokenResponse.data;
-    console.log(access_token);
+
     // Use the access token to get user profile information
     const profileResponse = await axios.get("https://api.line.me/v2/profile", {
       headers: {
@@ -42,6 +44,11 @@ const lineCallback = async (req, res, next) => {
     });
 
     const profile = profileResponse.data;
+    // {
+    //   userId: 'U9acc24aec8497b5e7159c861f9079b71',
+    //   displayName: '林潔君',
+    //   pictureUrl: 'https://profile.line-scdn.net/0hOFa5F3OkEGlMTAVAkk5uFjwcEwNvPUl7Mn1aXSkZSVBzfAM-MChWXH5NHFBxKVFqZyoIXS1KTl1AX2cPUhrsXUt8TVhweFA6Yytciw'
+    // }
     res.json(profile);
   } catch (error) {
     res

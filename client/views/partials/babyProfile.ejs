@@ -1,0 +1,25 @@
+<div class="profile">
+  <div class="imageContainer cover" id="coverPhoto">
+    <img src="<%=babyData.cover%>" alt="Profile Cover" />
+
+    <div class="upload-btn-wrapper">
+      <button class="btn btn-light btn-sm">Change Cover</button>
+      <input type="file" id="coverInput" accept="image/*" />
+    </div>
+  </div>
+  <div
+    class="imageContainer profile-pic"
+    id="profilePic"
+    style="background-color: orange"
+  >
+    <img src="<%=babyData.headshot%>" alt="Profile Headshot" />
+  </div>
+  <div class="profile-info">
+    <h4><%=babyData.name%></h4>
+    <p><%=babyData.old%> | <%=babyData.followsCount%> family memebers</p>
+  </div>
+</div>
+
+<div class="upload-btn-wrapper" style="left: 20px; bottom: -50px">
+  <input type="file" id="profileInput" accept="image/*" />
+</div>
