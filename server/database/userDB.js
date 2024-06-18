@@ -66,7 +66,8 @@ async function getUserByEmail(conn, email) {
             JSON_OBJECT(
                 'id', b.id,
                 'name', b.name,
-                'headshot', b.headshot
+                'headshot', b.headshot,
+                'userRole', f.babyRole
             )
         ) AS follows
         FROM users u

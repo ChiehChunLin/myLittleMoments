@@ -18,21 +18,20 @@ const timelineController = async (req, res, next) => {
       babyData.headshot = getImageCDN(babyData.headshot);
     });
     const babyId = follows[0].id;
-
     const babyData = await babyDB.getBaby(conn, babyId);
     babyData.old = getDateDifference(babyData.birthday);
     babyData.headshot = getImageCDN(babyData.headshot);
     babyData.cover = getImageCDN(babyData.cover);
     babyData.followsCount = follows.length;
 
-    const { data } = await imageDB.getImageByMonth(conn, babyId, "2024-06-01");
+    const data = await imageDB.getImageByMonth(conn, babyId, "2024-06-01");
     data.map((dateData) => {
-      const urls = dateData.images.map((url) => {
-        return getImageCDN(`${babyId}/${url}`);
+      const urls = dateData.images.map((image) => {
+        return getImageCDN(`${babyId}/${image}`);
       });
       dateData.images = urls;
     });
-    // res.status(200).send({ babyData });
+    // res.status(200).send({ data });
     res.status(200).render("timeline", { follows, babyData, data });
   } catch (error) {
     next(error);

@@ -137,47 +137,34 @@ async function createBabyDailyTable() {
 // ];
 
 // const imgCommands = [
-//   setImage(
-//     pool,
-//     cherryId,
-//     puffId,
-//     "image",
-//     "2024-06-16/512921638023987330",
-//     "2024-06-16"
-//   ),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998677590573377"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998677724528990"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998677808414950"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998678194553318"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998678597206593"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998678865904098"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998678949527845"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998679453106439"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998679989453174"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998680409145637"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998752417218933"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998752886456578"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998753222001107"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998753674985572"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-17/512998753708539975")
+//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148621525352675"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148622834499683"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148623538880651"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148624075751624"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148624713285958"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148625502077219"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148626592596177"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148627078611379"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148627733708916"),
+//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148628471120059")
 // ];
-const dailyCommands = [
-  setUserFollowBaby(pool, cherryId, puffId, babyRole.MANAGER, "mama"),
-  setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 51, "2023-05-01"),
-  setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 63, "2023-10-02"),
-  setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 63, "2023-10-02"),
-  setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 63, "2023-11-02"),
-  setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 65.5, "2024-01-06"),
-  setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 69, "2024-06-08"),
-  setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 3.6, "2023-05-01"),
-  setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 5.6, "2023-10-02"),
-  setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 6.3, "2023-11-02"),
-  setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 6.3, "2023-12-11"),
-  setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 6.6, "2024-01-06"),
-  setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 7.1, "2024-05-01"),
-  setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 7.5, "2024-06-08")
-];
-Promise.all(dailyCommands)
+// const dailyCommands = [
+//   setUserFollowBaby(pool, cherryId, puffId, babyRole.MANAGER, "mama"),
+//   setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 51, "2023-05-01"),
+//   setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 63, "2023-10-02"),
+//   setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 63, "2023-10-02"),
+//   setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 63, "2023-11-02"),
+//   setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 65.5, "2024-01-06"),
+//   setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 69, "2024-06-08"),
+//   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 3.6, "2023-05-01"),
+//   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 5.6, "2023-10-02"),
+//   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 6.3, "2023-11-02"),
+//   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 6.3, "2023-12-11"),
+//   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 6.6, "2024-01-06"),
+//   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 7.1, "2024-05-01"),
+//   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 7.5, "2024-06-08")
+// ];
+Promise.all(imgCommands)
   .then((result) => {
     console.log("result %j", result);
   })
