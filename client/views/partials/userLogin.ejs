@@ -13,22 +13,21 @@
     </div>
     <br />
     <div class="sign-group">
-      <label for="inputPassword">Password：</label>
+      <label for="inputLoginPassword">Password：</label>
       <input
         class="sign-control"
         type="password"
-        id="inputPassword"
-        placeholder="At least one lower letter and number"
+        id="inputLoginPassword"
         name="password"
         required
       />
       <div class="showPwBox">
-        <input id="showPw" type="checkbox" onclick="myFunction()" />
+        <input id="showPw" type="checkbox" onclick="myLoginPwFunction()" />
         <label for="showPw" style="font-size: 1rem">Show Password</label>
       </div>
       <script>
-        function myFunction() {
-          var pw = document.getElementById("inputPassword");
+        function myLoginPwFunction() {
+          var pw = document.getElementById("inputLoginPassword");
           if (pw.type == "password") {
             pw.type = "text";
           } else {

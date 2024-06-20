@@ -1,12 +1,3 @@
-const babyGender = {
-  GIRL: "girl",
-  BOY: "boy"
-};
-const recordType = {
-  WEIGHT: "weight",
-  HEIGHT: "height"
-};
-
 if (window.location.href.includes("/timeline")) {
   $(".imageBlock").on("click", function (e) {
     $("#postsContainer").removeClass("divHide").addClass("divShow");
@@ -60,24 +51,22 @@ function fetchChartData(babyId, date) {
           summeryWeekTable(dailyData);
         }
         if (weightData) {
-          const cdcWeight = getCdcData(weightData.gender, recordType.WEIGHT);
-          console.log(cdcWeight);
+          const cdcWeight = getCdcData(weightData.gender, babyActivity.WEIGHT);
           showBabyWeightLength(
-            recordType.WEIGHT,
+            babyActivity.WEIGHT,
             cdcWeight,
             weightData.weights
           );
-          recordTable(recordType.WEIGHT, weightData.weights);
+          recordTable(babyActivity.WEIGHT, weightData.weights);
         }
         if (heightData) {
-          const cdcHeight = getCdcData(heightData.gender, recordType.HEIGHT);
-          console.log(cdcHeight);
+          const cdcHeight = getCdcData(heightData.gender, babyActivity.HEIGHT);
           showBabyWeightLength(
-            recordType.HEIGHT,
+            babyActivity.HEIGHT,
             cdcHeight,
             heightData.heights
           );
-          recordTable(recordType.HEIGHT, heightData.heights);
+          recordTable(babyActivity.HEIGHT, heightData.heights);
         }
       }
     })
@@ -86,7 +75,7 @@ function fetchChartData(babyId, date) {
     });
 }
 function getCdcData(gender, type) {
-  if (type == recordType.WEIGHT) {
+  if (type == babyActivity.WEIGHT) {
     if (gender == babyGender.GIRL) {
       return femaleWeight;
     } else {
@@ -183,14 +172,12 @@ function showBabyDailyChart(dailyData) {
   });
 }
 function showBabyWeightLength(title, cdcData, babyData) {
-  console.log(cdcData);
-  console.log(babyData);
   const margin = { top: 20, right: 30, bottom: 40, left: 50 };
   const width = 800 - margin.left - margin.right;
   const height = 400 - margin.top - margin.bottom;
 
   let selectedDiv = "#babyGrowthWeight";
-  if (title == recordType.HEIGHT) selectedDiv = "#babyGrowthLength";
+  if (title == babyActivity.HEIGHT) selectedDiv = "#babyGrowthLength";
 
   const svg = d3
     .select(selectedDiv)
@@ -235,10 +222,7 @@ function showBabyWeightLength(title, cdcData, babyData) {
   const line = d3
     .line()
     .x((d) => x(d.age))
-    .y((d) => {
-      console.log(y);
-      return y(d.value);
-    });
+    .y((d) => y(d.value));
 
   const percentiles = [
     "97th",
@@ -301,10 +285,6 @@ function showBabyWeightLength(title, cdcData, babyData) {
 function summeryWeekTable(weeklyData) {
   const weeklySummaryDiv = document.getElementById("weeklySummary");
   const table = document.createElement("table");
-
-  const caption = document.createElement("caption");
-  caption.textContent = `Weekly Baby Daily Summary`;
-  table.appendChild(caption);
 
   // Create header row
   const thead = document.createElement("thead");

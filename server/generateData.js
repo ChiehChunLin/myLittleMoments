@@ -1,3 +1,4 @@
+const moment = require("moment");
 const mysql = require("mysql2");
 const dotenv = require("dotenv").config();
 const { babyGender, babyRole, babyActivity } = require("./utils/getBabyConst");
@@ -12,6 +13,16 @@ const { setImage } = require("./database/imageDB");
 
 const cherryId = 657590400000;
 const puffId = 1682294400000;
+const puffBirth = "2023-03-24";
+
+function getDateDifference(dateOld, dateNew) {
+  const todays = dateNew.split("-");
+  const dates = dateOld.split("-");
+  const today = moment([todays[0], todays[1], todays[2]]);
+  const dateBirth = moment([dates[0], dates[1], dates[2]]);
+  const diffDuration = moment.duration(today.diff(dateBirth));
+  return `${diffDuration.years()}Y-${diffDuration.months()}M`;
+}
 
 async function createUserTable() {
   const userTable = await pool.query(
@@ -22,7 +33,7 @@ async function createUserTable() {
                 \`authRole\` VARCHAR(255) NOT NULL DEFAULT 'user' COMMENT 'User Role',
                 \`name\` VARCHAR(255) NOT NULL COMMENT 'User name',
                 \`email\` VARCHAR(255) NOT NULL UNIQUE KEY COMMENT 'User email',
-                \`password\` VARCHAR(255) NOT NULL COMMENT 'User password',
+                \`password\` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'User password',
                 \`picture\` VARCHAR(255) NOT NULL DEFAULT 'default/defaultUser' COMMENT 'User picture',
                 \`timestamp\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
               );`
@@ -68,6 +79,7 @@ async function createImageTable() {
                   \`id\` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT 'Image id',
                   \`userId\` BIGINT UNSIGNED NOT NULL COMMENT 'User id',
                   \`babyId\` BIGINT UNSIGNED NOT NULL COMMENT 'Baby id',
+                  \`babyOld\` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Baby old',
                   \`tag\` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Image tag',
                   \`type\` VARCHAR(255) NOT NULL DEFAULT 'image' COMMENT 'Image type',
                   \`filename\` VARCHAR(255) NOT NULL COMMENT 'Image full filename',
@@ -137,16 +149,16 @@ async function createBabyDailyTable() {
 // ];
 
 // const imgCommands = [
-//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148621525352675"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148622834499683"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148623538880651"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148624075751624"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148624713285958"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148625502077219"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148626592596177"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148627078611379"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148627733708916"),
-//   setImage(pool, cherryId, puffId, "image", "2024-06-18/513148628471120059")
+//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148621525352675"),
+//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148622834499683"),
+//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148623538880651"),
+//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148624075751624"),
+//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148624713285958"),
+//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148625502077219"),
+//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148626592596177"),
+//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148627078611379"),
+//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148627733708916"),
+//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148628471120059")
 // ];
 // const dailyCommands = [
 //   setUserFollowBaby(pool, cherryId, puffId, babyRole.MANAGER, "mama"),

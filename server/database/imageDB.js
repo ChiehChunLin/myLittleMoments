@@ -1,14 +1,22 @@
 const moment = require("moment");
 const { getLogTimeFormat } = require("../utils/getFormattedDate");
 
-async function setImage(conn, userId, babyId, type, filename, date = "") {
+async function setImage(
+  conn,
+  userId,
+  babyId,
+  babyOld,
+  type,
+  filename,
+  date = ""
+) {
   const imageDate = date == "" ? getLogTimeFormat() : date;
   const [rows] = await conn.query(
     `
-     INSERT INTO images (userId, babyId, type, filename, timestamp)
-     VALUES (?,?,?,?,?)
+     INSERT INTO images (userId, babyId, babyOld, type, filename, timestamp)
+     VALUES (?,?,?,?,?,?)
     `,
-    [userId, babyId, type, filename, imageDate]
+    [userId, babyId, babyOld, type, filename, imageDate]
   );
   // console.log("setImage:" + JSON.stringify(rows));
   return rows.insertId;

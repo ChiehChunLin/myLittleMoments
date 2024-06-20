@@ -49,4 +49,14 @@ app.listen(port, () => {
   console.log(`Server is listening on ${port}`);
 });
 
+function handle(code) {
+  console.log(`${code} signal received: closing HTTP server`);
+  server.close(() => {
+    console.debug("HTTP server closed");
+  });
+}
+
+process.on("SIGTERM", handle);
+process.on("SIGINT", handle);
+
 module.exports = app;

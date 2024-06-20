@@ -1,8 +1,9 @@
 if (window.location.href.includes("/login")) {
   $("#lineBtn").on("click", function (e) {
     const LINE_CHANNEL_ID = "2005642025";
+    // const LINE_CALLBACK_URI = "https://www.chiehchunlin.com/lineCallback";
     const LINE_CALLBACK_URI =
-      "https://2d66-59-120-11-125.ngrok-free.app/lineCallback";
+      "https://a949-59-120-11-125.ngrok-free.app/lineCallback";
     const LINE_STATE = crypto.randomUUID().replace(/[-]+/g, ""); //prevent xss
     const LINE_NONCE = crypto.randomUUID().replace(/[-]+/g, ""); //prevent xss
     let link = "https://access.line.me/oauth2/v2.1/authorize?";
@@ -27,7 +28,6 @@ if (window.location.href.includes("/login")) {
   $("#loginForm").submit(function (e) {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const provider = authProvider.NATIVE;
     const name = undefined;
     const email = formData.get("email");
     const password = formData.get("password");
@@ -37,56 +37,68 @@ if (window.location.href.includes("/login")) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ provider, name, email, password })
+      body: JSON.stringify({ name, email, password })
     };
-    loginFetch("/login", config);
+    userCheckinFetch("/login", config);
   });
+
   $("#signupForm").submit(function (e) {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const provider = authProvider.NATIVE;
     const name = formData.get("name");
     const email = formData.get("email");
     const password = formData.get("password");
-    console.log(provider);
-    //用function 包起來會出現，TypeError: NetworkError when attempting to fetch resource.
-    // signinFetch("/user/signup", provider, email, password);
+
     const config = {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ provider, name, email, password })
+      body: JSON.stringify({ name, email, password })
     };
-    loginFetch("/signup", config);
+    userCheckinFetch("/signup", config);
   });
 }
-function loginFetch(url, config) {
+
+function userCheckAuth() {
+  if (localStorage.getItem("accessToken") === null) {
+    const url = "/authCheck";
+    userCheckinFetch(url);
+  }
+  return true;
+}
+function userCheckinFetch(url, config = "") {
   fetch(url, config)
-    .then(checkStatus)
-    .then(checkResponse)
+    .then((res) => res.json())
     .then((data) => {
       if (data) {
-        const { access_token, access_expired, user, shoppingCount, message } =
-          data;
-        // console.log("data:" + JSON.stringify(user));
+        const { accessJwtToken, accessExpired, user, message } = data;
+        // console.log("data: %j", data);
 
-        if (access_token && user) {
-          localStorage.setItem("accessToken", access_token);
-          displayLoginUserInfo(user.name, user.email, user.picture);
-          displayShoppingCount(shoppingCount);
-          displayTempMessage("Login Successfully.");
-        } else {
-          if (message) {
-            displayTempMessage(message);
+        if (accessJwtToken && user) {
+          localStorage.setItem("accessToken", accessJwtToken);
+          displayLoginMessage("Login Successfully!");
+          if (url != "/authCheck") {
+            window.location.href = "/admin/timeline";
           }
-          console.error("Login failed:", data);
+        } else {
+          console.error("Login data failed:", data);
           throw new Error("Something went wrong with login authentication");
         }
       }
     })
     .catch((err) => {
-      displayTempMessage(err);
-      console.error("fetch error:", err);
+      displayLoginMessage(err.message);
+      console.error(err);
     });
+}
+function displayLoginMessage(message) {
+  if (message) {
+    const messageDiv = document.querySelector(".message");
+    messageDiv.textContent = message;
+
+    setTimeout(() => {
+      messageDiv.textContent = "";
+    }, 5000); // Hide after 5 seconds
+  }
 }

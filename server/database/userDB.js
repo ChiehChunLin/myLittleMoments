@@ -1,43 +1,26 @@
 const { authProvider, authRole } = require("../utils/getAuthConst");
 const { getUTCTime } = require("../utils/getFormattedDate");
 
-async function newNativeUser(
-  conn,
-  name,
-  email,
-  password,
-  isAdmin = false,
-  id = 0
-) {
+async function newNativeUser(conn, name, email, password, id = 0) {
   const userId = id == 0 ? getUTCTime() : id;
-  const role = isAdmin ? authRole.ADMIN : authRole.USER;
   const [rows] = await conn.query(
     `
-      INSERT INTO users (id, provider, authRole, name, email, password)
-      VALUES (?,?,?,?,?,?)
+      INSERT INTO users (id, provider, name, email, password)
+      VALUES (?,?,?,?,?)
     `,
-    [userId, authProvider.NATIVE, role, name, email, password]
+    [userId, authProvider.NATIVE, name, email, password]
   );
   // console.log("newNativeUser:" + JSON.stringify(rows));
   return await getUser(conn, userId);
 }
-async function newLineUser(
-  conn,
-  lineId,
-  name,
-  email,
-  password,
-  isAdmin = false,
-  id = 0
-) {
+async function newLineUser(conn, lineId, name, email, picture, id = 0) {
   const userId = id == 0 ? getUTCTime() : id;
-  const role = isAdmin ? authRole.ADMIN : authRole.USER;
   const [rows] = await conn.query(
     `
-      INSERT INTO users (id, lineId, provider, authRole, name, email, password)
-      VALUES (?,?,?,?,?,?,?)
+      INSERT INTO users (id, lineId, provider, authRole, name, email, password, picture)
+      VALUES (?,?,?,?,?,?,?,?)
     `,
-    [userId, lineId, authProvider.LINE, role, name, email, password]
+    [userId, lineId, authProvider.LINE, authRole.USER, name, email, "", picture]
   );
   // console.log("newLineUser:" + JSON.stringify(rows));
   return await getUser(conn, userId);
@@ -53,6 +36,16 @@ async function getUser(conn, id) {
   return rows[0];
 }
 async function getUserByEmail(conn, email) {
+  const [rows] = await conn.query(
+    `
+      SELECT * FROM users where email = ?
+    `,
+    [email]
+  );
+  // console.log("getUserByEmail:" + JSON.stringify(rows[0]));
+  return rows[0];
+}
+async function getUserInfo(conn, id) {
   const [rows] = await conn.query(
     `
       SELECT 
@@ -73,11 +66,11 @@ async function getUserByEmail(conn, email) {
         FROM users u
         JOIN follows f ON u.id = f.userId
         JOIN babys b ON f.babyId = b.id
-        WHERE u.email = ?;
+        WHERE u.id = ?;
     `,
-    [email]
+    [id]
   );
-  // console.log("getUserByEmail:" + JSON.stringify(rows[0]));
+  // console.log("getUserInfo:" + JSON.stringify(rows[0]));
   return rows[0];
 }
 async function setUserFollowBaby(conn, userId, babyId, babyRole, relation) {
@@ -97,5 +90,6 @@ module.exports = {
   newLineUser,
   getUser,
   getUserByEmail,
+  getUserInfo,
   setUserFollowBaby
 };

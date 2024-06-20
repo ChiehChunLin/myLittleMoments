@@ -25,22 +25,22 @@
     </div>
     <br />
     <div class="sign-group">
-      <label for="inputPassword">Password：</label>
+      <label for="inputSignupPassword">Password：</label>
       <input
         class="sign-control"
         type="password"
-        id="inputPassword"
-        placeholder="Must Contain LowerCase and Numbers"
+        id="inputSignupPassword"
+        placeholder="strong password required"
         name="password"
         required
       />
       <div class="showPwBox">
-        <input id="showPw" type="checkbox" onclick="myFunction()" />
+        <input id="showPw" type="checkbox" onclick="mySignupPwFunction()" />
         <label for="showPw" style="font-size: 1rem">Show Password</label>
       </div>
       <script>
-        function myFunction() {
-          var pw = document.getElementById("inputPassword");
+        function mySignupPwFunction() {
+          var pw = document.getElementById("inputSignupPassword");
           if (pw.type == "password") {
             pw.type = "text";
           } else {

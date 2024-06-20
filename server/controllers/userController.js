@@ -1,15 +1,29 @@
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 const axios = require("axios");
 const qs = require("qs");
 const conn = require("../database/connDB");
 const userDB = require("../database/userDB");
+const auth = require("../middlewares/authHandler");
 
 const homeRender = async (req, res, next) => {
   try {
-    res.status(200).send("Hello");
-    // res.status(200).redirect("/login");
+    // res.status(200).send("Hello");
+    res.status(200).redirect("/login");
   } catch (error) {
     next(error);
   }
+};
+const userCheckAuth = async (req, res, next) => {
+  if (req.session.accessToken) {
+    const user = req.user;
+    const accessJwtToken = req.session.accessToken;
+    const accessExpired = req.session.cookie.maxAge / 1000;
+    return res
+      .status(200)
+      .send({ accessJwtToken, accessExpired, user, message: undefined });
+  }
+  return res.status(401).send({ message: "Please Login to continue." });
 };
 const lineCallback = async (req, res, next) => {
   const { code } = req.query;
@@ -35,21 +49,35 @@ const lineCallback = async (req, res, next) => {
       }
     );
     const { access_token } = tokenResponse.data;
-
-    // Use the access token to get user profile information
     const profileResponse = await axios.get("https://api.line.me/v2/profile", {
       headers: {
         Authorization: `Bearer ${access_token}`
       }
     });
-
-    const profile = profileResponse.data;
     // {
     //   userId: 'U9acc24aec8497b5e7159c861f9079b71',
     //   displayName: '林潔君',
     //   pictureUrl: 'https://profile.line-scdn.net/0hOFa5F3OkEGlMTAVAkk5uFjwcEwNvPUl7Mn1aXSkZSVBzfAM-MChWXH5NHFBxKVFqZyoIXS1KTl1AX2cPUhrsXUt8TVhweFA6Yytciw'
     // }
-    res.json(profile);
+    const profile = profileResponse.data;
+    const user = await userDB.getUserByEmail(conn, profile.userId);
+    console.log("%j", user);
+    if (user == undefined) {
+      const user = await userDB.newLineUser(
+        conn,
+        profile.userId,
+        profile.displayName,
+        profile.userId,
+        profile.pictureUrl
+      );
+      console.log(`${profile.displayName} register successfully`);
+      const { accessJwtToken, accessExpired } = auth.authJwtSign(user);
+      req.user = user;
+      req.session.accessToken = accessJwtToken;
+      req.session.cookie.maxAge = accessExpired * 1000;
+      res.cookie("accessToken", accessJwtToken);
+    }
+    return res.status(200).redirect("/admin/timeline");
   } catch (error) {
     res
       .status(500)
@@ -58,42 +86,116 @@ const lineCallback = async (req, res, next) => {
 };
 const loginRender = async (req, res, next) => {
   try {
-    res.status(200).render("login");
+    res.status(200).render("login", { message: undefined });
   } catch (error) {
     next(error);
   }
 };
 const loginController = async (req, res, next) => {
   try {
-    res.status(200).send({
-      access_token,
-      access_expired,
-      user,
-      message
-    });
+    const { email, password } = req.body;
+    const user = await userDB.getUserByEmail(conn, email);
+    if (!user) {
+      return res.status(403).send({ message: "User account doesn't exit!" });
+    }
+    const match = await bcrypt.compare(password, user.password);
+    if (match) {
+      const { accessJwtToken, accessExpired } = auth.authJwtSign(user);
+      req.session.accessToken = accessJwtToken;
+      res.cookie("accessToken", accessJwtToken);
+      req.session.cookie.maxAge = accessExpired * 1000;
+
+      return res.status(200).send({
+        accessJwtToken,
+        accessExpired,
+        user,
+        message: ""
+      });
+    } else {
+      const message = "Wrong email or password!";
+      return res.status(403).send({ message });
+    }
   } catch (error) {
     next(error);
   }
 };
 const signupController = async (req, res, next) => {
   try {
-    res.status(200).send({
-      access_token,
-      access_expired,
-      user,
-      message
-    });
+    const { name, email, password } = req.body;
+
+    const messagePW = verificationOfPassword(password);
+    if (messagePW != undefined) {
+      req.flash("message", messagePW);
+      return res.status(403).send(messagePW);
+    }
+    const messageEmail = verificationOfEmail(email);
+    if (messageEmail != undefined) {
+      req.flash("message", messageEmail);
+      return res.status(400).send(messageEmail);
+    }
+    const user = await userDB.getUserByEmail(conn, email);
+    if (user != undefined) {
+      console.log("signup user duplicated:" + JSON.stringify(user));
+      return res
+        .status(403)
+        .send({ message: "Email has already been registered." });
+    } else {
+      const passwordHash = await bcrypt.hash(password, saltRounds); //length:60
+      const user = await userDB.newNativeUser(conn, name, email, passwordHash);
+      const { accessJwtToken, accessExpired } = auth.authJwtSign(user);
+      req.session.accessToken = accessJwtToken;
+      req.session.cookie.maxAge = accessExpired * 1000;
+      res.cookie("accessToken", accessJwtToken);
+      res.status(200).send({
+        accessJwtToken,
+        accessExpired,
+        user,
+        message: ""
+      });
+    }
   } catch (error) {
     next(error);
   }
 };
 const logoutController = async (req, res, next) => {
   try {
-    res.status(200).render("/login");
+    //clear cache
+    res.clearCookie("accessToken");
+    res.status(200).render("/login", { message: "Logout successfully!" });
   } catch (error) {
     next(error);
   }
 };
+//---------------------------------
+//------      Functions -----------
+//---------------------------------
+function verificationOfPassword(password) {
+  //Check Complexity Of Password
+  if (password.length < 8) {
+    return "password should be at least 8 characters.";
+  }
+  // else if (!/[A-Z]/.test(password)) {
+  //   return "password should be at least one UpperCase";
+  // }
+  else if (!/[a-z]/.test(password)) {
+    return "password should be at least one LowerCase";
+  } else if (!/\d/.test(password)) {
+    return "password should be at least one Number";
+  } else {
+    return undefined;
+  }
+  // } else if (!/\W/.test(password)) {
+  //   return "password should be at least non-alphas"; //特殊符號
+  // }
+}
+function verificationOfEmail(email) {
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailPattern.test(email)) {
+    return "email without domain address.";
+  } else {
+    return undefined;
+  }
+}
 
 module.exports = {
   homeRender,
@@ -101,5 +203,6 @@ module.exports = {
   loginRender,
   loginController,
   signupController,
-  logoutController
+  logoutController,
+  userCheckAuth
 };

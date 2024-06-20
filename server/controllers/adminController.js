@@ -23,8 +23,9 @@ const testS3Controller = async (req, res, next) => {
 const testTimelineController = async (req, res, next) => {
   try {
     //after login, redirect to "/timeline" and display
-    const userData = await userDB.getUserByEmail(conn, userEmail);
-    const follows = userData.follows;
+    const userData = await userDB.getUserInfo(conn, userId);
+    console.log(userData);
+    const follows = userData.follows == null ? [] : userData.follows;
     follows.map((babyData) => {
       babyData.headshot = getImageCDN(babyData.headshot);
     });
