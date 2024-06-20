@@ -143,3 +143,14 @@ if (window.location.href.includes("/timeline")) {
     });
   });
 }
+
+function fetchDailyData(babyId) {
+  const config = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ provider, name, email, password })
+  };
+  loginFetch("/signup", config);
+}

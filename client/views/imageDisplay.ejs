@@ -1,11 +1,24 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
+  <head>
+    <%- include ("partials/head") %>
+    <title>myLittleMoments | Timeline</title>
+    <script defer src="/public/js/chartService.js"></script>
+  </head>
   <body>
-    <main>
-      <h3 style="font-size: 2rem">Welcome to myLineBot!</h3>
-      <div class="main-content">
-        <img src="<%=imgUrl%>" alt="s3Image" />
-      </div>
-    </main>
+    <h3 style="font-size: 2rem">Welcome to myLineBot!</h3>
+    <div class="main-content">
+      <img
+        src="/public/images/Logo.png"
+        alt="s3Image"
+        style="width: 300px; height: 300px"
+      />
+    </div>
+    <div>
+      <div id="babyActivityChart"></div>
+      <div id="babyGrowthLength"></div>
+      <div id="babyGrowthWeight"></div>
+    </div>
   </body>
+  <script></script>
 </html>

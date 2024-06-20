@@ -1,6 +1,11 @@
+<!-- input: text array  -->
+<% for(let i=textData.length - 1; i >= 0; i--){ %>
 <div class="post card my-3">
   <div class="card-body">
-    <p class="post-time">Posted on June 14, 2024</p>
-    <img src="post-image1.jpg" alt="Post Image 1" class="img-fluid" />
+    <p class="post-time">Posted on <%= textData[i].date %></p>
+    <% for(let j=0; j< textData[i].texts.length; j++){ %>
+    <p class="txt-fluid"><%=textData[i].texts[j]%></p>
+    <% }%>
   </div>
 </div>
+<% }%>

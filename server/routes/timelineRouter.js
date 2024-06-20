@@ -1,6 +1,8 @@
 const router = require("express").Router();
-const { testS3Controller } = require("../controllers/adminController");
+const timeline = require("../controllers/timelineController");
 
-router.get("/s3", testS3Controller);
+router.get("/s3", timeline.timelineController);
+router.post("/image", timeline.imageController);
+router.post("/health", timeline.healthController);
 
 module.exports = router;

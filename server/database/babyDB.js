@@ -44,9 +44,24 @@ async function getBabyDailyWeek(conn, babyId, date) {
   const week = getWeekNumberByDate(date);
   const [rows] = await conn.query(
     `
-      SELECT * FROM babyDaily 
-      WHERE babyId = ? AND week = ?
-      AND activity <> ${babyActivity.HEIGHT} AND activity <> ${babyActivity.WEIGHT}
+      SELECT 
+        DATE(timestamp) AS date,
+        SUM(CASE WHEN activity = '${babyActivity.MILK}' THEN quantity ELSE 0 END) AS dailyMilk,
+        SUM(CASE WHEN activity = '${babyActivity.FOOD}' THEN quantity ELSE 0 END) AS dailyFood,
+        SUM(CASE WHEN activity = '${babyActivity.SLEEP}' THEN quantity ELSE 0 END) AS dailySleep,
+        SUM(CASE WHEN activity = '${babyActivity.MEDICINE}' THEN quantity ELSE 0 END) AS dailyMedicine,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'starttime', timestamp,
+                'activity', activity,
+                'quantity', quantity
+            )
+        ) AS daily
+      FROM babyDaily
+      WHERE babyId = ? AND week = ? 
+            AND  activity != '${babyActivity.HEIGHT}' AND activity != '${babyActivity.WEIGHT}'           
+      GROUP BY DATE(timestamp)
+      ORDER BY DATE(timestamp) ASC;
     `,
     [babyId, week]
   );
@@ -56,24 +71,64 @@ async function getBabyDailyWeek(conn, babyId, date) {
 async function getBabyWeightData(conn, babyId) {
   const [rows] = await conn.query(
     `
-      SELECT quantity, timestamp FROM babyDaily 
-      WHERE babyId = ? AND activity = ${babyActivity.WEIGHT}
+      SELECT
+        b.name,
+        b.gender,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                '${babyActivity.WEIGHT}', ROUND(ordered_bd.quantity, 1),
+                'age', ROUND(DATEDIFF(ordered_bd.timestamp, b.birthday) / 30.41, 1)
+            )
+        ) AS ${babyActivity.WEIGHT}s
+      FROM
+        babys b
+      JOIN (
+        SELECT *,
+              ROUND(DATEDIFF(timestamp, (SELECT birthday FROM babys WHERE id = ?)) / 30.41, 1) AS calculated_age
+        FROM babyDaily
+        WHERE babyId = ? AND activity = '${babyActivity.WEIGHT}'
+        ORDER BY calculated_age
+      ) ordered_bd ON b.id = ordered_bd.babyId
+      WHERE
+        b.id = ?
+      GROUP BY
+        b.name, b.gender;
     `,
-    [babyId]
+    [babyId, babyId, babyId]
   );
-  // console.log("getBabyWeightData:" + JSON.stringify(rows));
-  return rows;
+  // console.log("getBabyWeightData:" + JSON.stringify(rows[0]));
+  return rows[0];
 }
 async function getBabyHeightData(conn, babyId) {
   const [rows] = await conn.query(
     `
-      SELECT quantity, timestamp FROM babyDaily 
-      WHERE babyId = ? AND activity = ${babyActivity.HEIGHT}
+      SELECT
+        b.name,
+        b.gender,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                '${babyActivity.HEIGHT}', ROUND(ordered_bd.quantity, 1),
+                'age', ROUND(DATEDIFF(ordered_bd.timestamp, b.birthday) / 30.41, 1)
+            )
+        ) AS ${babyActivity.HEIGHT}s
+      FROM
+        babys b
+      JOIN (
+        SELECT *,
+              ROUND(DATEDIFF(timestamp, (SELECT birthday FROM babys WHERE id = ?)) / 30.41, 1) AS calculated_age
+        FROM babyDaily
+        WHERE babyId = ? AND activity = '${babyActivity.HEIGHT}'
+        ORDER BY calculated_age
+      ) ordered_bd ON b.id = ordered_bd.babyId
+      WHERE
+        b.id = ?
+      GROUP BY
+        b.name, b.gender;
     `,
-    [babyId]
+    [babyId, babyId, babyId]
   );
-  // console.log("getBabyHeightData:" + JSON.stringify(rows));
-  return rows;
+  // console.log("getBabyHeightData:" + JSON.stringify(rows[0]));
+  return rows[0];
 }
 module.exports = {
   newBaby,

@@ -17,11 +17,16 @@
           <%- include ("partials/babyNav") %>
 
           <div class="posts" id="postsContainer">
-            <% if(data) { %>
-            <!-- data: date, images, urls -->
-            <%- include ("partials/babyImageBlock", { data }) %>
-            <!-- imageBlock for display -->
-            <% }%>
+            <%- include ("partials/babyImageBlock", { imageData }) %>
+          </div>
+          <div class="posts" id="diaryContainer">
+            <%- include ("partials/babyTextBlock", { textData }) %>
+          </div>
+          <div class="tags" id="tagContainer">
+            <%- include ("partials/babyTextBlock", { tagData }) %>
+          </div>
+          <div class="charts" id="healthContainer">
+            <%- include ("partials/babyHealthBlock") %>
           </div>
         </div>
         <%- include ("partials/babyAgeTree") %>

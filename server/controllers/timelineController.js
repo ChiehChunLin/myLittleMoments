@@ -1,9 +1,12 @@
+const moment = require("moment");
 const conn = require("../database/connDB");
 const userDB = require("../database/userDB");
 const babyDB = require("../database/babyDB");
 const imageDB = require("../database/imageDB");
 const { getDateDifference } = require("../utils/getFormattedDate");
 const { getImageCDN } = require("../utils/getCdnFile");
+const babyConst = require("../utils/getBabyConst");
+const babyFakeData = require("../utils/babyDailyData");
 
 const timelineController = async (req, res, next) => {
   try {
@@ -37,4 +40,44 @@ const timelineController = async (req, res, next) => {
     next(error);
   }
 };
-module.exports = { timelineController };
+const imageController = async (req, res, next) => {
+  const { babyId, date } = req.body;
+};
+const textController = async (req, res, next) => {
+  const { babyId, date } = req.body;
+};
+const tagController = async (req, res, next) => {
+  const { babyId } = req.body;
+};
+const healthController = async (req, res, next) => {
+  const { babyId, date } = req.body;
+  const weightData = await babyDB.getBabyWeightData(conn, babyId);
+  const heightData = await babyDB.getBabyHeightData(conn, babyId);
+  const dailys = await babyDB.getBabyDailyWeek(conn, babyId, date);
+
+  dailys.map((date) => {
+    date.daily.map((activity) => {
+      if (activity.activity == babyConst.babyActivity.SLEEP) {
+        const hours = activity.quantity;
+        date.daily.endtime = moment(activity.starttime).add(
+          moment.duration(hours, "hours")
+        );
+        date.daily.unit = babyConst.babyActivityUnit[activity.activity];
+      } else {
+        date.daily.endtime = moment(activity.starttime).add(
+          moment.duration(1, "hours")
+        );
+        date.daily.unit = babyConst.babyActivityUnit[activity.activity];
+      }
+    });
+  });
+  const dailyData = babyFakeData;
+  res.status(200).send({ dailyData, weightData, heightData });
+};
+module.exports = {
+  timelineController,
+  healthController,
+  imageController,
+  textController,
+  tagController
+};

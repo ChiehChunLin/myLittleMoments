@@ -23,4 +23,70 @@ if (window.location.href.includes("/login")) {
     $(".login-div").removeClass("formShow").addClass("formHide");
     $(".signup-div").removeClass("formHide").addClass("formShow");
   });
+
+  $("#loginForm").submit(function (e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const provider = authProvider.NATIVE;
+    const name = undefined;
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    const config = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ provider, name, email, password })
+    };
+    loginFetch("/login", config);
+  });
+  $("#signupForm").submit(function (e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const provider = authProvider.NATIVE;
+    const name = formData.get("name");
+    const email = formData.get("email");
+    const password = formData.get("password");
+    console.log(provider);
+    //用function 包起來會出現，TypeError: NetworkError when attempting to fetch resource.
+    // signinFetch("/user/signup", provider, email, password);
+    const config = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ provider, name, email, password })
+    };
+    loginFetch("/signup", config);
+  });
+}
+function loginFetch(url, config) {
+  fetch(url, config)
+    .then(checkStatus)
+    .then(checkResponse)
+    .then((data) => {
+      if (data) {
+        const { access_token, access_expired, user, shoppingCount, message } =
+          data;
+        // console.log("data:" + JSON.stringify(user));
+
+        if (access_token && user) {
+          localStorage.setItem("accessToken", access_token);
+          displayLoginUserInfo(user.name, user.email, user.picture);
+          displayShoppingCount(shoppingCount);
+          displayTempMessage("Login Successfully.");
+        } else {
+          if (message) {
+            displayTempMessage(message);
+          }
+          console.error("Login failed:", data);
+          throw new Error("Something went wrong with login authentication");
+        }
+      }
+    })
+    .catch((err) => {
+      displayTempMessage(err);
+      console.error("fetch error:", err);
+    });
 }

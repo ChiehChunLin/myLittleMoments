@@ -4,6 +4,11 @@ const babyDB = require("../database/babyDB");
 const imageDB = require("../database/imageDB");
 const { getDateDifference } = require("../utils/getFormattedDate");
 const { getImageCDN } = require("../utils/getCdnFile");
+const dailyData = require("../utils/babyDailyData");
+
+const userId = 657590400000;
+const userEmail = "justme11012@gmail.com";
+const babyId = 1682294400000;
 
 const testS3Controller = async (req, res, next) => {
   try {
@@ -18,10 +23,6 @@ const testS3Controller = async (req, res, next) => {
 const testTimelineController = async (req, res, next) => {
   try {
     //after login, redirect to "/timeline" and display
-    const userId = 657590400000;
-    const userEmail = "justme11012@gmail.com";
-    const babyId = 1682294400000;
-
     const userData = await userDB.getUserByEmail(conn, userEmail);
     const follows = userData.follows;
     follows.map((babyData) => {
@@ -34,18 +35,31 @@ const testTimelineController = async (req, res, next) => {
     babyData.cover = getImageCDN(babyData.cover);
     babyData.followsCount = follows.length;
 
-    const data = await imageDB.getImageByMonth(conn, babyId, "2024-06-01");
-    data.map((dateData) => {
-      const urls = dateData.images.map((image) => {
-        return getImageCDN(`${babyId}/${image}`);
+    const imageData = await imageDB.getImageByMonth(conn, babyId, "2024-06-01");
+    imageData.map((dateData) => {
+      dateData.images.map((image) => {
+        image.filename = getImageCDN(`${babyId}/${image.filename}`);
       });
-      dateData.images = urls;
     });
+
     // res.status(200).send({ data });
-    res.status(200).render("timeline", { follows, babyData, data });
+    res.status(200).render("timeline", {
+      follows,
+      babyData,
+      imageData,
+      textData: [],
+      tagData: []
+    });
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = { testS3Controller, testTimelineController };
+const testDailyPlot = async (req, res, next) => {
+  const weights = await babyDB.getBabyWeightData(conn, babyId);
+  const heights = await babyDB.getBabyHeightData(conn, babyId);
+
+  res.send(weights);
+  // res.status(200).render("imageDisplay");
+};
+module.exports = { testS3Controller, testTimelineController, testDailyPlot };

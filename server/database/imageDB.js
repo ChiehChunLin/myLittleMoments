@@ -30,15 +30,21 @@ async function getImageByMonth(conn, babyId, date) {
     `
       SELECT
         DATE_FORMAT(date, '%Y-%m-%d') as date,
-        JSON_ARRAYAGG(filename) as images
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'filename', filename,
+                'type', type
+            )
+        ) as images
       FROM (
         SELECT
           DATE(timestamp) as date,
-          filename
+          filename,
+          type
         FROM
           images
         WHERE
-          babyId = 1682294400000 AND timestamp BETWEEN '2024-06-01' AND '2024-07-01'
+          babyId = ? AND timestamp BETWEEN ? AND ?
         ORDER BY
           DATE(timestamp), timestamp
         ) as ordered_images
