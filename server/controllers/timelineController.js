@@ -3,39 +3,49 @@ const conn = require("../database/connDB");
 const userDB = require("../database/userDB");
 const babyDB = require("../database/babyDB");
 const imageDB = require("../database/imageDB");
-const { getDateDifference } = require("../utils/getFormattedDate");
-const { getImageCDN } = require("../utils/getCdnFile");
+const textDB = require("../database/textDB");
 const babyConst = require("../utils/getBabyConst");
 const babyFakeData = require("../utils/babyDailyData");
+const time = require("../utils/getFormattedDate");
+const { getImageCDN } = require("../utils/getCdnFile");
 
-const timelineController = async (req, res, next) => {
+const timelineRender = async (req, res, next) => {
   try {
     const { user } = req;
-    //after login, redirect to "/timeline" and display
-    const userId = 657590400000;
-    const userEmail = "justme11012@gmail.com";
 
-    const userData = await userDB.getUserByEmail(conn, userEmail);
+    const userData = await userDB.getUserInfo(conn, user.id);
+    if (userData.follows == null) {
+      return res.status(200).redirect("/timeline/firstFollow");
+    }
+
     const follows = userData.follows;
-    follows.map((babyData) => {
-      babyData.headshot = getImageCDN(babyData.headshot);
-    });
-    const babyId = follows[0].id;
-    const babyData = await babyDB.getBaby(conn, babyId);
-    babyData.old = getDateDifference(babyData.birthday);
+    const babyData = follows[0];
+    babyData.old = time.getDateDifference(babyData.birthday);
     babyData.headshot = getImageCDN(babyData.headshot);
     babyData.cover = getImageCDN(babyData.cover);
     babyData.followsCount = follows.length;
 
-    const data = await imageDB.getImageByMonth(conn, babyId, "2024-06-01");
-    data.map((dateData) => {
-      const urls = dateData.images.map((image) => {
-        return getImageCDN(`${babyId}/${image}`);
+    const startDate = time.getDateBefore30days();
+    const imageData = await imageDB.getImageByMonth(
+      conn,
+      babyData.id,
+      startDate
+    );
+    imageData.map((dateData) => {
+      dateData.images.map((image) => {
+        image.filename = getImageCDN(`${babyData.id}/${image.filename}`);
       });
-      dateData.images = urls;
     });
+    const textData = await textDB.getTextByMonth(conn, babyData.id, startDate);
+    console.log(textData);
     // res.status(200).send({ data });
-    res.status(200).render("timeline", { follows, babyData, data });
+    res.status(200).render("timeline", {
+      follows,
+      babyData,
+      imageData,
+      textData,
+      tagData: []
+    });
   } catch (error) {
     next(error);
   }
@@ -74,8 +84,41 @@ const healthController = async (req, res, next) => {
   const dailyData = babyFakeData;
   res.status(200).send({ dailyData, weightData, heightData });
 };
+
+const firstFollowRender = async (req, res, next) => {
+  try {
+    res.status(200).render("firstFollow");
+  } catch (error) {
+    next(error);
+  }
+};
+const firstFollowController = async (req, res, next) => {
+  try {
+    const { user } = req;
+    if (user) {
+      console.log("firstFollowController");
+      const { babyId, babyRole, relation } = req.body;
+      const followId = await userDB.setUserFollowBaby(
+        conn,
+        user.id,
+        babyId,
+        babyRole,
+        relation
+      );
+      if (followId) {
+        return res.status(200).send({ message: "Follow Successfully!" });
+      }
+    }
+    return res.status(500).send({ message: "user is not defined" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
-  timelineController,
+  firstFollowRender,
+  firstFollowController,
+  timelineRender,
   healthController,
   imageController,
   textController,

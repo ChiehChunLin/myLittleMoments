@@ -32,6 +32,9 @@ function getDateDifference(date) {
   const diffDuration = moment.duration(today.diff(dateBirth));
   return `${diffDuration.years()}Y-${diffDuration.months()}M-${diffDuration.days()}D old`;
 }
+function getDateBefore30days() {
+  return moment().subtract(30, "d").format("YYYY-MM-DD");
+}
 module.exports = {
   getUTCTime,
   getFormattedDate,
@@ -39,5 +42,6 @@ module.exports = {
   getLogTimeFormat,
   getCalendarDate,
   getWeekNumberByDate,
-  getDateDifference
+  getDateDifference,
+  getDateBefore30days
 };

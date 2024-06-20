@@ -58,7 +58,9 @@ async function getUserInfo(conn, id) {
         JSON_ARRAYAGG(
             JSON_OBJECT(
                 'id', b.id,
+                'birthday', b.birthday,
                 'name', b.name,
+                'cover', b.cover,
                 'headshot', b.headshot,
                 'userRole', f.babyRole
             )

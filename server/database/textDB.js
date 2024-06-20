@@ -17,9 +17,13 @@ async function getTextByMonth(conn, babyId, date) {
   const addMonth = moment(date).add(1, "M").format("YYYY-MM-DD");
   const [rows] = await conn.query(
     `
-     SELECT * FROM texts 
-     WHERE babyId = ? AND timestamp >= ? AND timestamp <= ?
-     ORDER BY timestamp DESC
+     SELECT 
+        id,
+        content,
+        DATE_FORMAT(timestamp, '%Y-%m-%d') AS date
+     FROM texts 
+     WHERE babyId = ? AND timestamp BETWEEN ? AND ?
+     ORDER BY timestamp ASC;
     `,
     [babyId, `${date} 00:00:00`, `${addMonth} 00:00:00`]
   );

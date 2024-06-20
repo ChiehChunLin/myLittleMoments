@@ -61,7 +61,7 @@ const lineCallback = async (req, res, next) => {
     // }
     const profile = profileResponse.data;
     const user = await userDB.getUserByEmail(conn, profile.userId);
-    console.log("%j", user);
+    // console.log("%j", user);
     if (user == undefined) {
       const user = await userDB.newLineUser(
         conn,
@@ -71,13 +71,14 @@ const lineCallback = async (req, res, next) => {
         profile.pictureUrl
       );
       console.log(`${profile.displayName} register successfully`);
-      const { accessJwtToken, accessExpired } = auth.authJwtSign(user);
-      req.user = user;
-      req.session.accessToken = accessJwtToken;
-      req.session.cookie.maxAge = accessExpired * 1000;
-      res.cookie("accessToken", accessJwtToken);
     }
-    return res.status(200).redirect("/admin/timeline");
+    const { accessJwtToken, accessExpired } = auth.authJwtSign(user);
+    req.user = user;
+    req.session.accessToken = accessJwtToken;
+    req.session.cookie.maxAge = accessExpired * 1000;
+    res.cookie("accessToken", accessJwtToken);
+
+    return res.status(200).redirect("/timeline");
   } catch (error) {
     res
       .status(500)
@@ -160,8 +161,9 @@ const signupController = async (req, res, next) => {
 const logoutController = async (req, res, next) => {
   try {
     //clear cache
+    req.session.accessToken = null;
     res.clearCookie("accessToken");
-    res.status(200).render("/login", { message: "Logout successfully!" });
+    res.status(200).redirect("/login");
   } catch (error) {
     next(error);
   }
@@ -199,10 +201,10 @@ function verificationOfEmail(email) {
 
 module.exports = {
   homeRender,
+  userCheckAuth,
   lineCallback,
   loginRender,
   loginController,
   signupController,
-  logoutController,
-  userCheckAuth
+  logoutController
 };

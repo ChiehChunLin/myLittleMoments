@@ -7,10 +7,11 @@ const ejs = require("ejs");
 const path = require("path");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
-const { errorHandler } = require("./middlewares/errorHandler");
 const userRoute = require("./routes/userRouter");
 const adminRoute = require("./routes/adminRouter");
 const timelineRoute = require("./routes/timelineRouter");
+const auth = require("./middlewares/authHandler");
+const { errorHandler } = require("./middlewares/errorHandler");
 
 app.set("views", path.join(path.dirname(__dirname), "/client/views"));
 app.set("view engine", "ejs");
@@ -32,8 +33,8 @@ app.use(
 );
 
 app.use("/", userRoute);
-app.use("/admin", adminRoute);
-app.use("/timeline", timelineRoute);
+app.use("/timeline", auth.authJwtCheckLogin, timelineRoute);
+app.use("/admin", auth.authJwtCheckLogin, auth.authAdminCheck, adminRoute);
 app.use("/public", express.static("../client"));
 
 // app.use(errorHandler);
@@ -49,14 +50,14 @@ app.listen(port, () => {
   console.log(`Server is listening on ${port}`);
 });
 
-function handle(code) {
-  console.log(`${code} signal received: closing HTTP server`);
-  server.close(() => {
-    console.debug("HTTP server closed");
-  });
-}
+// function handle(code) {
+//   console.log(`${code} signal received: closing HTTP server`);
+//   server.close(() => {
+//     console.debug("HTTP server closed");
+//   });
+// }
 
-process.on("SIGTERM", handle);
-process.on("SIGINT", handle);
+// process.on("SIGTERM", handle);
+// process.on("SIGINT", handle);
 
 module.exports = app;

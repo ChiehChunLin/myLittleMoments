@@ -66,6 +66,8 @@ async function createFollowTable() {
                 \`babyId\` BIGINT UNSIGNED NOT NULL COMMENT 'Baby id',
                 \`babyRole\` VARCHAR(255) NOT NULL COMMENT 'Baby role',
                 \`relation\` VARCHAR(255) NOT NULL COMMENT 'Baby relation',
+                FOREIGN KEY (userId) REFERENCES users(id),
+                FOREIGN KEY (babyId) REFERENCES babys(id),
                 UNIQUE KEY (userId, babyId)
               );`
   );
@@ -84,6 +86,8 @@ async function createImageTable() {
                   \`type\` VARCHAR(255) NOT NULL DEFAULT 'image' COMMENT 'Image type',
                   \`filename\` VARCHAR(255) NOT NULL COMMENT 'Image full filename',
                   \`timestamp\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Image date in S3',
+                  FOREIGN KEY (userId) REFERENCES users(id),
+                  FOREIGN KEY (babyId) REFERENCES babys(id),
                   UNIQUE KEY (babyId, filename)
                 );`
   );
@@ -93,13 +97,17 @@ async function createImageTable() {
 }
 async function createTextTable() {
   const textTable = await pool.query(
-    `CREATE TABLE IF NOT EXISTS \`texts\` (
+    `
+      CREATE TABLE IF NOT EXISTS \`texts\` (
                   \`id\` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT 'Text id',
                   \`userId\` BIGINT UNSIGNED NOT NULL COMMENT 'User id',
                   \`babyId\` BIGINT UNSIGNED NOT NULL COMMENT 'Baby id',
                   \`content\` TEXT NOT NULL COMMENT 'Text content',
                   \`timestamp\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Text date'
-                );`
+                  FOREIGN KEY (userId) REFERENCES users(id),
+                  FOREIGN KEY (babyId) REFERENCES babys(id)
+                );
+    `
   );
   if (textTable) {
     return "textTable ok";
@@ -107,7 +115,8 @@ async function createTextTable() {
 }
 async function createBabyDailyTable() {
   const babyDailyTable = await pool.query(
-    `CREATE TABLE IF NOT EXISTS \`babyDaily\` (
+    `
+      CREATE TABLE IF NOT EXISTS \`babyDaily\` (
                   \`id\` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT 'Text id',
                   \`userId\` BIGINT UNSIGNED NOT NULL COMMENT 'User id',
                   \`babyId\` BIGINT UNSIGNED NOT NULL COMMENT 'Baby id',
@@ -115,7 +124,10 @@ async function createBabyDailyTable() {
                   \`activity\` VARCHAR(255) NOT NULL COMMENT 'Baby activity',
                   \`quantity\` FLOAT NOT NULL COMMENT 'Baby quantity',
                   \`timestamp\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Living date'
-                );`
+                  FOREIGN KEY (userId) REFERENCES users(id),
+                  FOREIGN KEY (babyId) REFERENCES babys(id)
+                );
+    `
   );
   if (babyDailyTable) {
     return "babyDailyTable ok";

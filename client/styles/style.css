@@ -47,7 +47,17 @@ main {
   justify-content: center;
   align-items: center;
 }
-
+/* ===  Hide Input Number Arrows ================
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
 /* ================================= 
                 Login
 ==================================== */
@@ -77,12 +87,14 @@ main {
   padding: 0 2rem;
   margin: auto 2rem;
 }
-.home-col2 {
+.home-col2,
+.home-col3 {
   width: 50%;
   height: auto;
   text-align: center;
   margin: auto 5rem;
 }
+
 .fromGroup {
   border-radius: 0.5rem;
   border: 1px solid lightgray;

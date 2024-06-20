@@ -24,7 +24,7 @@ const testTimelineController = async (req, res, next) => {
   try {
     //after login, redirect to "/timeline" and display
     const userData = await userDB.getUserInfo(conn, userId);
-    console.log(userData);
+
     const follows = userData.follows == null ? [] : userData.follows;
     follows.map((babyData) => {
       babyData.headshot = getImageCDN(babyData.headshot);
@@ -57,10 +57,6 @@ const testTimelineController = async (req, res, next) => {
 };
 
 const testDailyPlot = async (req, res, next) => {
-  const weights = await babyDB.getBabyWeightData(conn, babyId);
-  const heights = await babyDB.getBabyHeightData(conn, babyId);
-
-  res.send(weights);
-  // res.status(200).render("imageDisplay");
+  res.status(200).render("firstFollow");
 };
 module.exports = { testS3Controller, testTimelineController, testDailyPlot };

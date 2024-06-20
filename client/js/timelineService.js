@@ -1,5 +1,29 @@
 if (window.location.href.includes("/timeline")) {
-  document.addEventListener("DOMContentLoaded", function () {
+  $("#firstFollowForm").submit(function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const babyRole = formData.get("babyRole");
+    const relation = formData.get("call");
+    const babyId = formData.get("babyId");
+
+    const checkAuth = userCheckAuth();
+    if (checkAuth) {
+      const config = {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache" // without this config, the page return "304 Not Modified"
+        },
+        body: JSON.stringify({ babyId, babyRole, relation })
+      };
+      userFolowFetch("/timeline/firstFollow", config);
+      window.location.href = "/timeline";
+    }
+  });
+
+  if (!window.location.href.includes("/firstFollow")) {
     const friends = [
       {
         id: 1,
@@ -141,9 +165,28 @@ if (window.location.href.includes("/timeline")) {
         this.classList.toggle("active");
       });
     });
-  });
+  }
 }
 
+function userCheckAuth() {
+  if (localStorage.getItem("accessToken") === null) {
+    const accessJwtToken = document.cookie.split("accessToken=")[1];
+    localStorage.setItem("accessToken", accessJwtToken);
+  }
+  return true;
+}
+function userFolowFetch(url, config = "") {
+  fetch(url, config)
+    .then((res) => res.json())
+    .then((data) => {
+      const { message } = data;
+      displayLoginMessage(message);
+    })
+    .catch((err) => {
+      displayLoginMessage(err.message);
+      console.error(err);
+    });
+}
 function fetchDailyData(babyId) {
   const config = {
     method: "POST",

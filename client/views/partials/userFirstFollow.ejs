@@ -1,0 +1,43 @@
+<div class="firstFollow-div">
+  <form id="firstFollowForm">
+    <div class="sign-group">
+        <label for="inputRole">關係</label>
+        <select
+        class="sign-control"
+          id="inputRole"
+          name="babyRole"
+        />
+            <option value="manager">父母</option>
+            <option value="family">家人</option>
+            <option value="fans">粉絲</option>
+        </select>
+    </div>
+    <br />
+    <div class="sign-group">
+      <label for="inputCall">稱呼
+    </label>
+      <input
+        class="sign-control"
+        type="text"
+        id="inputCall"
+        placeholder="寶寶怎麼稱呼您?"
+        name="call"
+        required
+      />
+    </div>
+    <br />
+    <div class="sign-group">
+      <label for="inputBabyId">寶寶代碼</label>
+      <input
+        class="sign-control"
+        type="number"
+        id="inputBabyId"
+        placeholder="請輸入寶寶代碼"
+        name="babyId"
+        required
+      />
+    </div>
+    <br />
+    <button type="submit" class="sign-btn sign-btn-primary">Follow</button>
+  </form>
+</div>

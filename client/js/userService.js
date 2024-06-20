@@ -1,3 +1,8 @@
+$(".logout").on("click", function (e) {
+  localStorage.removeItem("accessToken");
+  displayLoginMessage("Logout Successfully!");
+});
+
 if (window.location.href.includes("/login")) {
   $("#lineBtn").on("click", function (e) {
     const LINE_CHANNEL_ID = "2005642025";
@@ -60,13 +65,6 @@ if (window.location.href.includes("/login")) {
   });
 }
 
-function userCheckAuth() {
-  if (localStorage.getItem("accessToken") === null) {
-    const url = "/authCheck";
-    userCheckinFetch(url);
-  }
-  return true;
-}
 function userCheckinFetch(url, config = "") {
   fetch(url, config)
     .then((res) => res.json())
@@ -77,9 +75,16 @@ function userCheckinFetch(url, config = "") {
 
         if (accessJwtToken && user) {
           localStorage.setItem("accessToken", accessJwtToken);
-          displayLoginMessage("Login Successfully!");
+          if (user.picture != "") {
+            const imgAccount = document.querySelector(".account");
+            if (imgAccount) {
+              imgAccount.setAttribute("src", user.picture);
+              imgAccount.setAttribute("value", user.id);
+            }
+          }
           if (url != "/authCheck") {
-            window.location.href = "/admin/timeline";
+            displayLoginMessage("Login Successfully!");
+            window.location.href = "/timeline";
           }
         } else {
           console.error("Login data failed:", data);
@@ -92,6 +97,7 @@ function userCheckinFetch(url, config = "") {
       console.error(err);
     });
 }
+
 function displayLoginMessage(message) {
   if (message) {
     const messageDiv = document.querySelector(".message");
