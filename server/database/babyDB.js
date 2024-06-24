@@ -130,11 +130,34 @@ async function getBabyHeightData(conn, babyId) {
   // console.log("getBabyHeightData:" + JSON.stringify(rows[0]));
   return rows[0];
 }
+
+async function updateBabyHeadshot(conn, babyId, headshot) {
+  const [rows] = await conn.query(
+    `
+      UPDATE babys SET headshot = ? WHERE id = ?
+    `,
+    [headshot, babyId]
+  );
+  // console.log("babyHead:" + JSON.stringify(rows[0]));
+  return rows[0];
+}
+async function updateBabyCover(conn, babyId, cover) {
+  const [rows] = await conn.query(
+    `
+      UPDATE babys SET cover = ? WHERE id = ?
+    `,
+    [cover, babyId]
+  );
+  // console.log("babyCover:" + JSON.stringify(rows[0]));
+  return rows[0];
+}
 module.exports = {
   newBaby,
   getBaby,
   setBabyDaily,
   getBabyDailyWeek,
   getBabyWeightData,
-  getBabyHeightData
+  getBabyHeightData,
+  updateBabyHeadshot,
+  updateBabyCover
 };

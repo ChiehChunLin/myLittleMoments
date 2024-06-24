@@ -1,8 +1,9 @@
 if (window.location.href.includes("/timeline")) {
-  $("#firstFollowForm").submit(function (e) {
+  $("#firstFollowForm").on("submit", function (e) {
     e.preventDefault();
-
-    const formData = new FormData(e.target);
+    console.log("click")
+    const followForm = document.getElementById("firstFollowForm");
+    const formData = new FormData(followForm);
     const babyRole = formData.get("babyRole");
     const relation = formData.get("call");
     const babyId = formData.get("babyId");
@@ -19,153 +20,101 @@ if (window.location.href.includes("/timeline")) {
         body: JSON.stringify({ babyId, babyRole, relation })
       };
       userFolowFetch("/timeline/firstFollow", config);
-      window.location.href = "/timeline";
+
+      $(".babyFollow").removeClass("divShow").addClass("divHide");
+      // window.location.href = "/timeline";
     }
   });
 
-  if (!window.location.href.includes("/firstFollow")) {
-    const friends = [
-      {
-        id: 1,
-        name: "Baby 1",
-        cover: "cover1.jpg",
-        profilePic: "profile1.jpg",
-        posts: [
-          { time: "Posted on June 14, 2024", img: "post1-1.jpg" },
-          { time: "Posted on June 13, 2024", img: "post1-2.jpg" }
-        ]
-      },
-      {
-        id: 2,
-        name: "Baby 2",
-        cover: "cover2.jpg",
-        profilePic: "profile2.jpg",
-        posts: [
-          { time: "Posted on June 14, 2024", img: "post2-1.jpg" },
-          { time: "Posted on June 13, 2024", img: "post2-2.jpg" }
-        ]
+  $("#addBabyBtn").on("click", function (e){
+    $(".babyFollow").removeClass("divHide").addClass("divShow");
+  })
+  $("#cancelBtn").on("click", function (e){
+    $(".babyFollow").removeClass("divShow").addClass("divHide");
+  })
+
+  $("#changeCoverBtn").on("click", function (e) {
+    document.getElementById("coverInput").click();
+  })
+  $("#profilePic").on("click", function (e) {
+    document.getElementById("profileInput").click();
+  })
+
+  $("#profileInput").on("change", function(e) {
+    e.preventDefault();
+
+    const file = this.files[0];
+    const babyId = document.getElementById("profilePic").getAttribute("value");
+    if (file) {
+      const formData = new FormData();     
+      formData.append("babyId", babyId);
+      formData.append("file", file);
+      formData.append("type", "profile");
+
+      console.log(formData);
+      const url = "/timeline/uploadImage";
+      const config = {
+        method: "POST",
+        body: formData,
+      };
+      userUploadFetch(url, config);
+      // $("#profileInput img").attr("src", e.target.result);
+    }
+  })    
+  $("#coverInput").on("change", function(e) {
+    e.preventDefault();
+
+    const file = this.files[0];
+    const babyId = document.getElementById("profilePic").getAttribute("value");
+    if (file) {
+      const url = "/timeline/uploadImage";
+      const config = {
+        method: "POST",
+        body: JSON.stringify({ babyId, file, type: "cover" }),
+      };
+      userUploadFetch(url, config);
+
+      // document.getElementById(
+      //   "coverPhoto"
+      // ).style.backgroundImage = `url(${e.target.result})`;
+    }      
+  })
+  
+  document.querySelectorAll('.baby-item').forEach(item => {    
+    item.addEventListener('click', function() {
+      
+      document.querySelectorAll('.babyChecked').forEach(img => {
+        $(img.closest(".baby-item")).removeClass('baby-selected');
+        img.style.display = 'none';
+      });
+
+      $(this).addClass('baby-selected');
+      const checkedImg = this.querySelector('.babyChecked');
+      if (checkedImg) {
+        checkedImg.style.display = 'block';
+
+        const babyId = checkedImg.parentElement.getAttribute("data-baby");
+        //fetch baby data and display
+        //div.post-content
       }
-      // Add more friend data here
-    ];
-
-    document.querySelectorAll(".friend-item").forEach((item) => {
-      item.addEventListener("click", function () {
-        const friendId = parseInt(this.getAttribute("data-friend"));
-        const friend = friends.find((f) => f.id === friendId);
-
-        if (friend) {
-          document.getElementById(
-            "coverPhoto"
-          ).style.backgroundImage = `url(${friend.cover})`;
-          document.getElementById("profilePic").src = friend.profilePic;
-
-          const postsContainer = document.getElementById("postsContainer");
-          postsContainer.innerHTML = "";
-
-          friend.posts.forEach((post) => {
-            const postElement = document.createElement("div");
-            postElement.className = "post card my-3";
-            postElement.innerHTML = `
-                            <div class="card-body">
-                                <p class="post-time">${post.time}</p>
-                                <img src="${post.img}" alt="Post Image" class="img-fluid">
-                            </div>
-                        `;
-            postsContainer.appendChild(postElement);
-          });
-        }
-      });
     });
+  });
 
-    document
-      .getElementById("addFriendBtn")
-      .addEventListener("click", function () {
-        const newFriendId = friends.length + 1;
-        const newFriendName = `Friend ${newFriendId}`;
-        friends.push({
-          id: newFriendId,
-          name: newFriendName,
-          cover: "default-cover.jpg",
-          profilePic: "default-profile.jpg",
-          posts: []
-        });
-
-        const newFriendItem = document.createElement("li");
-        newFriendItem.className = "list-group-item friend-item";
-        newFriendItem.setAttribute("data-friend", newFriendId);
-        newFriendItem.textContent = newFriendName;
-        newFriendItem.addEventListener("click", function () {
-          const friendId = parseInt(this.getAttribute("data-friend"));
-          const friend = friends.find((f) => f.id === friendId);
-
-          if (friend) {
-            document.getElementById(
-              "coverPhoto"
-            ).style.backgroundImage = `url(${friend.cover})`;
-            document.getElementById("profilePic").src = friend.profilePic;
-
-            const postsContainer = document.getElementById("postsContainer");
-            postsContainer.innerHTML = "";
-
-            friend.posts.forEach((post) => {
-              const postElement = document.createElement("div");
-              postElement.className = "post card my-3";
-              postElement.innerHTML = `
-                            <div class="card-body">
-                                <p class="post-time">${post.time}</p>
-                                <img src="${post.img}" alt="Post Image" class="img-fluid">
-                            </div>
-                        `;
-              postsContainer.appendChild(postElement);
-            });
-          }
-        });
-
-        document
-          .getElementById("friendList")
-          .insertBefore(newFriendItem, this.parentElement);
-      });
-
-    document
-      .getElementById("coverInput")
-      .addEventListener("change", function () {
-        const file = this.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            document.getElementById(
-              "coverPhoto"
-            ).style.backgroundImage = `url(${e.target.result})`;
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-
-    document
-      .getElementById("profileInput")
-      .addEventListener("change", function () {
-        const file = this.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            document.getElementById("profilePic").src = e.target.result;
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-
-    document
-      .getElementById("profilePic")
-      .addEventListener("click", function () {
-        document.getElementById("profileInput").click();
-      });
-
-    document.querySelectorAll(".tree-item").forEach((item) => {
-      item.addEventListener("click", function () {
-        this.classList.toggle("active");
-      });
+  document.querySelectorAll(".tree-item").forEach((item) => {
+    item.addEventListener("click", function () {
+      this.classList.toggle("active");
     });
-  }
+  });
+
+  document.querySelectorAll(".viewAll").forEach((view) => {
+    view.addEventListener("click", function (e) {
+      const date = e.target.parentElement.previousElementSibling.children[0].getAttribute("value");
+      const babyId = document.getElementById("profilePic").getAttribute("value");
+      fetchImagesToCarousel(date, babyId);
+    });
+  });
+
+ 
 }
 
 function userCheckAuth() {
@@ -180,20 +129,91 @@ function userFolowFetch(url, config = "") {
     .then((res) => res.json())
     .then((data) => {
       const { message } = data;
-      displayLoginMessage(message);
+      confirm(message);
     })
     .catch((err) => {
-      displayLoginMessage(err.message);
+      alert(err.message);
       console.error(err);
     });
 }
-function fetchDailyData(babyId) {
+function userUploadFetch(url,config ="") {
+  fetch(url, config)
+    .then((res) => res.json())
+    .then((data) => {
+      const { message } = data;
+      confirm(message);
+    })
+    .catch((err) => {
+      alert(err.message);
+      console.error(err);
+    });
+}
+
+function fetchImagesToCarousel(date, babyId){
+  const url = "/timeline/image/daily"
   const config = {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ provider, name, email, password })
+    body: JSON.stringify({ date, babyId })
   };
-  loginFetch("/signup", config);
+  fetch(url, config)
+    .then((res) => res.json())
+    .then((data) => {
+      // console.log(data);
+      const { images } = data;
+      displayImagesInCarousel(images);
+      $(".close-carousel").on("click", function(e) {
+        document.getElementById("fullscreenCarousel").remove();
+      })
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
+function displayImagesInCarousel(images){
+  let insertHTML =
+  `
+    <div id="fullscreenCarousel" class="fullscreen-carousel">
+        <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+          <div class="close-carousel">&times;</div>
+          <div class="carousel-inner">          
+  `;
+  
+  for(let i = 0 ; i< images.length; i++){
+    const active = (i==0) ? "active" : "";
+    if(images[i].type === "image")
+    {
+      insertHTML += 
+      `
+        <div class="carousel-item ${active}">
+          <img src=${images[i].filename} class="d-block w-100" alt="...">
+        </div>
+      `;
+    } else {
+      insertHTML += 
+      `
+        <div class="carousel-item ${active}">
+          <video src=${images[i].filename} type="video/mp4" class="d-block w-100" alt="..." controls></video>
+        </div>
+      `;
+    }    
+  }
+  insertHTML += 
+  `
+        </div>
+        <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+    </div>
+  `
+  const body = document.getElementsByTagName("body");
+  body[0].insertAdjacentHTML('afterbegin', insertHTML);
 }

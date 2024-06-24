@@ -2,7 +2,7 @@ const { authProvider, authRole } = require("../utils/getAuthConst");
 const { getUTCTime } = require("../utils/getFormattedDate");
 
 async function newNativeUser(conn, name, email, password, id = 0) {
-  const userId = id == 0 ? getUTCTime() : id;
+  const userId = id === 0 ? getUTCTime() : id;
   const [rows] = await conn.query(
     `
       INSERT INTO users (id, provider, name, email, password)
@@ -14,7 +14,7 @@ async function newNativeUser(conn, name, email, password, id = 0) {
   return await getUser(conn, userId);
 }
 async function newLineUser(conn, lineId, name, email, picture, id = 0) {
-  const userId = id == 0 ? getUTCTime() : id;
+  const userId = id === 0 ? getUTCTime() : id;
   const [rows] = await conn.query(
     `
       INSERT INTO users (id, lineId, provider, authRole, name, email, password, picture)
@@ -75,6 +75,15 @@ async function getUserInfo(conn, id) {
   // console.log("getUserInfo:" + JSON.stringify(rows[0]));
   return rows[0];
 }
+async function getLineUserList(conn) {
+  const [rows] = await conn.query(
+    `
+      SELECT id,lineId,name FROM users where provider = 'line'
+    `,
+  );
+  // console.log("getLineUserList:" + JSON.stringify(rows));
+  return rows;
+}
 async function setUserFollowBaby(conn, userId, babyId, babyRole, relation) {
   const [rows] = await conn.query(
     `
@@ -93,5 +102,6 @@ module.exports = {
   getUser,
   getUserByEmail,
   getUserInfo,
+  getLineUserList,
   setUserFollowBaby
 };

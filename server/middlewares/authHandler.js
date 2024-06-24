@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 const authConst = require("../utils/getAuthConst");
+const conn = require("../database/connDB")
+const userDB = require("../database/userDB");
 
 function getToken(req) {
   const authToken = req.headers["authorization"]; //"Bear " + token
@@ -27,19 +29,19 @@ async function authJwtCheckLogin(req, res, next) {
   if (!token) {
     return res.status(401).redirect("/login");
   }
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
     if (err) {
       return res
         .status(403)
         .json({ message: `User Authentication Error! ${err}` });
     }
-    req.user = user;
+    req.user = await userDB.getUser(conn, user.id);
     next();
   });
 }
 async function authAdminCheck(req, res, next) {
   const { user } = req;
-  if (!user || user.role != authConst.authRole.ADMIN) {
+  if (!user || user.authRole != authConst.authRole.ADMIN) {
     return res
       .status(403)
       .json({ message: "User Authentication Error! The page for admin only!" });

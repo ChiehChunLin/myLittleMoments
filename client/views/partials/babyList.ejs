@@ -1,7 +1,9 @@
 <div class="bg-light p-3 baby-list">
   <ul class="list-group" id="friendList">
     <% for(let i=0; i< follows.length; i++){ %>
-    <li class="list-group-item friend-item" data-friend="<%=follows[i].id%>">
+    <% const select = (i==0) ? "baby-selected" : "" %>
+    <% const display = (i==0) ? "block" : "none" %>
+    <li class="list-group-item baby-item <%=select%>" data-baby="<%=follows[i].id%>">
       <img
         src="<%=follows[i].headshot%>"
         alt="babyshot"
@@ -12,11 +14,22 @@
           margin-right: 1rem;
         "
       />
-      <%=follows[i].name%>
+      <div style="margin-right: auto;"><%=follows[i].name%></div>      
+      <img
+        class ="babyChecked"
+        src="/public/images/s_check_icon.png"
+        alt="checked"
+        style="
+          width: 30px;
+          height: 30px;
+          margin-left: auto;
+          display: <%=display%>;
+        "
+      />      
     </li>
     <% }%>
     <li class="list-group-item text-center">
-      <button class="btn btn-primary" id="addFriendBtn">Add Baby</button>
+      <button class="btn btn-primary" id="addBabyBtn">Add Baby</button>
     </li>
   </ul>
 </div>

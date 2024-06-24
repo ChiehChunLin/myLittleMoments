@@ -59,4 +59,23 @@ const testTimelineController = async (req, res, next) => {
 const testDailyPlot = async (req, res, next) => {
   res.status(200).render("firstFollow");
 };
-module.exports = { testS3Controller, testTimelineController, testDailyPlot };
+
+const lineUserList = async (req,res,next)=>{
+  try {
+    const lineUserList = await userDB.getLineUserList(conn);
+    res.status(200).send({ lineUserList });
+  } catch (error) {
+    next(error);
+  }
+}
+const newBaby = async (req,res,next)=>{
+  try {
+    const { name , gender, birthday } = req.body;
+    console.log(req.body)
+    const newBaby = await babyDB.newBaby(conn, name , gender, birthday);
+    res.status(200).send({ newBaby });
+  } catch (error) {
+    next(error);
+  }
+}
+module.exports = { lineUserList, newBaby, testS3Controller, testTimelineController, testDailyPlot };

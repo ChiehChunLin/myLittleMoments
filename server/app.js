@@ -35,6 +35,7 @@ app.use(
 app.use("/", userRoute);
 app.use("/timeline", auth.authJwtCheckLogin, timelineRoute);
 app.use("/admin", auth.authJwtCheckLogin, auth.authAdminCheck, adminRoute);
+app.use("/admin", auth.authJwtCheckLogin, auth.authAdminCheck, express.static("./admin"));
 app.use("/public", express.static("../client"));
 
 // app.use(errorHandler);

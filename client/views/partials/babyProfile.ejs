@@ -3,16 +3,20 @@
     <img src="<%=babyData.cover%>" alt="Profile Cover" />
 
     <div class="upload-btn-wrapper">
-      <button class="btn btn-light btn-sm">Change Cover</button>
-      <input type="file" id="coverInput" accept="image/*" />
+      <button id="changeCoverBtn" class="btn btn-light btn-sm">Change Cover</button>
     </div>
   </div>
   <div
     class="imageContainer profile-pic"
     id="profilePic"
     style="background-color: orange"
+    value="<%=babyData.id%>"
   >
-    <img src="<%=babyData.headshot%>" alt="Profile Headshot" />
+    <img src="<%=babyData.headshot%>" alt="Profile Headshot" title="點擊更換大頭照"/>
+  </div>
+  <div class="upload-btn-wrapper" style="display: none;">
+    <input type="file" id="profileInput" name="profile" accept="image/*" />
+    <input type="file" id="coverInput" name="cover" accept="image/*" />
   </div>
   <div class="profile-info">
     <h4><%=babyData.name%></h4>
@@ -20,6 +24,4 @@
   </div>
 </div>
 
-<div class="upload-btn-wrapper" style="left: 20px; bottom: -50px">
-  <input type="file" id="profileInput" accept="image/*" />
-</div>
+

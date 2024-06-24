@@ -2,32 +2,40 @@
 <% for(let i=imageData.length - 1; i >= 0; i--){ %>
 <div class="post card my-3">
   <div class="card-body">
-    <p class="post-time">Posted on <%= imageData[i].date %></p>
-    <% for(let j=0; j< imageData[i].images.length; j++){ %>
-    <!-- Check image datatype -->
-    <% if (imageData[i].images[j].type === "image") { %>
-    <img
-      src="<%=imageData[i].images[j].filename %> "
-      alt="Post Image <%=j%>"
-      class="img-fluid"
-    />
-    <% } %>
-    <!-- Check video datatype -->
-    <% if (imageData[i].images[j].type === "video") { %>
-    <video
-      src="<%=imageData[i].images[j].filename %>"
-      autoplay="autoplay"
-      loop="loop"
-      muted="muted"
-      alt="Post Video <%=j%>"
-      class="img-fluid"
-    ></video>
-    <% } %> <% }%>
+    <p class="post-time" value="<%= imageData[i].date %>">Posted on <%= imageData[i].date %></p>
+    <% const count = (imageData[i].images.length < 5) ? imageData[i].images.length : 5; %>
+    <div class="imageBlocks" data-blocks="<%=count%>" >
+      <% for(let j=0; j< count; j++){ %>
+        <div class="block">
+          <% if (imageData[i].images[j].type === "image") { %>
+            <img
+              src="<%=imageData[i].images[j].filename %> "
+              alt="Post Image <%=j%>"
+              class="img-fluid"
+            />
+          <% } %>
+          <!-- Check video datatype -->
+          <% if (imageData[i].images[j].type === "video") { %>
+            <video
+              src="<%=imageData[i].images[j].filename %>"
+              autoplay="autoplay"
+              loop="loop"
+              muted="muted"
+              alt="Post Video <%=j%>"
+              class="img-fluid"
+            ></video>
+          <% } %> 
+        </div>
+      <% }%>
+      <% if(imageData[i].images.length > 5) { %>
+        <div class="block blockFilter">+<%=`${imageData[i].images.length - 5}` %></div>
+      <% }%>
+    </div>    
   </div>
   <div class="card-footer" style="text-align: right">
     <span>Photo <%=imageData[i].images.length%></span>
     <span>·</span>
-    <span>View all ></span>
+    <span class="viewAll">View all ></span>
   </div>
 </div>
 <% }%>

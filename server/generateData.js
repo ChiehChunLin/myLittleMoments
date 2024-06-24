@@ -81,7 +81,6 @@ async function createImageTable() {
                   \`id\` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT 'Image id',
                   \`userId\` BIGINT UNSIGNED NOT NULL COMMENT 'User id',
                   \`babyId\` BIGINT UNSIGNED NOT NULL COMMENT 'Baby id',
-                  \`babyOld\` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Baby old',
                   \`tag\` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Image tag',
                   \`type\` VARCHAR(255) NOT NULL DEFAULT 'image' COMMENT 'Image type',
                   \`filename\` VARCHAR(255) NOT NULL COMMENT 'Image full filename',

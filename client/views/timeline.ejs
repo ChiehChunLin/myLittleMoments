@@ -2,10 +2,13 @@
 <html lang="en">
   <head>
     <%- include ("partials/head") %>
-    <title>myLittleMoments | Timeline</title>
+    <title>我的小小時光 | Timeline</title>
   </head>
   <body>
     <%- include ("partials/nav") %>
+    <!-- user add baby -->
+    <%- include ("partials/userFirstFollow", { newFollow })%>
+    <!-- main timeline board -->
     <div class="container-fluid">
       <div class="row h-100">
         <!-- baby followed list -->
@@ -19,13 +22,13 @@
           <div class="posts" id="postsContainer">
             <%- include ("partials/babyImageBlock", { imageData }) %>
           </div>
-          <div class="posts" id="diaryContainer">
+          <div class="posts divHide" id="diaryContainer">
             <%- include ("partials/babyTextBlock", { textData }) %>
           </div>
-          <div class="tags" id="tagContainer">
+          <div class="tags divHide" id="tagContainer">
             <%- include ("partials/babyTextBlock", { tagData }) %>
           </div>
-          <div class="charts" id="healthContainer">
+          <div class="charts divHide" id="healthContainer">
             <%- include ("partials/babyHealthBlock") %>
           </div>
         </div>

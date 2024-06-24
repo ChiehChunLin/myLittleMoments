@@ -67,7 +67,7 @@ async function getImageByMonth(conn, babyId, date) {
 async function getImageByDate(conn, babyId, date) {
   const [rows] = await conn.query(
     `
-     SELECT * FROM images 
+     SELECT type, filename FROM images 
      WHERE babyId = ? AND timestamp >= ? AND timestamp <= ?
      ORDER BY timestamp DESC
     `,
