@@ -1,4 +1,5 @@
 const { authProvider, authRole } = require("../utils/getAuthConst");
+const { babyRole } = require("../utils/getBabyConst");
 const { getUTCTime } = require("../utils/getFormattedDate");
 
 async function newNativeUser(conn, name, email, password, id = 0) {
@@ -84,6 +85,7 @@ async function getLineUserList(conn) {
   // console.log("getLineUserList:" + JSON.stringify(rows));
   return rows;
 }
+
 async function setUserFollowBaby(conn, userId, babyId, babyRole, relation) {
   const [rows] = await conn.query(
     `
@@ -94,6 +96,16 @@ async function setUserFollowBaby(conn, userId, babyId, babyRole, relation) {
   );
   // console.log("setUserFollowBaby:" + JSON.stringify(rows));
   return rows.insertId;
+}
+async function getManagerBabyList(conn, id){
+  const [rows] = await conn.query(
+    `
+      SELECT babyId FROM follows where userId = ? AND babyRole = '${babyRole.MANAGER}'
+    `,
+    [id]
+  );
+  // console.log("getManagerBabyList:" + JSON.stringify(rows));
+  return rows;
 }
 
 module.exports = {

@@ -5,7 +5,6 @@ async function setImage(
   conn,
   userId,
   babyId,
-  babyOld,
   type,
   filename,
   date = ""
@@ -13,10 +12,10 @@ async function setImage(
   const imageDate = date == "" ? getLogTimeFormat() : date;
   const [rows] = await conn.query(
     `
-     INSERT INTO images (userId, babyId, babyOld, type, filename, timestamp)
-     VALUES (?,?,?,?,?,?)
+     INSERT INTO images (userId, babyId, type, filename, timestamp)
+     VALUES (?,?,?,?,?)
     `,
-    [userId, babyId, babyOld, type, filename, imageDate]
+    [userId, babyId, type, filename, imageDate]
   );
   // console.log("setImage:" + JSON.stringify(rows));
   return rows.insertId;

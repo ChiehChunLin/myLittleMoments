@@ -36,7 +36,7 @@ async function getBaby(conn, id) {
   return rows[0];
 }
 
-async function setBabyDaily(conn, userId, babyId, activity, quantity, date) {
+async function setBabyDaily(conn, userId, babyId, activity, quantity, date = "") {
   const activityDate = date == "" ? getLogTimeFormat() : date;
   const week = getWeekNumberByDate(activityDate);
   const [rows] = await conn.query(
