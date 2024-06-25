@@ -60,17 +60,17 @@ const lineCallback = async (req, res, next) => {
     //   pictureUrl: 'https://profile.line-scdn.net/0hOFa5F3OkEGlMTAVAkk5uFjwcEwNvPUl7Mn1aXSkZSVBzfAM-MChWXH5NHFBxKVFqZyoIXS1KTl1AX2cPUhrsXUt8TVhweFA6Yytciw'
     // }
     const profile = profileResponse.data;
-    const user = await userDB.getUserByEmail(conn, profile.userId);
+    let user = await userDB.getUserByEmail(conn, profile.userId);
     // console.log("%j", user);
     if (user == undefined) {
-      const user = await userDB.newLineUser(
+      user = await userDB.newLineUser(
         conn,
         profile.userId,
         profile.displayName,
         profile.userId,
         profile.pictureUrl
       );
-      console.log(`${profile.displayName} register successfully`);
+      console.log(`${user.name} register successfully`);
     }
     const { accessJwtToken, accessExpired } = auth.authJwtSign(user);
     req.user = user;
