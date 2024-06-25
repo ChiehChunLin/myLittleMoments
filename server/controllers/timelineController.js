@@ -26,6 +26,7 @@ const timelineRender = async (req, res, next) => {
       });
     }
 
+    //userDB grep user data then get babyInfo from babyList[0]
     const follows = userData.follows;
     follows.map(data => {
       data.old = time.getDateDifference(data.birthday);
@@ -61,40 +62,7 @@ const timelineRender = async (req, res, next) => {
     next(error);
   }
 };
-const imageController = async (req, res, next) => {
-  const { babyId, date } = req.body;
-};
-const textController = async (req, res, next) => {
-  const { babyId, date } = req.body;
-};
-const tagController = async (req, res, next) => {
-  const { babyId } = req.body;
-};
-const healthController = async (req, res, next) => {
-  const { babyId, date } = req.body;
-  const weightData = await babyDB.getBabyWeightData(conn, babyId);
-  const heightData = await babyDB.getBabyHeightData(conn, babyId);
-  const dailys = await babyDB.getBabyDailyWeek(conn, babyId, date);
 
-  dailys.map((date) => {
-    date.daily.map((activity) => {
-      if (activity.activity == babyConst.babyActivity.SLEEP) {
-        const hours = activity.quantity;
-        date.daily.endtime = moment(activity.starttime).add(
-          moment.duration(hours, "hours")
-        );
-        date.daily.unit = babyConst.babyActivityUnit[activity.activity];
-      } else {
-        date.daily.endtime = moment(activity.starttime).add(
-          moment.duration(1, "hours")
-        );
-        date.daily.unit = babyConst.babyActivityUnit[activity.activity];
-      }
-    });
-  });
-  const dailyData = babyFakeData;
-  res.status(200).send({ dailyData, weightData, heightData });
-};
 
 const firstFollowRender = async (req, res, next) => {
   try {
@@ -126,7 +94,93 @@ const firstFollowController = async (req, res, next) => {
     next(error);
   }
 };
+const healthController = async (req, res, next) => {
+  try {
+    const { babyId, date } = req.body;
 
+    // healthData
+    const weightData = await babyDB.getBabyWeightData(conn, babyId);
+    const heightData = await babyDB.getBabyHeightData(conn, babyId);
+    const dailys = await babyDB.getBabyDailyWeek(conn, babyId, date);
+    
+    dailys.map((date) => {
+      date.daily.map((activity) => {
+        if (activity.activity == babyConst.babyActivity.SLEEP) {
+          const hours = activity.quantity;
+          date.daily.endtime = moment(activity.starttime).add(
+            moment.duration(hours, "hours")
+          );
+          date.daily.unit = babyConst.babyActivityUnit[activity.activity];
+        } else {
+          date.daily.endtime = moment(activity.starttime).add(
+            moment.duration(1, "hours")
+          );
+          date.daily.unit = babyConst.babyActivityUnit[activity.activity];
+        }
+      });
+    });
+    const dailyData = babyFakeData;
+
+    res.status(200).send({ weightData, heightData, dailyData});
+  } catch (error) {
+    next(error);
+  }
+}
+const babyTimelineTabsData = async (req,res,next) => {
+  try{
+    const { babyId, date } = req.body;
+
+    // babyData
+    const babyData = await babyDB.getBaby(conn, babyId);
+    babyData.old = time.getDateDifference(babyData.birthday);
+    babyData.headshot = getImageCDN(babyData.headshot);
+    babyData.cover = getImageCDN(babyData.cover);
+
+    // imageData
+    const startDate = time.getDateBefore30days();
+    const imageData = await imageDB.getImageByMonth(
+      conn,
+      babyId,
+      startDate
+    );
+    imageData.map((dateData) => {
+      dateData.images.map((image) => {
+        image.filename = getImageCDN(`${babyData.id}/${image.filename}`);
+      });
+    });
+
+    // textData
+    const textData = await textDB.getTextByMonth(conn, babyId, startDate);
+
+    // healthData
+    const weightData = await babyDB.getBabyWeightData(conn, babyId);
+    const heightData = await babyDB.getBabyHeightData(conn, babyId);
+    const dailys = await babyDB.getBabyDailyWeek(conn, babyId, date);
+    
+    dailys.map((date) => {
+      date.daily.map((activity) => {
+        if (activity.activity == babyConst.babyActivity.SLEEP) {
+          const hours = activity.quantity;
+          date.daily.endtime = moment(activity.starttime).add(
+            moment.duration(hours, "hours")
+          );
+          date.daily.unit = babyConst.babyActivityUnit[activity.activity];
+        } else {
+          date.daily.endtime = moment(activity.starttime).add(
+            moment.duration(1, "hours")
+          );
+          date.daily.unit = babyConst.babyActivityUnit[activity.activity];
+        }
+      });
+    });
+    const dailyData = babyFakeData;
+    healthData = { weightData, heightData, dailyData};
+
+    res.status(200).send({ babyData, imageData, textData, healthData });
+  } catch (error) {
+    next(error);
+  } 
+}
 const dailyImages = async (req,res,next) => {
   try{
     const { babyId, date } = req.body;
@@ -177,11 +231,9 @@ async function uploadFileToS3(file){
 module.exports = {
   firstFollowRender,
   firstFollowController,
+  healthController,
+  babyTimelineTabsData,
   dailyImages,
   timelineRender,
-  healthController,
-  imageController,
-  textController,
-  tagController,
   uploadImageToS3
 };

@@ -19,7 +19,16 @@ async function newBaby(conn, name, gender, birthday, id = 0) {
 async function getBaby(conn, id) {
   const [rows] = await conn.query(
     `
-      SELECT * FROM babys WHERE id = ?
+      SELECT 
+        b.id AS id,
+        b.name AS name,
+        b.birthday AS birthday,
+        b.headshot AS headshot,
+        b.cover AS cover,
+        COUNT(*) AS followed
+      FROM babys b
+      JOIN follows f ON b.id = f.babyId
+      WHERE b.id = ?
     `,
     [id]
   );

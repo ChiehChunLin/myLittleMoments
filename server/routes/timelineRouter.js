@@ -26,11 +26,9 @@ router.get("/", timeline.timelineRender);
 router.get("/firstFollow", timeline.firstFollowRender);
 
 router.post("/firstFollow", timeline.firstFollowController);
-router.post("/uploadImage", upload.fields([{ name: "file", maxCount: 1 }]), timeline.uploadImageToS3);//
-router.post("/image", timeline.imageController);
-router.post("/text", timeline.textController);
+router.post("/uploadImage", upload.fields([{ name: "file", maxCount: 1 }]), timeline.uploadImageToS3);
 router.post("/health", timeline.healthController);
-
+router.post("/babyProfile", timeline.babyTimelineTabsData);
 router.post("/image/daily", timeline.dailyImages);
 
 
