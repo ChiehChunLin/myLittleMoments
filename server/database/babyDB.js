@@ -14,7 +14,7 @@ async function newBaby(conn, name, gender, birthday, id = 0) {
     [babyId, name, gender, birthday]
   );
   // console.log("newBaby:" + JSON.stringify(rows));
-  return await getBaby(conn, babyId);
+  return babyId;
 }
 async function getBaby(conn, id) {
   const [rows] = await conn.query(

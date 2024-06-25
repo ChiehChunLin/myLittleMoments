@@ -71,9 +71,8 @@ const lineUserList = async (req,res,next)=>{
 const newBaby = async (req,res,next)=>{
   try {
     const { name , gender, birthday } = req.body;
-    console.log(req.body)
-    const newBaby = await babyDB.newBaby(conn, name , gender, birthday);
-    res.status(200).send({ newBaby });
+    const newBabyId = await babyDB.newBaby(conn, name , gender, birthday);
+    res.status(200).send({ newBabyId });
   } catch (error) {
     next(error);
   }

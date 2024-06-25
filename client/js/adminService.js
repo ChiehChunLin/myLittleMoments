@@ -55,10 +55,11 @@ function fetchPostNewBaby(e){
   .then((data) => {
     console.log(data);
     if (data) {
-      const { newBaby } = data;
-      if(newBaby){
+      const { newBabyId } = data;
+      
+      if(newBabyId){
         $("#babyForm").append(
-          `<h3>New Baby successfully! BabyId: ${newBaby.id}</h3>`
+          `<h3>New Baby successfully! BabyId: ${newBabyId}</h3>`
         );
       }      
     }

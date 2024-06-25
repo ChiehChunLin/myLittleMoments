@@ -5,7 +5,7 @@ if (window.location.href.includes("/timeline")) {
   //=====================================================
   $("#firstFollowForm").on("submit", function (e) {
     e.preventDefault();
-    console.log("click")
+
     const followForm = document.getElementById("firstFollowForm");
     const formData = new FormData(followForm);
     const babyRole = formData.get("babyRole");
@@ -24,9 +24,6 @@ if (window.location.href.includes("/timeline")) {
         body: JSON.stringify({ babyId, babyRole, relation })
       };
       userFolowFetch("/timeline/firstFollow", config);
-
-      $(".babyFollow").removeClass("divShow").addClass("divHide");
-      // window.location.href = "/timeline";
     }
   });
 
@@ -173,8 +170,12 @@ function userFolowFetch(url, config = "") {
   fetch(url, config)
     .then((res) => res.json())
     .then((data) => {
-      const { message } = data;
-      confirm(message);
+      const { message } = data;      
+      if(message){
+        confirm(message);
+        $(".babyFollow").removeClass("divShow").addClass("divHide");
+        window.location.href = "/timeline";
+      }      
     })
     .catch((err) => {
       alert(err.message);

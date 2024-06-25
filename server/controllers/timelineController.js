@@ -13,7 +13,6 @@ const { getImageCDN } = require("../utils/getCdnFile");
 const timelineRender = async (req, res, next) => {
   try {
     const { user } = req;
-
     const userData = await userDB.getUserInfo(conn, user.id);
     if (userData.follows == null) {
       return res.status(200).render("timeline", {
@@ -74,7 +73,7 @@ const firstFollowRender = async (req, res, next) => {
 const firstFollowController = async (req, res, next) => {
   try {
     const { user } = req;
-    console.log(user);
+
     if (user) {
       const { babyId, babyRole, relation } = req.body;
       const followBaby = await userDB.setUserFollowBaby(
@@ -194,8 +193,6 @@ const dailyImages = async (req,res,next) => {
   } 
 }
 
-
-
 const uploadImageToS3 = async (req, res, next) => {
   try {
     const { babyId, type } = req.body;
@@ -216,7 +213,6 @@ const uploadImageToS3 = async (req, res, next) => {
     next(error);
   }
 };
-
 async function uploadFileToS3(file){
   try {
     const awsResult = await putImageS3(file);
