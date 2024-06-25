@@ -115,7 +115,7 @@ if (window.location.href.includes("/timeline")) {
       formData.append("file", file);
       formData.append("type", "profile");
 
-      console.log(formData);
+      // console.log(formData);
       const url = "/timeline/uploadImage";
       const config = {
         method: "POST",
@@ -130,16 +130,18 @@ if (window.location.href.includes("/timeline")) {
     const file = this.files[0];
     const babyId = document.getElementById("profilePic").getAttribute("value");
     if (file) {
+      const formData = new FormData();     
+      formData.append("babyId", babyId);
+      formData.append("file", file);
+      formData.append("type", "cover");
+
+      // console.log(formData);
       const url = "/timeline/uploadImage";
       const config = {
         method: "POST",
-        body: JSON.stringify({ babyId, file, type: "cover" }),
+        body: formData,
       };
       userUploadFetch(url, config);
-
-      // document.getElementById(
-      //   "coverPhoto"
-      // ).style.backgroundImage = `url(${e.target.result})`;
     }      
   })
   
