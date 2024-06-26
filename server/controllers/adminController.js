@@ -23,4 +23,4 @@ const newBaby = async (req,res,next)=>{
     next(error);
   }
 }
-module.exports = { lineUserList, newBaby, testS3Controller, testTimelineController, testDailyPlot };
+module.exports = { lineUserList, newBaby };
