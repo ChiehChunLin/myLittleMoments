@@ -23,7 +23,7 @@ async function getTextByMonth(conn, babyId, date) {
         DATE_FORMAT(timestamp, '%Y-%m-%d') AS date
      FROM texts 
      WHERE babyId = ? AND timestamp BETWEEN ? AND ?
-     ORDER BY timestamp ASC;
+     ORDER BY timestamp DESC;
     `,
     [babyId, `${date} 00:00:00`, `${addMonth} 00:00:00`]
   );

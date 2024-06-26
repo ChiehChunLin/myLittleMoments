@@ -201,7 +201,11 @@ const uploadImageToS3 = async (req, res, next) => {
     if (file != undefined) {
       const filename = (type === "profile") ? `${babyId}/babyProfile`: `${babyId}/babyCover`;
 
-      await awsS3.putStreamImageS3( file.buffer, filename, file.mimetype);
+      const awsResult = await awsS3.putStreamImageS3( file.buffer, filename, file.mimetype);
+      if (awsResult.$metadata.httpStatusCode !== 200) {
+        console.log("S3 result: %j", awsResult);
+        throw new Error("image upload to S3 failed!");
+      }
       if(type ==="profile"){
         await babyDB.updateBabyHeadshot(conn, babyId, filename);
       }
