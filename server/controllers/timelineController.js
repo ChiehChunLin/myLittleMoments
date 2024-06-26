@@ -8,7 +8,8 @@ const awsS3 = require("../utils/awsS3");
 const babyConst = require("../utils/getBabyConst");
 const babyFakeData = require("../utils/babyDailyData");
 const time = require("../utils/getFormattedDate");
-const { getImageCDN, createInvalidation } = require("../utils/awsS3");
+const { getImageCDN } = require("../utils/awsS3");
+const { getSerialTimeFormat } = require("../utils/getFormattedDate");
 
 const timelineRender = async (req, res, next) => {
   try {
@@ -99,9 +100,9 @@ const healthController = async (req, res, next) => {
     // healthData
     const weightData = await babyDB.getBabyWeightData(conn, babyId);
     const heightData = await babyDB.getBabyHeightData(conn, babyId);
-    const dailys = await babyDB.getBabyDailyWeek(conn, babyId, date);
+    const dailyData = await babyDB.getBabyDailyWeek(conn, babyId, date);
     
-    dailys.map((date) => {
+    dailyData.map((date) => {
       date.daily.map((activity) => {
         if (activity.activity == babyConst.babyActivity.SLEEP) {
           const hours = activity.quantity;
@@ -117,7 +118,6 @@ const healthController = async (req, res, next) => {
         }
       });
     });
-    const dailyData = babyFakeData;
 
     res.status(200).send({ weightData, heightData, dailyData});
   } catch (error) {
@@ -196,17 +196,16 @@ const uploadImageToS3 = async (req, res, next) => {
   try {
     const { babyId, type } = req.body;
 
+    const timestap = getSerialTimeFormat();
     const file = req.files.file[0];
     if (file != undefined) {
-      const filename = (type === "profile") ? `${babyId}/babyProfile`: `${babyId}/babyCover`;
+      const filename = (type === "profile") ? `headshots/${timestap}-${babyId}`: `covers/${timestap}-${babyId}`;
 
-      // await awsS3.createInvalidation([filename]);
       const awsResult = await awsS3.putStreamImageS3( file.buffer, filename, file.mimetype);
       if (awsResult.$metadata.httpStatusCode !== 200) {
         console.log("S3 result: %j", awsResult);
         throw new Error("image upload to S3 failed!");
       }
-      await awsS3.createInvalidation([filename]);
       if(type ==="profile"){
         await babyDB.updateBabyHeadshot(conn, babyId, filename);
       }

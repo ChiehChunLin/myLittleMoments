@@ -343,8 +343,8 @@ input[type="number"] {
   border: 5px solid white;
   cursor: pointer;
   z-index: 2;
-  display: flex;
-  justify-content: center;
+  /* display: flex; */
+  /* justify-content: center; */
 }
 .imageContainer {
   overflow: hidden;

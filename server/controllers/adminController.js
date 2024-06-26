@@ -3,7 +3,6 @@ const userDB = require("../database/userDB");
 const babyDB = require("../database/babyDB");
 const imageDB = require("../database/imageDB");
 const { getDateDifference } = require("../utils/getFormattedDate");
-const { getImageCDN } = require("../utils/awsS3");
 const dailyData = require("../utils/babyDailyData");
 
 const lineUserList = async (req,res,next)=>{
