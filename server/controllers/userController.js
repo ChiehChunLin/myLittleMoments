@@ -63,6 +63,9 @@ const lineCallback = async (req, res, next) => {
     let user = await userDB.getUserByEmail(conn, profile.userId);
     // console.log("%j", user);
     if (user == undefined) {
+      if(profile.pictureUrl === null){
+        profile.pictureUrl = `${process.env.AWS_S3_CDN_URL}/default/defaultUser`;
+      }
       user = await userDB.newLineUser(
         conn,
         profile.userId,
