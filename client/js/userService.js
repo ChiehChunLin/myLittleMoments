@@ -6,9 +6,9 @@ $(".logout").on("click", function (e) {
 if (window.location.href.includes("/login")) {
   $("#lineBtn").on("click", function (e) {
     const LINE_CHANNEL_ID = "2005642025";
-    // const LINE_CALLBACK_URI = "https://www.chiehchunlin.com/lineCallback";
-    const LINE_CALLBACK_URI =
-      "https://a949-59-120-11-125.ngrok-free.app/lineCallback";
+    const LINE_CALLBACK_URI = "https://www.chiehchunlin.com/lineCallback";
+    //const LINE_CALLBACK_URI =
+    //  "https://a949-59-120-11-125.ngrok-free.app/lineCallback";
     const LINE_STATE = crypto.randomUUID().replace(/[-]+/g, ""); //prevent xss
     const LINE_NONCE = crypto.randomUUID().replace(/[-]+/g, ""); //prevent xss
     let link = "https://access.line.me/oauth2/v2.1/authorize?";
