@@ -8,7 +8,7 @@ const awsS3 = require("../utils/awsS3");
 const babyConst = require("../utils/getBabyConst");
 const babyFakeData = require("../utils/babyDailyData");
 const time = require("../utils/getFormattedDate");
-const { getImageCDN } = require("../utils/getCdnFile");
+const { getImageCDN, createInvalidation } = require("../utils/awsS3");
 
 const timelineRender = async (req, res, next) => {
   try {
@@ -61,7 +61,6 @@ const timelineRender = async (req, res, next) => {
     next(error);
   }
 };
-
 
 const firstFollowRender = async (req, res, next) => {
   try {
@@ -201,11 +200,13 @@ const uploadImageToS3 = async (req, res, next) => {
     if (file != undefined) {
       const filename = (type === "profile") ? `${babyId}/babyProfile`: `${babyId}/babyCover`;
 
+      // await awsS3.createInvalidation([filename]);
       const awsResult = await awsS3.putStreamImageS3( file.buffer, filename, file.mimetype);
       if (awsResult.$metadata.httpStatusCode !== 200) {
         console.log("S3 result: %j", awsResult);
         throw new Error("image upload to S3 failed!");
       }
+      await awsS3.createInvalidation([filename]);
       if(type ==="profile"){
         await babyDB.updateBabyHeadshot(conn, babyId, filename);
       }
@@ -218,16 +219,6 @@ const uploadImageToS3 = async (req, res, next) => {
     next(error);
   }
 };
-async function uploadFileToS3(file){
-  try {
-    const awsResult = await awsS3.putImageS3(file);
-    if (awsResult.$metadata.httpStatusCode !== 200) {
-      throw new Error("image upload to S3 failed!");
-    }
-  } catch (error) {
-    console.error(error);
-  }
-}
 
 module.exports = {
   firstFollowRender,

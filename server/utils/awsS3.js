@@ -1,10 +1,7 @@
-const fs = require("fs");
 require("dotenv").config();
-const {
-  S3Client,
-  GetObjectCommand,
-  PutObjectCommand
-} = require("@aws-sdk/client-s3");
+const fs = require("fs");
+const { CloudFrontClient, CreateInvalidationCommand } = require("@aws-sdk/client-cloudfront");
+const { S3Client, GetObjectCommand, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { Upload } = require("@aws-sdk/lib-storage");
 // const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
@@ -15,14 +12,34 @@ const s3Client = new S3Client({
     secretAccessKey: process.env.AWS_S3_ACCESS_SECRET_KEY
   }
 });
-
 const bucketName = process.env.AWS_S3_BUCKET_NAME;
 const cdnURL = process.env.AWS_S3_CDN_URL;
+const cdnRegion = process.env.AWS_S3_CDN_REGION;
+const cdnId = process.env.AWS_S3_CDN_ID;
+const cdnClient = new CloudFrontClient({ region: cdnRegion });
 
 function getImageCDN(key) {
   return cdnURL + key;
 }
+async function createInvalidation(paths) {
+  const command = new CreateInvalidationCommand({
+    DistributionId: cdnId,
+    InvalidationBatch: {
+      CallerReference: `${Date.now().toString()}`, // Unique value for each invalidation
+      Paths: {
+        Quantity: paths.length,
+        Items: paths
+      }
+    }
+  });
 
+  try {
+    const response = await cdnClient.send(command);
+    console.log("Invalidation created:", response);
+  } catch (error) {
+    console.error("Error creating invalidation:", error);
+  }
+}
 async function getImageS3(key) {
   try {
     const params = {
@@ -76,5 +93,6 @@ module.exports = {
   getImageCDN,
   getImageS3,
   putImageS3,
-  putStreamImageS3
+  putStreamImageS3,
+  createInvalidation
 };
