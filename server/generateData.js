@@ -11,7 +11,7 @@ const {
 const { newBaby, setBabyDaily } = require("./database/babyDB");
 const { setImage } = require("./database/imageDB");
 
-const cherryId = 657590400000;
+const cherryId = "U9acc24aec8497b5e7159c861f9079b71";
 const puffId = 1682294400000;
 const puffBirth = "2023-03-24";
 
@@ -79,7 +79,7 @@ async function createImageTable() {
   const imageTable = await pool.query(
     `CREATE TABLE IF NOT EXISTS \`images\` (
                   \`id\` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT 'Image id',
-                  \`userId\` BIGINT UNSIGNED NOT NULL COMMENT 'User id',
+                  \`lineId\` VARCHAR(255) NOT NULL COMMENT 'User line id',
                   \`babyId\` BIGINT UNSIGNED NOT NULL COMMENT 'Baby id',
                   \`tag\` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Image tag',
                   \`type\` VARCHAR(255) NOT NULL DEFAULT 'image' COMMENT 'Image type',
@@ -99,7 +99,7 @@ async function createTextTable() {
     `
       CREATE TABLE IF NOT EXISTS \`texts\` (
                   \`id\` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT 'Text id',
-                  \`userId\` BIGINT UNSIGNED NOT NULL COMMENT 'User id',
+                  \`lineId\` VARCHAR(255) NOT NULL COMMENT 'User line id',
                   \`babyId\` BIGINT UNSIGNED NOT NULL COMMENT 'Baby id',
                   \`content\` TEXT NOT NULL COMMENT 'Text content',
                   \`timestamp\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Text date'
@@ -117,7 +117,7 @@ async function createBabyDailyTable() {
     `
       CREATE TABLE IF NOT EXISTS \`babyDaily\` (
                   \`id\` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT 'Text id',
-                  \`userId\` BIGINT UNSIGNED NOT NULL COMMENT 'User id',
+                  \`lineId\` VARCHAR(255) NOT NULL COMMENT 'User line id',
                   \`babyId\` BIGINT UNSIGNED NOT NULL COMMENT 'Baby id',
                   \`week\` INT NOT NULL COMMENT 'Activity week',
                   \`activity\` VARCHAR(255) NOT NULL COMMENT 'Baby activity',
