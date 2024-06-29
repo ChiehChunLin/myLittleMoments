@@ -3,6 +3,26 @@ if (window.location.href.includes("/timeline")) {
   //=====================================================
   //============  Add Baby Follow Form  =================
   //=====================================================
+  $("#newBabyForm").on("submit", function (e) {
+    e.preventDefault();
+
+    const newBabyForm = document.getElementById("newBabyForm");
+    const formData = new FormData(newBabyForm);
+
+    const checkAuth = userCheckAuth();
+    if (checkAuth) {
+      const config = {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache" // without this config, the page return "304 Not Modified"
+        },
+        body: formData
+      };
+      userNewBabyAndFolowFetch("/timeline/newBaby", config);
+    }
+  });
   $("#firstFollowForm").on("submit", function (e) {
     e.preventDefault();
 
@@ -23,15 +43,31 @@ if (window.location.href.includes("/timeline")) {
         },
         body: JSON.stringify({ babyId, babyRole, relation })
       };
-      userFolowFetch("/timeline/firstFollow", config);
+      userNewBabyAndFolowFetch("/timeline/firstFollow", config);
     }
   });
+  $("inputRole").on("change", function(e){
+    if(e.target.value === "manager"){
+      $(".showNewBabyLink").style.display = "block";
+    }else{
+      $(".showNewBabyLink").style.display = "none";
+    }
+  })
 
   $("#addBabyBtn").on("click", function (e){
     $(".babyFollow").removeClass("divHide").addClass("divShow");
   })
   $("#cancelBtn").on("click", function (e){
     $(".babyFollow").removeClass("divShow").addClass("divHide");
+  })
+
+  $(".newBaby-a").on("click", function (e) {
+    $(".newBabyForm-div").removeClass("divHide").addClass("divShow");
+    $(".firstFollow-div").removeClass("divShow").addClass("divHide");
+  })
+  $("followBaby-a").on("click", function (e) {
+    $(".firstFollow-div").removeClass("divHide").addClass("divShow");
+    $(".newBabyForm-div").removeClass("divShow").addClass("divHide");
   })
 
   //=====================================================
@@ -168,7 +204,7 @@ function userCheckAuth() {
   }
   return true;
 }
-function userFolowFetch(url, config = "") {
+function userNewBabyAndFolowFetch(url, config = "") {
   fetch(url, config)
     .then((res) => res.json())
     .then((data) => {

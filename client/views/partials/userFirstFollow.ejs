@@ -1,65 +1,48 @@
-<div class="babyFollow <%=newFollow%>" >
-  <div class="home" >
-    <div class="home-col3">
-      <div class="message" style="margin-bottom: 1rem"></div>
-      <div class="cancelFollow">
-        <img id="cancelBtn" src="/public/images/cancel_icon.png" alt="cancel" >
-      </div>
-      <div class="fromGroup" style="background-color: white; opacity: 1; z-index: 2;">
-        <div class="icon" style="padding: 0.75rem">
-          <img
-            src="/public/images/child-head.png"
-            alt="baby"
-            style="width: 60px; height: 60px"
-          />
-        </div>
-        <hr style="width: 80%; margin: auto" />
-        <div class="firstFollow-div">
-          <form id="firstFollowForm" style="margin: 2rem 0;">
-            <div class="sign-group">
-                <label for="inputRole">關係</label>
-                <select
-                class="sign-control"
-                  id="inputRole"
-                  name="babyRole"
-                />
-                    <option value="manager">父母</option>
-                    <option value="family">家人</option>
-                    <option value="fans">粉絲</option>
-                </select>
-            </div>
-            <br />
-            <div class="sign-group">
-              <label for="inputCall">稱呼
-            </label>
-              <input
-                class="sign-control"
-                type="text"
-                id="inputCall"
-                placeholder="寶寶怎麼稱呼您?"
-                name="call"
-                required
-              />
-            </div>
-            <br />
-            <div class="sign-group">
-              <label for="inputBabyId">寶寶代碼</label>
-              <input
-                class="sign-control"
-                type="number"
-                id="inputBabyId"
-                placeholder="請輸入寶寶代碼"
-                name="babyId"
-                required
-              />
-            </div>
-            <br />
-            <button type="submit" class="sign-btn sign-btn-primary">Follow</button>
-          </form>
-        </div>
-      </div>
+<div class="firstFollow-div divShow">
+  <form id="firstFollowForm" style="margin: 2rem 0;">
+    <div class="sign-group">
+        <label for="inputRole">關係</label>
+        <select
+        class="sign-control"
+          id="inputRole"
+          name="babyRole"
+          value=""
+        />
+            <option value="manager">父母</option>
+            <option value="family">家人</option>
+            <option value="fans">粉絲</option>
+        </select>
     </div>
-  </div>
- </div>    
+    <br />
+    <div class="sign-group">
+      <label for="inputCall">稱呼
+    </label>
+      <input
+        class="sign-control"
+        type="text"
+        id="inputCall"
+        placeholder="寶寶怎麼稱呼您?"
+        name="call"
+        required
+      />
+    </div>
+    <br />
+    <div class="sign-group">
+      <label for="inputBabyId">寶寶代碼</label>
+      <input
+        class="sign-control"
+        type="number"
+        id="inputBabyId"
+        placeholder="請輸入寶寶代碼"
+        name="babyId"
+        required
+      />
+    </div>
+    <br />
+    <button type="submit" class="sign-btn sign-btn-primary">Follow</button>
+    <p class="showNewBabyLink">沒有寶寶代碼，我要<a class="newBaby-a">新增寶寶</a></p>
+  </form>
+</div>
+
 
 

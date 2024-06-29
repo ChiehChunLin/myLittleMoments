@@ -93,6 +93,29 @@ const firstFollowController = async (req, res, next) => {
     next(error);
   }
 };
+const newBabyController = async (req, res, next) => {
+  try {
+    const { user } = req;
+    if(!user){
+      return res.status(500).send({ message: "user is not defined" });
+    }
+    const { babyRole, babyCall, babyName, babyGender, babyBirth, babyId} = req.body;   
+    const newBabyId = await babyDB.newBaby(conn, babyName, babyGender, babyBirth, babyId);
+    const followBaby = await userDB.setUserFollowBaby(conn, user.id, newBabyId, babyRole, babyCall);
+
+    if (newBabyId && followBaby) {
+      const trainFiles = req.files;
+      if(trainFiles["babyFront"] || trainFiles["babySide"] || trainFiles["babyUpward"]){
+        
+      }
+      return res.status(200).send({ message: "New Baby Train and Follow Successfully!" });
+    }
+    
+  } catch (error) {
+    next(error);
+  }
+}
+
 const healthController = async (req, res, next) => {
   try {
     const { babyId, date } = req.body;
@@ -222,6 +245,7 @@ const uploadImageToS3 = async (req, res, next) => {
 module.exports = {
   firstFollowRender,
   firstFollowController,
+  newBabyController,
   healthController,
   babyTimelineTabsData,
   dailyImages,

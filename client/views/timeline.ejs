@@ -5,9 +5,33 @@
     <title>我的小小時光 | Timeline</title>
   </head>
   <body>
+    <!------------ baby Nav ------------>
     <%- include ("partials/nav") %>
-    <!-- user add baby -->
-    <%- include ("partials/userFirstFollow", { newFollow })%>
+    <!-------- add/follow baby ------------>
+    <div class="babyFollow <%=firstFollow%>">
+      <div class="home" >
+        <div class="home-col3">
+          <div class="message" style="margin-bottom: 1rem"></div>
+          <div class="cancelFollow">
+            <img id="cancelBtn" src="/public/images/cancel_icon.png" alt="cancel" >
+          </div>
+          <div class="fromGroup" style="background-color: white; opacity: 1; z-index: 2;">
+            <div class="icon" style="padding: 0.75rem">
+              <img
+                src="/public/images/child-head.png"
+                alt="baby"
+                style="width: 60px; height: 60px"
+              />
+            </div>
+            <hr style="width: 80%; margin: auto" />
+            <!-- user new follow -->
+            <%- include ("partials/userFirstFollow")%>
+            <!-- user new baby -->
+            <%- include ("partials/userNewBaby")%
+          </div>
+        </div>
+      </div>      
+    </div>  
     <!-- main timeline board -->
     <div class="container-fluid">
       <div class="row h-100">

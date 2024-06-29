@@ -1,0 +1,141 @@
+<div class="newBabyForm-div divHide">
+    <form id="newBabyForm" style="margin: 2rem 0;">
+      <div class="sign-group">
+          <label for="inputBabyRole">關係</label>
+          <select
+          class="sign-control"
+            id="inputBabyRole"
+            name="babyRole"
+            value="manager"
+          />
+              <option value="manager">父母</option>
+          </select>
+      </div>
+      <br />
+      <div class="sign-group">
+        <label for="inputBabyCall">稱呼
+      </label>
+        <input
+          class="sign-control"
+          type="text"
+          id="inputBabyCall"
+          placeholder="寶寶怎麼稱呼您?"
+          name="babyCall"
+          required
+        />
+      </div>
+      <br />
+      <div class="sign-group">
+        <label for="inputBabyName">寶寶名稱</label>
+        <input
+          class="sign-control"
+          type="number"
+          id="inputBabyName"
+          placeholder="請輸入寶寶名稱"
+          name="babyName"
+          required
+        />
+      </div>
+      <br />
+      <div class="sign-group">
+        <label for="inputBabyGender">寶寶性別</label>
+        <select
+            class="form-control"
+            id="inputBabyGender"
+            name="babyGender"
+            value=""
+        />
+            <option value="boy">男孩兒</option>
+            <option value="girl">女孩兒</option>
+        </select>
+      </div>
+      <br />
+      <div class="sign-group">
+        <label for="inputBabyBirth">寶寶生日</label>
+        <input
+            type="date"
+            class="form-control"
+            id="inputBabyBirth"
+            name="babyBirth"
+            required
+        />
+      </div>
+      <br />
+      <div class="sign-group">
+        <label for="inputBabyId">寶寶代碼</label>
+        <input
+          class="sign-control"
+          type="number"
+          id="inputBabyId"
+          placeholder="請輸入寶寶代碼"
+          name="babyId"
+        />
+      </div>
+      <br />
+      <div class="sign-group">
+        <div class="showBabyTrainBox">
+            <input id="showBabyTrain" type="checkbox" onclick="showBabyTrainBox()" />
+            <label for="showBabyTrain" style="font-size: 1rem">是否自動蒐集親友內含寶寶的家庭合照</label>
+        </div>
+        <script>
+            function showBabyTrainBox() {
+                const trainBox = document.getElementById("babyTrainBox");
+                if (trainBox.style.display == "none") {
+                    trainBox.style.display == "block"
+                } else {
+                    trainBox.style.display == "none"
+                }
+            }
+        </script>
+        <div id="babyTrainBox" style="display: none;">
+            <p>為了自動辨識寶寶人臉，請上傳寶寶包含五官的正臉、側臉、上仰照片</p>
+            <div class="trainBox-row sampleBox">
+                <div class="sample">
+                    <img src="/public/images/front.png" alt="front" style="width: 260px; height: 270px;">
+                </div>
+                <div class="sample">
+                    <img src="/public/images/side.png" alt="side" style="width: 260px; height: 270px;">
+                </div>
+                <div class="sample">
+                    <img src="/public/images/upward.png" alt="upward" style="width: 260px; height: 270px;">
+                </div>
+            </div>
+            <div class="trainBox-row sampleBox">
+                <div class="trainUpload">
+                    <label for="newBabyFront">正臉</label>
+                    <input
+                        type="file"
+                        class="form-control-file"
+                        id="newBabyFront"
+                        name="babyFront"                                
+                    />
+                </div>
+                <div class="trainUpload">
+                    <label for="newBabySide">側臉</label>
+                    <input
+                        type="file"
+                        class="form-control-file"
+                        id="newBabySide"
+                        name="babySide"                                
+                    />
+                </div>
+                <div class="trainUpload">
+                    <label for="newBabyUpward">上仰</label>
+                    <input
+                        type="file"
+                        class="form-control-file"
+                        id="newBabyUpward"
+                        name="babyUpward"                                
+                    />
+                </div>
+            </div>
+        </div>
+      </div>
+      <br />
+      <button type="submit" class="sign-btn sign-btn-primary">New Baby</button>
+      <p>已有寶寶代碼，我要<a class="followBaby-a">追蹤寶寶</a></p>
+    </form>
+  </div>
+  
+  
+  
