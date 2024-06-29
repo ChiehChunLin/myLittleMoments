@@ -1,4 +1,5 @@
 const moment = require("moment");
+const faceControl = require("./pythonController")
 const conn = require("../database/connDB");
 const userDB = require("../database/userDB");
 const babyDB = require("../database/babyDB");
@@ -10,7 +11,10 @@ const babyFakeData = require("../utils/babyDailyData");
 const time = require("../utils/getFormattedDate");
 const { getImageCDN } = require("../utils/awsS3");
 const { getSerialTimeFormat } = require("../utils/getFormattedDate");
-
+const faceCase ={
+  FACE_TRAIN: 1,
+  FACE_VALID: 2
+}
 const timelineRender = async (req, res, next) => {
   try {
     const { user } = req;
@@ -62,7 +66,6 @@ const timelineRender = async (req, res, next) => {
     next(error);
   }
 };
-
 const firstFollowRender = async (req, res, next) => {
   try {
     res.status(200).render("firstFollow");
@@ -105,12 +108,39 @@ const newBabyController = async (req, res, next) => {
 
     if (newBabyId && followBaby) {
       const trainFiles = req.files;
+      console.log(trainFiles);
       if(trainFiles["babyFront"] || trainFiles["babySide"] || trainFiles["babyUpward"]){
-        
+        trainFiles.map((file, index) => {
+          file.filename = `${newBabyId}-${index + 1}`;
+        })
+        faceControl(faceCase.FACE_TRAIN, trainFiles, (err, result) => {
+          if (err) {
+            return res.status(500).send(err.message);
+          }
+          //check files in faceTrained folder
+          return res.status(200).send({ message: "New Baby Train and Follow Successfully!" });
+        })
       }
-      return res.status(200).send({ message: "New Baby Train and Follow Successfully!" });
+      return res.status(200).send({ message: "New Baby and Follow Successfully!" });
     }
     
+  } catch (error) {
+    next(error);
+  }
+}
+const recognizeBabyFace = async (req, res, next) => {
+  try {
+    const { file } = req.body;
+
+    if( file ){
+      const imageFiles = [ file ];
+      faceControl(faceCase.FACE_VALID, imageFiles, (err, result) => {
+        if (err) {
+          return res.status(500).send(err.message);
+        }
+        return res.status(200).send(result);
+      })
+    }    
   } catch (error) {
     next(error);
   }
@@ -246,6 +276,7 @@ module.exports = {
   firstFollowRender,
   firstFollowController,
   newBabyController,
+  recognizeBabyFace,
   healthController,
   babyTimelineTabsData,
   dailyImages,
