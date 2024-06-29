@@ -2,3 +2,5 @@ node_modules/
 .env
 logs/
 downloaded/*
+uploads/*
+faceTest/*
