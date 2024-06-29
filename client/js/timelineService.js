@@ -8,6 +8,15 @@ if (window.location.href.includes("/timeline")) {
 
     const newBabyForm = document.getElementById("newBabyForm");
     const formData = new FormData(newBabyForm);
+    // const babyRole = formData.get("babyRole");
+    // const babyCall = formData.get("babyCall");
+    // const babyName = formData.get("babyName");
+    // const babyGender = formData.get("babyGender");
+    // const babyBirth = formData.get("babyBirth");
+    // const babyId = formData.get("babyId");
+    // const babyFront = formData.get("babyFront");
+    // const babySide = formData.get("babySide");
+    // const babyUpward = formData.get("babyUpward");
 
     const checkAuth = userCheckAuth();
     if (checkAuth) {
@@ -15,8 +24,8 @@ if (window.location.href.includes("/timeline")) {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache" // without this config, the page return "304 Not Modified"
+          // "Content-Type": "application/json",
+          // "Cache-Control": "no-cache" // without this config, the page return "304 Not Modified"
         },
         body: formData
       };
@@ -46,11 +55,11 @@ if (window.location.href.includes("/timeline")) {
       userNewBabyAndFolowFetch("/timeline/firstFollow", config);
     }
   });
-  $("inputRole").on("change", function(e){
+  $("#inputRole").on("change", function(e){
     if(e.target.value === "manager"){
-      $(".showNewBabyLink").style.display = "block";
+      $(".showNewBabyLink")[0].style.display = "block";
     }else{
-      $(".showNewBabyLink").style.display = "none";
+      $(".showNewBabyLink")[0].style.display = "none";
     }
   })
 
@@ -65,7 +74,7 @@ if (window.location.href.includes("/timeline")) {
     $(".newBabyForm-div").removeClass("divHide").addClass("divShow");
     $(".firstFollow-div").removeClass("divShow").addClass("divHide");
   })
-  $("followBaby-a").on("click", function (e) {
+  $(".followBaby-a").on("click", function (e) {
     $(".firstFollow-div").removeClass("divHide").addClass("divShow");
     $(".newBabyForm-div").removeClass("divShow").addClass("divHide");
   })

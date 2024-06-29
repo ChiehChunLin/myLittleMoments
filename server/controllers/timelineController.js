@@ -15,6 +15,7 @@ const faceCase ={
   FACE_TRAIN: 1,
   FACE_VALID: 2
 }
+
 const timelineRender = async (req, res, next) => {
   try {
     const { user } = req;
@@ -103,6 +104,9 @@ const newBabyController = async (req, res, next) => {
       return res.status(500).send({ message: "user is not defined" });
     }
     const { babyRole, babyCall, babyName, babyGender, babyBirth, babyId} = req.body;   
+    const trainFiles = req.files;
+      console.log(trainFiles);
+      return res.status(500).send({ babyRole, babyCall, babyName, babyGender, babyBirth, babyId, trainFiles});
     const newBabyId = await babyDB.newBaby(conn, babyName, babyGender, babyBirth, babyId);
     const followBaby = await userDB.setUserFollowBaby(conn, user.id, newBabyId, babyRole, babyCall);
 

@@ -1,5 +1,5 @@
 <div class="newBabyForm-div divHide">
-    <form id="newBabyForm" style="margin: 2rem 0;">
+    <form id="newBabyForm" style="margin: 2rem 0;" enctype="multipart/form-data">
       <div class="sign-group">
           <label for="inputBabyRole">關係</label>
           <select
@@ -29,7 +29,7 @@
         <label for="inputBabyName">寶寶名稱</label>
         <input
           class="sign-control"
-          type="number"
+          type="text"
           id="inputBabyName"
           placeholder="請輸入寶寶名稱"
           name="babyName"
@@ -40,7 +40,7 @@
       <div class="sign-group">
         <label for="inputBabyGender">寶寶性別</label>
         <select
-            class="form-control"
+            class="sign-control"
             id="inputBabyGender"
             name="babyGender"
             value=""
@@ -54,7 +54,7 @@
         <label for="inputBabyBirth">寶寶生日</label>
         <input
             type="date"
-            class="form-control"
+            class="sign-control"
             id="inputBabyBirth"
             name="babyBirth"
             required
@@ -74,59 +74,59 @@
       <br />
       <div class="sign-group">
         <div class="showBabyTrainBox">
-            <input id="showBabyTrain" type="checkbox" onclick="showBabyTrainBox()" />
+            <input id="showBabyTrain" type="checkbox" onclick="showBabyTrainBox()"/>
             <label for="showBabyTrain" style="font-size: 1rem">是否自動蒐集親友內含寶寶的家庭合照</label>
         </div>
         <script>
             function showBabyTrainBox() {
                 const trainBox = document.getElementById("babyTrainBox");
-                if (trainBox.style.display == "none") {
-                    trainBox.style.display == "block"
+                if (showBabyTrain.checked) {
+                    trainBox.style.display = "block"
                 } else {
-                    trainBox.style.display == "none"
+                    trainBox.style.display = "none"
                 }
             }
         </script>
-        <div id="babyTrainBox" style="display: none;">
-            <p>為了自動辨識寶寶人臉，請上傳寶寶包含五官的正臉、側臉、上仰照片</p>
+        <br />
+        <div id="babyTrainBox" class="sign-control" style="display: none;">
+            <p>為自動辨識寶寶</p>
+            <p>請上傳包含五官的正臉、側臉、上仰照片</p>
             <div class="trainBox-row sampleBox">
                 <div class="sample">
-                    <img src="/public/images/front.png" alt="front" style="width: 260px; height: 270px;">
+                    <img src="/public/images/front.png" alt="front">
                 </div>
                 <div class="sample">
-                    <img src="/public/images/side.png" alt="side" style="width: 260px; height: 270px;">
+                    <img src="/public/images/side.png" alt="side">
                 </div>
                 <div class="sample">
-                    <img src="/public/images/upward.png" alt="upward" style="width: 260px; height: 270px;">
+                    <img src="/public/images/upward.png" alt="upward">
                 </div>
             </div>
-            <div class="trainBox-row sampleBox">
+            <br>
+            <div class="trainUploadBox">
                 <div class="trainUpload">
-                    <label for="newBabyFront">正臉</label>
-                    <input
-                        type="file"
-                        class="form-control-file"
-                        id="newBabyFront"
-                        name="babyFront"                                
-                    />
+                  <div class="input-group mb-3">
+                    <div class="custom-file">
+                      <input type="file" class="custom-file-input" id="inputBabyFront" name="babyFront">
+                      <label class="custom-file-label" for="inputBabyFront" aria-describedby="inputGroupFileAddon02">Choose file</label>
+                    </div>
+                  </div>
                 </div>
                 <div class="trainUpload">
-                    <label for="newBabySide">側臉</label>
-                    <input
-                        type="file"
-                        class="form-control-file"
-                        id="newBabySide"
-                        name="babySide"                                
-                    />
+                  <div class="input-group mb-3">
+                    <div class="custom-file">
+                      <input type="file" class="custom-file-input" id="inputBabySide" name="babySide">
+                      <label class="custom-file-label" for="inputBabySide" aria-describedby="inputGroupFileAddon02">Choose file</label>
+                    </div>
+                  </div>
                 </div>
                 <div class="trainUpload">
-                    <label for="newBabyUpward">上仰</label>
-                    <input
-                        type="file"
-                        class="form-control-file"
-                        id="newBabyUpward"
-                        name="babyUpward"                                
-                    />
+                  <div class="input-group mb-3">
+                    <div class="custom-file">
+                      <input type="file" class="custom-file-input" id="inputBabyUpward" name="babyUpward">
+                      <label class="custom-file-label" for="inputBabyUpward" aria-describedby="inputGroupFileAddon02">Choose file</label>
+                    </div>
+                  </div>
                 </div>
             </div>
         </div>

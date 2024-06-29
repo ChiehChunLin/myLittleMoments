@@ -171,6 +171,17 @@ input[type="number"] {
 #lineBtn:hover {
   background-color: #05b34c;
 }
+
+.trainBox-row {
+  display: flex;
+  justify-content: space-around;
+}
+.sample {
+  width: 30%;
+  height: 30%;
+  overflow: hidden;
+}
+
 /* ================================= 
             Image Player
 ==================================== */
