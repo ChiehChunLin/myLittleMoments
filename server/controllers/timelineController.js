@@ -1,3 +1,5 @@
+const fs = require("fs");
+const sharp = require("sharp");
 const moment = require("moment");
 const faceControl = require("./pythonController")
 const conn = require("../database/connDB");
@@ -11,7 +13,7 @@ const babyFakeData = require("../utils/babyDailyData");
 const time = require("../utils/getFormattedDate");
 const { getImageCDN } = require("../utils/awsS3");
 const { getSerialTimeFormat } = require("../utils/getFormattedDate");
-const fs = require("fs");
+
 const faceCase ={
   FACE_TRAIN: 1,
   FACE_VALID: 2
@@ -123,24 +125,28 @@ const newBabyController = async (req, res, next) => {
     //   buffer: <Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 01 00 00 48 00 48 00 00 ff e1 00 58 45 78 69 66 00 00 4d 4d 00 2a 00 00 00 08 00 02 01 12 00 03 00 00 00 01 00 01 ... 219324 more bytes>,
     //   size: 219374
     // }
-    trainFiles.map((file, index) => {
-      file.path = `faceTest/1682294400000-${index + 1}.jpg`; //相對於python的路徑
-      file.filename = `${babyId}-${index + 1}`;
-    });
     const newBabyId = await babyDB.newBaby(conn, babyName, babyGender, babyBirth, babyId);
     const followBaby = await userDB.setUserFollowBaby(conn, user.id, newBabyId, babyRole, babyCall);
 
-    if(trainFiles.length > 0){
-      console.log('trainFiles.length > 0');
-      faceControl(faceCase.FACE_TRAIN, [trainFiles[0].path], (err, result) => {
+    const trainPaths = [];
+    for(let i = 0; i < trainFiles.length ; i++){
+      const filename = `${newBabyId}-${i + 1}`;
+      const fileExtension = trainFiles[i].mimetype.split('/')[1];
+      const filePath = `faceUploads/${filename}.${fileExtension}`;
+      await saveImageFromBuffer(trainFiles[i].buffer, filePath);
+      trainPaths.push(filePath);
+    }
+
+    if(trainPaths.length > 0){
+
+      //child_process
+      faceControl(faceCase.FACE_TRAIN, trainPaths, (err, result) => {
         if (err) {
           console.log(err);
           return res.status(500).send(err.message);
         }
-        //check files in faceTrained folder
-        console.log("result");
+        //output after child_process closed
         console.log(result);
-        return res.status(200).send({ message: "New Baby Train and Follow Successfully!" });
       })        
     }
     return res.status(200).send({ message: "New Baby and Follow Successfully!" });
@@ -292,6 +298,19 @@ const uploadImageToS3 = async (req, res, next) => {
     next(error);
   }
 };
+
+async function saveImageFromBuffer(imageBuffer, filepath) {
+  
+  await sharp(imageBuffer)
+      .toFile(filepath)
+      .then(() => {
+          console.log(`Image saved as ${filepath}`);
+      })
+      .catch(err => {
+          console.error('Error saving image:', err);
+          throw err;
+      });      
+}
 
 module.exports = {
   firstFollowRender,

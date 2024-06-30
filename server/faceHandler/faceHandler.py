@@ -35,13 +35,14 @@ def face_register(img_path):
                 points = landmarks[i, :].reshape((5, 2))
                 faces_sum += 1
         if faces_sum == 1:
+            filename = os.path.splitext(os.path.basename(img_path))[0]
             nimg = face_preprocess.preprocess(image, bbox, points, image_size='112,112')
-            cv2.imencode('.png', nimg)[1].tofile('faceTrained/%s.png' % os.path.splitext(os.path.basename(img_path))[0])
-            print("紀錄成功！")
+            cv2.imencode('.png', nimg)[1].tofile('faceTrained/%s.png' % filename)
+            return ("{}.png 紀錄成功！".format(filename))
         else:
-            print('紀錄圖片有錯，圖片中只能有一人五官清晰的照片')
+            return ('{}.png 圖片錯誤，圖片中只能有一人五官清晰的照片'.format(filename))
     else:
-        print('紀錄圖片有錯，圖片中至少一人五官清晰的照片')
+        return('{}.png 圖片錯誤，圖片中至少一人五官清晰的照片'.format(filename))
 
 
 def face_recognition(img_path):
@@ -96,27 +97,25 @@ def face_recognition(img_path):
                 print(f"{info_name[k]} {'%.2f' % probs[k]}")
 
 if __name__ == '__main__':
-    print('main')
     if len(sys.argv) != 3:
         print("Usage: script.py <arg1> <arg2>")
         sys.exit(1)
     
     # Get the arguments
-    print("args={}".format(sys.argv))
     case = sys.argv[1]
-    paths = sys.argv[2:]
-    print("python paths: {}".format(paths))
+    paths = sys.argv[2:][0].split(',')
+    # print("python paths: {}".format(paths))
 
     results = []
     if case == '1':                
-        print('case 1')
+        # print('case 1')
         for path in paths:
             result = face_register(path)
             results.append(result)
         print(results)
 
     elif case == '2':
-        print('case 2')
+        # print('case 2')
         result = face_recognition(paths[0])
         results.append(result)
         print(results)

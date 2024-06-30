@@ -1,31 +1,30 @@
 const { spawn } = require('child_process');
 const scriptPath = "faceHandler/faceHandler.py";
 
-function faceControl(caseCode, imageFiles, callback) {
-    
-    function constructPython(caseCode, imageFiles){
-        return [scriptPath, caseCode, imageFiles];
-        //return ['-l', '-c', '/home/chiehchunlin/wk/00-Web/Tensorflow-FaceRecognition/myenv/bin/python3', scriptPath, caseCode, imageFiles];
-        //return ['-l', '-c', 'ls -al']
+function faceControl(caseCode, imagePaths, callback) {
+
+    function constructPython(caseCode, imagePaths){
+        return [scriptPath, caseCode, imagePaths];
     }
-    const constructs = constructPython(caseCode, imageFiles);
-    console.log(constructs);
+    const constructs = constructPython(caseCode, imagePaths);
     const pythonProcess = spawn('/home/chiehchunlin/wk/00-Web/Tensorflow-FaceRecognition/myenv/bin/python3', constructs);
-    console.log('spawn done');
+    // const pythonProcess = spawn('python3', constructs);
+
     let result = '';
     let error = '';
 
     // Collect data from the Python script
     pythonProcess.stdout.on('data', (data) => {
-        console.log(data.toString())
-
-        result += data.toString();
+        // console.log("stdout")
+        // console.log(data.toString())
+        // result += data.toString();
     });
 
     // Handle any errors
     pythonProcess.stderr.on('data', (data) => {
-        console.log(data.toString())
-        error += data.toString();
+        // console.log("stderr")
+        // console.log(data.toString())
+        // error += data.toString();
     });
 
     // When the process is done
