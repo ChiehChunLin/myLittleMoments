@@ -11,6 +11,7 @@ const babyFakeData = require("../utils/babyDailyData");
 const time = require("../utils/getFormattedDate");
 const { getImageCDN } = require("../utils/awsS3");
 const { getSerialTimeFormat } = require("../utils/getFormattedDate");
+const fs = require("fs");
 const faceCase ={
   FACE_TRAIN: 1,
   FACE_VALID: 2
@@ -103,30 +104,43 @@ const newBabyController = async (req, res, next) => {
     if(!user){
       return res.status(500).send({ message: "user is not defined" });
     }
-    const { babyRole, babyCall, babyName, babyGender, babyBirth, babyId} = req.body;   
-    const trainFiles = req.files;
-      console.log(trainFiles);
-      return res.status(500).send({ babyRole, babyCall, babyName, babyGender, babyBirth, babyId, trainFiles});
+    const { babyRole, babyCall, babyName, babyGender, babyBirth, babyId } = req.body;   
+    const trainFiles = [];
+    if(req.files.babyFront){
+      trainFiles.push(req.files.babyFront[0]);
+    }
+    if(req.files.babySide){
+      trainFiles.push(req.files.babySide[0]);
+    }
+    if(req.files.babyUpward){
+      trainFiles.push(req.files.babyUpward[0]);
+    }
+    // {
+    //   fieldname: 'babyFront',
+    //   originalname: '1682294400000-1.jpg',
+    //   encoding: '7bit',
+    //   mimetype: 'image/jpeg',
+    //   buffer: <Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 01 00 00 48 00 48 00 00 ff e1 00 58 45 78 69 66 00 00 4d 4d 00 2a 00 00 00 08 00 02 01 12 00 03 00 00 00 01 00 01 ... 219324 more bytes>,
+    //   size: 219374
+    // }
+    trainFiles.map((file, index) => {
+      file.path = `../faceTest/1682294400000-${index + 1}.jpg`; //相對於python的路徑
+      file.filename = `${babyId}-${index + 1}`;
+    });
     const newBabyId = await babyDB.newBaby(conn, babyName, babyGender, babyBirth, babyId);
     const followBaby = await userDB.setUserFollowBaby(conn, user.id, newBabyId, babyRole, babyCall);
 
-    if (newBabyId && followBaby) {
-      const trainFiles = req.files;
-      console.log(trainFiles);
-      if(trainFiles["babyFront"] || trainFiles["babySide"] || trainFiles["babyUpward"]){
-        trainFiles.map((file, index) => {
-          file.filename = `${newBabyId}-${index + 1}`;
-        })
-        faceControl(faceCase.FACE_TRAIN, trainFiles, (err, result) => {
-          if (err) {
-            return res.status(500).send(err.message);
-          }
-          //check files in faceTrained folder
-          return res.status(200).send({ message: "New Baby Train and Follow Successfully!" });
-        })
-      }
-      return res.status(200).send({ message: "New Baby and Follow Successfully!" });
+    if(trainFiles.length > 0){
+      faceControl(faceCase.FACE_TRAIN, trainFiles, (err, result) => {
+        if (err) {
+          return res.status(500).send(err.message);
+        }
+        //check files in faceTrained folder
+        console.log(result);
+        return res.status(200).send({ message: "New Baby Train and Follow Successfully!" });
+      })        
     }
+    return res.status(200).send({ message: "New Baby and Follow Successfully!" });
     
   } catch (error) {
     next(error);
