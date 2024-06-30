@@ -124,18 +124,21 @@ const newBabyController = async (req, res, next) => {
     //   size: 219374
     // }
     trainFiles.map((file, index) => {
-      file.path = `../faceTest/1682294400000-${index + 1}.jpg`; //相對於python的路徑
+      file.path = `faceTest/1682294400000-${index + 1}.jpg`; //相對於python的路徑
       file.filename = `${babyId}-${index + 1}`;
     });
     const newBabyId = await babyDB.newBaby(conn, babyName, babyGender, babyBirth, babyId);
     const followBaby = await userDB.setUserFollowBaby(conn, user.id, newBabyId, babyRole, babyCall);
 
     if(trainFiles.length > 0){
-      faceControl(faceCase.FACE_TRAIN, trainFiles, (err, result) => {
+      console.log('trainFiles.length > 0');
+      faceControl(faceCase.FACE_TRAIN, [trainFiles[0].path], (err, result) => {
         if (err) {
+          console.log(err);
           return res.status(500).send(err.message);
         }
         //check files in faceTrained folder
+        console.log("result");
         console.log(result);
         return res.status(200).send({ message: "New Baby Train and Follow Successfully!" });
       })        

@@ -34,6 +34,7 @@ def load_mtcnn():
               MODEL_PATH + "/ONet_landmark/ONet"]
     epoch = [18, 14, 16]
     model_path = ['%s-%s' % (x, y) for x, y in zip(prefix, epoch)]
+    print("model_path[0]: {}".format(model_path[0]))
     PNet = FcnDetector(P_Net, model_path[0])
     detectors[0] = PNet
     RNet = Detector(R_Net, 24, 1, model_path[1])

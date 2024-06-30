@@ -36,7 +36,7 @@ def face_register(img_path):
                 faces_sum += 1
         if faces_sum == 1:
             nimg = face_preprocess.preprocess(image, bbox, points, image_size='112,112')
-            cv2.imencode('.png', nimg)[1].tofile('../faceTrained/%s.png' % os.path.splitext(os.path.basename(img_path))[0])
+            cv2.imencode('.png', nimg)[1].tofile('faceTrained/%s.png' % os.path.splitext(os.path.basename(img_path))[0])
             print("紀錄成功！")
         else:
             print('紀錄圖片有錯，圖片中只能有一人五官清晰的照片')
@@ -96,38 +96,42 @@ def face_recognition(img_path):
                 print(f"{info_name[k]} {'%.2f' % probs[k]}")
 
 if __name__ == '__main__':
+    print('main')
+    if len(sys.argv) != 3:
+        print("Usage: script.py <arg1> <arg2>")
+        sys.exit(1)
     
-    # if len(sys.argv) != 3:
-    #     print("Usage: script.py <arg1> <arg2>")
-    #     sys.exit(1)
+    # Get the arguments
+    print("args={}".format(sys.argv))
+    case = sys.argv[1]
+    paths = sys.argv[2:]
+    print("python paths: {}".format(paths))
 
-    # # Get the arguments
-    # case = sys.argv[1]
-    # paths = sys.argv[2]
+    results = []
+    if case == '1':                
+        print('case 1')
+        for path in paths:
+            result = face_register(path)
+            results.append(result)
+        print(results)
 
-    # results = []
-    # if case == 1:                
-    #     for path in paths
-    #         result = face_register(path)
-    #         results.append(result)
-    #     print(results)
+    elif case == '2':
+        print('case 2')
+        result = face_recognition(paths[0])
+        results.append(result)
+        print(results)
 
-    # elif case == 2:
-    #     result = face_recognition(paths[0])
-    #     results.append(result)
-    #     print(results)
-
-    # else:
-    #     print("功能选择错误")
-
-    i = int(input("请选择功能，1为注册人脸，2为识别人脸："))
-    image_path = input("请输入图片路径：")
-    if i == 1:
-        user_name = input("请输入注册名：")
-        face_register(image_path)
-    elif i == 2:
-        face_recognition(image_path)
     else:
         print("功能选择错误")
+
+    # i = int(input("请选择功能，1为注册人脸，2为识别人脸："))
+    # image_path = input("请输入图片路径：")
+    # if i == 1:
+    #     user_name = input("请输入注册名：")
+    #     face_register(image_path)
+    # elif i == 2:
+    #     face_recognition(image_path)
+    # else:
+    #     print("功能选择错误")
         
     
