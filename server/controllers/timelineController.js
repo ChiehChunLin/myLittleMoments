@@ -138,34 +138,72 @@ const newBabyController = async (req, res, next) => {
     }
 
     if(trainPaths.length > 0){
-
       //child_process
-      faceControl(faceCase.FACE_TRAIN, trainPaths, (err, result) => {
+      faceControl(faceCase.FACE_TRAIN, trainPaths, (err, resultStr) => {
         if (err) {
           console.log(err);
           return res.status(500).send(err.message);
         }
-        //output after child_process closed
-        console.log(result);
+        const resultArrays = resultStr.split(/\s+/);
+        // [
+        //   '1719820286587-1',
+        //   'Success',
+        //   '1719820286587-2',
+        //   'Success',
+        //   '1719820286587-3',
+        //   'Success',
+        //   ''
+        // ]
+        let trainMsg =""
+        if(resultArrays.includes('Success')){
+          trainMsg = " Train"
+        }
+        if(newBabyId && followBaby && resultArrays.includes('Success')){
+          return res.status(200).send({ message: `New Baby${trainMsg} and Follow Successfully!` });
+        }
       })        
-    }
-    return res.status(200).send({ message: "New Baby and Follow Successfully!" });
-    
+    }    
   } catch (error) {
     next(error);
   }
 }
 const recognizeBabyFace = async (req, res, next) => {
   try {
-    const { file } = req.body;
+    //req from Lambda, won't have user.id (handle in userRoute)
+    // const { file } = req.files;
+    // console.log(req.files);
 
-    if( file ){
-      const imageFiles = [ file ];
-      faceControl(faceCase.FACE_VALID, imageFiles, (err, result) => {
+    // return res.send({msg: "OK"})
+    //check faceTrained images --> waste resource 
+
+    // if( file )
+      {
+      const filePath = `faceUploads/validBabyTemp.jpg`;
+      // await saveImageFromBuffer(file.buffer, filePath);
+
+      const imageFiles = [ filePath ];
+      faceControl(faceCase.FACE_VALID, imageFiles, (err, resultStr) => {
         if (err) {
           return res.status(500).send(err.message);
         }
-        return res.status(200).send(result);
+        const babyIds = [];
+        const resultArrays = resultStr.split(/\s+/);
+        // [ 
+        //    '1719820286587-2',
+        //    '0.74',
+        //    'unknown',
+        //    '0.38',
+        //    '' 
+        //  ]
+        resultArrays.map(result => {
+          if(result.includes("-")){
+            const id = result.split('-')[0];
+            if(!babyIds.includes(id)){
+              babyIds.push(id);
+            }
+          }
+        })
+        return res.status(200).send(babyIds);
       })
     }    
   } catch (error) {

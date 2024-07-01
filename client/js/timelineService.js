@@ -8,15 +8,6 @@ if (window.location.href.includes("/timeline")) {
 
     const newBabyForm = document.getElementById("newBabyForm");
     const formData = new FormData(newBabyForm);
-    // const babyRole = formData.get("babyRole");
-    // const babyCall = formData.get("babyCall");
-    // const babyName = formData.get("babyName");
-    // const babyGender = formData.get("babyGender");
-    // const babyBirth = formData.get("babyBirth");
-    // const babyId = formData.get("babyId");
-    // const babyFront = formData.get("babyFront");
-    // const babySide = formData.get("babySide");
-    // const babyUpward = formData.get("babyUpward");
 
     const checkAuth = userCheckAuth();
     if (checkAuth) {
@@ -24,8 +15,6 @@ if (window.location.href.includes("/timeline")) {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          // "Content-Type": "application/json",
-          // "Cache-Control": "no-cache" // without this config, the page return "304 Not Modified"
         },
         body: formData
       };

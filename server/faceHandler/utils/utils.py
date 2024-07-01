@@ -34,7 +34,7 @@ def load_mtcnn():
               MODEL_PATH + "/ONet_landmark/ONet"]
     epoch = [18, 14, 16]
     model_path = ['%s-%s' % (x, y) for x, y in zip(prefix, epoch)]
-    print("model_path[0]: {}".format(model_path[0]))
+    # print("model_path[0]: {}".format(model_path[0]))
     PNet = FcnDetector(P_Net, model_path[0])
     detectors[0] = PNet
     RNet = Detector(R_Net, 24, 1, model_path[1])
@@ -96,7 +96,7 @@ def add_faces(mtcnn_detector):
 # 加载人脸识别模型
 def load_mobilefacenet():
     MODEL_PATH = config.MOBILEFACENET_MODEL_PATH
-    print('Model filename: %s' % MODEL_PATH)
+    # print('Model filename: %s' % MODEL_PATH)
     with tf.gfile.FastGFile(MODEL_PATH, 'rb') as f:
         graph_def = tf.GraphDef()
         graph_def.ParseFromString(f.read())

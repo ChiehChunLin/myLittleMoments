@@ -20,12 +20,12 @@ const upload = multer({
 router.get("/", timeline.timelineRender);
 router.get("/firstFollow", timeline.firstFollowRender);
 
+router.post("/firstFollow", timeline.firstFollowController);
 router.post("/newBaby", upload.fields([
   { name: "babyFront", maxCount: 1 },
   { name: "babySide", maxCount: 1 },
   { name: "babyUpward", maxCount: 1 }]),timeline.newBabyController);
-router.post("/validBaby", upload.fields([{ name: "file", maxCount: 1 }]),timeline.recognizeBabyFace);
-router.post("/firstFollow", timeline.firstFollowController);
+// router.post("/validBaby", upload.fields([{ name: "file", maxCount: 1 }]),timeline.recognizeBabyFace);
 router.post("/uploadImage", upload.fields([{ name: "file", maxCount: 1 }]), timeline.uploadImageToS3);
 router.post("/health", timeline.healthController);
 router.post("/babyProfile", timeline.babyTimelineTabsData);

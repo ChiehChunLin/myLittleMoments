@@ -10,14 +10,14 @@ function faceControl(caseCode, imagePaths, callback) {
     const pythonProcess = spawn('/home/chiehchunlin/wk/00-Web/Tensorflow-FaceRecognition/myenv/bin/python3', constructs);
     // const pythonProcess = spawn('python3', constructs);
 
-    let result = '';
+    let resultStr = '';
     let error = '';
 
     // Collect data from the Python script
     pythonProcess.stdout.on('data', (data) => {
         // console.log("stdout")
         // console.log(data.toString())
-        // result += data.toString();
+        resultStr += data.toString();
     });
 
     // Handle any errors
@@ -33,10 +33,9 @@ function faceControl(caseCode, imagePaths, callback) {
         if (code !== 0) {
             callback(new Error(`Python script exited with code ${code}\n${error}`), null);
         } else {
-            callback(null, result);
+            callback(null, resultStr);
         }
     });
-    console.log('nothing happen');
 }
 
 
