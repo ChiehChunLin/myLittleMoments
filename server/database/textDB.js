@@ -14,7 +14,7 @@ async function setText(conn, userId, babyId, content, date = "") {
   return rows.insertId;
 }
 async function getTextByMonth(conn, babyId, date) {
-  const addMonth = moment(date).add(1, "M").format("YYYY-MM-DD");
+  const monthAgo = moment(date).subtract(30, 'd').format('YYYY-MM-DD');
   const [rows] = await conn.query(
     `
      SELECT 
@@ -25,7 +25,7 @@ async function getTextByMonth(conn, babyId, date) {
      WHERE babyId = ? AND timestamp BETWEEN ? AND ?
      ORDER BY timestamp DESC;
     `,
-    [babyId, `${date} 00:00:00`, `${addMonth} 00:00:00`]
+    [babyId, `${monthAgo} 00:00:00`, `${date} 23:59:59`]
   );
   // console.log("getTextByMonth:" + JSON.stringify(rows));
   return rows;

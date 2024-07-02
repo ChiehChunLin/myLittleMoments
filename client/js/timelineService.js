@@ -118,7 +118,7 @@ if (window.location.href.includes("/timeline")) {
   $(".healthBlock").on("click", function (e) {
     if(document.querySelector("#healthContainer").getAttribute("loaded") == "false"){
       const babyId = document.querySelector("#profilePic").getAttribute("value");
-      const date = new Date().toISOString().slice(0, 10);  
+      const date = new Date().toISOString().slice(0, 10);  //YYYY-MM-DD
       fetchChartData(date, babyId)
     }
     $("#postsContainer").removeClass("divShow").addClass("divHide");

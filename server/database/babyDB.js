@@ -1,3 +1,4 @@
+const moment = require("moment");
 const { babyActivity } = require("../utils/getBabyConst");
 const {
   getUTCTime,
@@ -49,30 +50,87 @@ async function setBabyDaily(conn, userId, babyId, activity, quantity, date = "")
   // console.log("setBabyDaily:" + JSON.stringify(rows));
   return rows.insertId;
 }
-async function getBabyDailyWeek(conn, babyId, date) {
-  const week = getWeekNumberByDate(date);
+async function getBabyDailyDay(conn, babyId, date){
   const [rows] = await conn.query(
     `
-      SELECT 
-        DATE(timestamp) AS date,
-        SUM(CASE WHEN activity = '${babyActivity.MILK}' THEN quantity ELSE 0 END) AS dailyMilk,
-        SUM(CASE WHEN activity = '${babyActivity.FOOD}' THEN quantity ELSE 0 END) AS dailyFood,
-        SUM(CASE WHEN activity = '${babyActivity.SLEEP}' THEN quantity ELSE 0 END) AS dailySleep,
-        SUM(CASE WHEN activity = '${babyActivity.MEDICINE}' THEN quantity ELSE 0 END) AS dailyMedicine,
-        JSON_ARRAYAGG(
-            JSON_OBJECT(
-                'starttime', timestamp,
-                'activity', activity,
-                'quantity', quantity
-            )
-        ) AS daily
-      FROM babyDaily
-      WHERE babyId = ? AND week = ? 
-            AND  activity != '${babyActivity.HEIGHT}' AND activity != '${babyActivity.WEIGHT}'           
-      GROUP BY DATE(timestamp)
-      ORDER BY DATE(timestamp) ASC;
+      SELECT
+          date,
+          SUM(dailyMilk) as dailyMilk,
+          SUM(dailyFood) as dailyFood,
+          SUM(dailySleep) as dailySleep,
+          SUM(dailyMedicine) as dailyMedicine,
+          JSON_ARRAYAGG(
+              JSON_OBJECT(
+                  'endtime', endtime,
+                  'activity', activity,
+                  'quantity', quantity
+              )
+          ) as daily
+      FROM (
+          SELECT
+              DATE_FORMAT(DATE(timestamp), '%Y-%m-%d') as date,
+              timestamp as endtime,
+              activity,
+              quantity,
+              CASE WHEN activity = '${babyActivity.MILK}' THEN quantity ELSE 0 END as dailyMilk,
+              CASE WHEN activity = '${babyActivity.FOOD}' THEN quantity ELSE 0 END as dailyFood,
+              CASE WHEN activity = '${babyActivity.SLEEP}' THEN quantity ELSE 0 END as dailySleep,
+              CASE WHEN activity = '${babyActivity.MEDICINE}' THEN quantity ELSE 0 END as dailyMedicine
+          FROM
+              babyDaily
+          WHERE
+              babyId = ? AND timestamp BETWEEN ? AND ?
+              AND activity != '${babyActivity.HEIGHT}' AND activity != '${babyActivity.WEIGHT}'
+      ) as subquery
+      GROUP BY
+          date
+      ORDER BY
+          date ASC;
     `,
-    [babyId, week]
+    [babyId, `${date} 00:00:00`, `${date} 23:59:59`]
+  );
+  // console.log("getBabyDailyWeek:" + JSON.stringify(rows));
+  return rows;
+}
+async function getBabyDailyWeek(conn, babyId, date) {
+  const weekAgo = moment(date).subtract(6, 'd').format('YYYY-MM-DD');
+  const [rows] = await conn.query(
+    `
+      SELECT
+          date,
+          SUM(dailyMilk) as dailyMilk,
+          SUM(dailyFood) as dailyFood,
+          SUM(dailySleep) as dailySleep,
+          SUM(dailyMedicine) as dailyMedicine,
+          JSON_ARRAYAGG(
+              JSON_OBJECT(
+                  'endtime', endtime,
+                  'activity', activity,
+                  'quantity', quantity
+              )
+          ) as daily
+      FROM (
+          SELECT
+              DATE_FORMAT(DATE(timestamp), '%Y-%m-%d') as date,
+              timestamp as endtime,
+              activity,
+              quantity,
+              CASE WHEN activity = '${babyActivity.MILK}' THEN quantity ELSE 0 END as dailyMilk,
+              CASE WHEN activity = '${babyActivity.FOOD}' THEN quantity ELSE 0 END as dailyFood,
+              CASE WHEN activity = '${babyActivity.SLEEP}' THEN quantity ELSE 0 END as dailySleep,
+              CASE WHEN activity = '${babyActivity.MEDICINE}' THEN quantity ELSE 0 END as dailyMedicine
+          FROM
+              babyDaily
+          WHERE
+              babyId = ? AND timestamp BETWEEN ? AND ?
+              AND activity != '${babyActivity.HEIGHT}' AND activity != '${babyActivity.WEIGHT}'
+      ) as subquery
+      GROUP BY
+          date
+      ORDER BY
+          date ASC;
+    `,
+    [babyId, `${weekAgo} 00:00:00`, `${date} 23:59:59`]
   );
   // console.log("getBabyDailyWeek:" + JSON.stringify(rows));
   return rows;
@@ -164,6 +222,7 @@ module.exports = {
   newBaby,
   getBaby,
   setBabyDaily,
+  getBabyDailyDay,
   getBabyDailyWeek,
   getBabyWeightData,
   getBabyHeightData,

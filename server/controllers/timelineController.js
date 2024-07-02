@@ -12,7 +12,6 @@ const awsS3 = require("../utils/awsS3");
 const babyConst = require("../utils/getBabyConst");
 const babyFakeData = require("../utils/babyDailyData");
 const time = require("../utils/getFormattedDate");
-const { getImageCDN } = require("../utils/awsS3");
 const { getSerialTimeFormat } = require("../utils/getFormattedDate");
 const { pipeline } = require("stream");
 
@@ -40,24 +39,24 @@ const timelineRender = async (req, res, next) => {
     const follows = userData.follows;
     follows.map(data => {
       data.old = time.getDateDifference(data.birthday);
-      data.headshot = getImageCDN(data.headshot);
-      data.cover = getImageCDN(data.cover);
+      data.headshot = awsS3.getImageCDN(data.headshot);
+      data.cover = awsS3.getImageCDN(data.cover);
     })
     const babyData = follows[0];
     babyData.followsCount = follows.length;
 
-    const startDate = time.getDateBefore30days();
+    const today = moment().format('YYYY-MM-DD');
     const imageData = await imageDB.getImageByMonth(
       conn,
       babyData.id,
-      startDate
+      today
     );
     imageData.map((dateData) => {
       dateData.images.map((image) => {
-        image.filename = getImageCDN(`${babyData.id}/${image.filename}`);
+        image.filename = awsS3.getImageCDN(`${babyData.id}/${image.filename}`);
       });
     });
-    const textData = await textDB.getTextByMonth(conn, babyData.id, startDate);
+    const textData = await textDB.getTextByMonth(conn, babyData.id, today);
     // console.log(textData);
     // res.status(200).send({ data });
     res.status(200).render("timeline", {
@@ -172,42 +171,41 @@ const newBabyController = async (req, res, next) => {
 const recognizeBabyFace = async (req, res, next) => {
   try {
     //req from Lambda, won't have user.id (handle in userRoute)
-    console.log("Headers:", req.headers);
-    console.log('Body:', req.body);
-    const { babyId, filePath  } = req.body;
-    console.log('babyId:', babyId);
-    console.log('filePath:', filePath);
-    // if( file )
-      {
-      // const filePath = `faceUploads/validBabyTemp.jpg`;
-      // await saveImageFromBuffer(stream, filePath);
-      // await downloadContent(stream, filePath);
-
-      // const imageFiles = [ filePath ];
-      // faceControl(faceCase.FACE_VALID, imageFiles, (err, resultStr) => {
-      //   if (err) {
-      //     return res.status(500).send(err.message);
-      //   }
-      //   const babyIds = [];
-      //   const resultArrays = resultStr.split(/\s+/);
-      //   // [ 
-      //   //    '1719820286587-2',
-      //   //    '0.74',
-      //   //    'unknown',
-      //   //    '0.38',
-      //   //    '' 
-      //   //  ]
-      //   resultArrays.map(result => {
-      //     if(result.includes("-")){
-      //       const id = result.split('-')[0];
-      //       if(!babyIds.includes(id)){
-      //         babyIds.push(id);
-      //       }
-      //     }
-      //   })
-      //   return res.status(200).send(babyIds);
-      // })
-    }    
+    const babyId = req.query.id;
+    const key = req.query.path;
+    const filePath = `faceUploads/validBabyTemp.jpg`;
+    await awsS3.dumpImageFromS3(key, filePath, (err, path) => {
+        if(err){
+          return res.status(500).send(err.message);
+        }
+        if(path){
+            const imageFiles = [ path ];
+            console.log(imageFiles);
+            // faceControl(faceCase.FACE_VALID, imageFiles, (err, resultStr) => {
+            //   if (err) {
+            //     return res.status(500).send(err.message);
+            //   }
+            //   const babyIds = [];
+            //   const resultArrays = resultStr.split(/\s+/);
+            //   // [ 
+            //   //    '1719820286587-2',
+            //   //    '0.74',
+            //   //    'unknown',
+            //   //    '0.38',
+            //   //    '' 
+            //   //  ]
+            //   resultArrays.map(result => {
+            //     if(result.includes("-")){
+            //       const id = result.split('-')[0];
+            //       if(!babyIds.includes(id)){
+            //         babyIds.push(id);
+            //       }
+            //     }
+            //   })
+            //   return res.status(200).send(babyIds);
+            // })
+        }
+    })    
   } catch (error) {
     next(error);
   }
@@ -220,24 +218,7 @@ const healthController = async (req, res, next) => {
     // healthData
     const weightData = await babyDB.getBabyWeightData(conn, babyId);
     const heightData = await babyDB.getBabyHeightData(conn, babyId);
-    const dailyData = await babyDB.getBabyDailyWeek(conn, babyId, date);
-    
-    dailyData.map((date) => {
-      date.daily.map((activity) => {
-        if (activity.activity == babyConst.babyActivity.SLEEP) {
-          const hours = activity.quantity;
-          date.daily.endtime = moment(activity.starttime).add(
-            moment.duration(hours, "hours")
-          );
-          date.daily.unit = babyConst.babyActivityUnit[activity.activity];
-        } else {
-          date.daily.endtime = moment(activity.starttime).add(
-            moment.duration(1, "hours")
-          );
-          date.daily.unit = babyConst.babyActivityUnit[activity.activity];
-        }
-      });
-    });
+    const dailyData = await getWeekDailyData(babyId);
 
     res.status(200).send({ weightData, heightData, dailyData});
   } catch (error) {
@@ -251,47 +232,29 @@ const babyTimelineTabsData = async (req,res,next) => {
     // babyData
     const babyData = await babyDB.getBaby(conn, babyId);
     babyData.old = time.getDateDifference(babyData.birthday);
-    babyData.headshot = getImageCDN(babyData.headshot);
-    babyData.cover = getImageCDN(babyData.cover);
+    babyData.headshot = awsS3.getImageCDN(babyData.headshot);
+    babyData.cover = awsS3.getImageCDN(babyData.cover);
 
     // imageData
-    const startDate = time.getDateBefore30days();
+    const today = moment().format('YYYY-MM-DD');
     const imageData = await imageDB.getImageByMonth(
       conn,
       babyId,
-      startDate
+      today
     );
     imageData.map((dateData) => {
       dateData.images.map((image) => {
-        image.filename = getImageCDN(`${babyData.id}/${image.filename}`);
+        image.filename = awsS3.getImageCDN(`${babyData.id}/${image.filename}`);
       });
     });
 
     // textData
-    const textData = await textDB.getTextByMonth(conn, babyId, startDate);
+    const textData = await textDB.getTextByMonth(conn, babyId, today);
 
     // healthData
     const weightData = await babyDB.getBabyWeightData(conn, babyId);
     const heightData = await babyDB.getBabyHeightData(conn, babyId);
-    const dailys = await babyDB.getBabyDailyWeek(conn, babyId, date);
-    
-    dailys.map((date) => {
-      date.daily.map((activity) => {
-        if (activity.activity == babyConst.babyActivity.SLEEP) {
-          const hours = activity.quantity;
-          date.daily.endtime = moment(activity.starttime).add(
-            moment.duration(hours, "hours")
-          );
-          date.daily.unit = babyConst.babyActivityUnit[activity.activity];
-        } else {
-          date.daily.endtime = moment(activity.starttime).add(
-            moment.duration(1, "hours")
-          );
-          date.daily.unit = babyConst.babyActivityUnit[activity.activity];
-        }
-      });
-    });
-    const dailyData = babyFakeData;
+    const dailyData = await getWeekDailyData(babyId);    
     healthData = { weightData, heightData, dailyData};
 
     res.status(200).send({ babyData, imageData, textData, healthData });
@@ -304,7 +267,7 @@ const dailyImages = async (req,res,next) => {
     const { babyId, date } = req.body;
     const images = await imageDB.getImageByDate(conn, babyId, date);
     images.map(image =>{
-      image.filename = getImageCDN(`${babyId}/${image.filename}`);
+      image.filename = awsS3.getImageCDN(`${babyId}/${image.filename}`);
     })
     res.status(200).send({ images });
   } catch (error) {
@@ -339,6 +302,36 @@ const uploadImageToS3 = async (req, res, next) => {
   }
 };
 
+async function getWeekDailyData(babyId){
+  const dailyData =[];
+  for (let i=0; i< 7 ; i++) {
+    const currentDate = moment().subtract(i, 'd').format('YYYY-MM-DD');
+    const dailys = await babyDB.getBabyDailyDay(conn, babyId, currentDate);
+    if(dailys.length > 0){
+      const currentDaily = dailys[0];
+      currentDaily.daily.map(item => {
+        if(item.activity == babyConst.babyActivity.SLEEP){
+          item.starttime = moment(item.endtime).subtract(item.quantity, 'h');          
+        } else{
+          item.starttime = moment(item.endtime).subtract(1, 'h');
+        }
+        item.unit = babyConst.babyActivityUnit[item.activity];        
+      })
+      dailyData.push(currentDaily);
+    } else {
+      const initDaily = {
+        date: currentDate,
+        dailyMilk: 0,
+        dailyFood: 0,
+        dailySleep: 0,
+        dailyMedicine: 0,
+        daily: []
+      }
+      dailyData.push(initDaily);
+    }
+  }
+  return dailyData;
+}
 async function saveImageFromBuffer(imageBuffer, filepath) {
   
   await sharp(imageBuffer)
