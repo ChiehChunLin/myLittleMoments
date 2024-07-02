@@ -5,3 +5,7 @@ downloaded/*
 faceUploads/*
 faceTrained/*
 faceTest/*
+myenv/*
+faceHandler/__pycache__/*
+faceHandler/detection/__pycache__/*
+faceHandler/utils/__pycache__/*

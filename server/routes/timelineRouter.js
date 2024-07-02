@@ -19,6 +19,7 @@ const upload = multer({
 
 router.get("/", timeline.timelineRender);
 router.get("/firstFollow", timeline.firstFollowRender);
+router.get("/testDaily", timeline.testRoute);
 
 router.post("/firstFollow", timeline.firstFollowController);
 router.post("/newBaby", upload.fields([

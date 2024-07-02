@@ -332,21 +332,29 @@ const uploadImageToS3 = async (req, res, next) => {
     next(error);
   }
 };
+const testRoute = async(req, res, next) => {
+  const babyId = 1682294400000;
+  const data = await getWeekDailyData(babyId);
+  res.status(200).send({ data });
+}
 
 async function getWeekDailyData(babyId){
   const dailyData =[];
   for (let i=0; i< 7 ; i++) {
     const currentDate = moment().subtract(i, 'd').format('YYYY-MM-DD');
     const dailys = await babyDB.getBabyDailyDay(conn, babyId, currentDate);
+
     if(dailys.length > 0){
       const currentDaily = dailys[0];
       currentDaily.daily.map(item => {
         if(item.activity == babyConst.babyActivity.SLEEP){
-          item.starttime = moment(item.endtime).subtract(item.quantity, 'h');          
+          item.starttime = moment(item.endtime).subtract(item.quantity, 'hours').format('YYYY-MM-DD HH:mm:ss');          
+          item.unit = babyConst.babyActivityUnit[item.activity.toUpperCase()]; 
         } else{
-          item.starttime = moment(item.endtime).subtract(1, 'h');
+          item.starttime = moment(item.endtime).subtract(1, 'hours').format('YYYY-MM-DD HH:mm:ss');
+          item.unit = babyConst.babyActivityUnit[item.activity.toUpperCase()]; 
         }
-        item.unit = babyConst.babyActivityUnit[item.activity];        
+           
       })
       dailyData.push(currentDaily);
     } else {
@@ -393,5 +401,6 @@ module.exports = {
   babyTimelineTabsData,
   dailyImages,
   timelineRender,
-  uploadImageToS3
+  uploadImageToS3,
+  testRoute
 };
