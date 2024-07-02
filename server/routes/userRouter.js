@@ -27,6 +27,7 @@ router.post("/signup", user.signupController);
 router.get("/logout", user.logoutController);
 
 router.get("/validBaby", timeline.recognizeBabyFace);
-router.post("/validBaby", upload.fields([{ name: "file", maxCount: 1 }]),timeline.recognizeBabyFace);
+router.post("/validBaby", timeline.recognizeBabyFace);
+// router.post("/validBaby", upload.fields([{ name: "file", maxCount: 1 }]),timeline.recognizeBabyFace);
 
 module.exports = router;

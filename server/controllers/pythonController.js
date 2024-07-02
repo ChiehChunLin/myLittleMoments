@@ -7,7 +7,7 @@ function faceControl(caseCode, imagePaths, callback) {
         return [scriptPath, caseCode, imagePaths];
     }
     const constructs = constructPython(caseCode, imagePaths);
-    const pythonProcess = spawn('/home/chiehchunlin/wk/00-Web/Tensorflow-FaceRecognition/myenv/bin/python3', constructs);
+    const pythonProcess = spawn(process.env.PYTHON3_PATH, constructs);
     // const pythonProcess = spawn('python3', constructs);
 
     let resultStr = '';

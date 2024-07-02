@@ -1,4 +1,5 @@
 const fs = require("fs");
+const util = require("util");
 const sharp = require("sharp");
 const moment = require("moment");
 const faceControl = require("./pythonController")
@@ -13,6 +14,7 @@ const babyFakeData = require("../utils/babyDailyData");
 const time = require("../utils/getFormattedDate");
 const { getImageCDN } = require("../utils/awsS3");
 const { getSerialTimeFormat } = require("../utils/getFormattedDate");
+const { pipeline } = require("stream");
 
 const faceCase ={
   FACE_TRAIN: 1,
@@ -170,41 +172,41 @@ const newBabyController = async (req, res, next) => {
 const recognizeBabyFace = async (req, res, next) => {
   try {
     //req from Lambda, won't have user.id (handle in userRoute)
-    // const { file } = req.files;
-    // console.log(req.files);
-
-    // return res.send({msg: "OK"})
-    //check faceTrained images --> waste resource 
-
+    console.log("Headers:", req.headers);
+    console.log('Body:', req.body);
+    const { babyId, filePath  } = req.body;
+    console.log('babyId:', babyId);
+    console.log('filePath:', filePath);
     // if( file )
       {
-      const filePath = `faceUploads/validBabyTemp.jpg`;
-      // await saveImageFromBuffer(file.buffer, filePath);
+      // const filePath = `faceUploads/validBabyTemp.jpg`;
+      // await saveImageFromBuffer(stream, filePath);
+      // await downloadContent(stream, filePath);
 
-      const imageFiles = [ filePath ];
-      faceControl(faceCase.FACE_VALID, imageFiles, (err, resultStr) => {
-        if (err) {
-          return res.status(500).send(err.message);
-        }
-        const babyIds = [];
-        const resultArrays = resultStr.split(/\s+/);
-        // [ 
-        //    '1719820286587-2',
-        //    '0.74',
-        //    'unknown',
-        //    '0.38',
-        //    '' 
-        //  ]
-        resultArrays.map(result => {
-          if(result.includes("-")){
-            const id = result.split('-')[0];
-            if(!babyIds.includes(id)){
-              babyIds.push(id);
-            }
-          }
-        })
-        return res.status(200).send(babyIds);
-      })
+      // const imageFiles = [ filePath ];
+      // faceControl(faceCase.FACE_VALID, imageFiles, (err, resultStr) => {
+      //   if (err) {
+      //     return res.status(500).send(err.message);
+      //   }
+      //   const babyIds = [];
+      //   const resultArrays = resultStr.split(/\s+/);
+      //   // [ 
+      //   //    '1719820286587-2',
+      //   //    '0.74',
+      //   //    'unknown',
+      //   //    '0.38',
+      //   //    '' 
+      //   //  ]
+      //   resultArrays.map(result => {
+      //     if(result.includes("-")){
+      //       const id = result.split('-')[0];
+      //       if(!babyIds.includes(id)){
+      //         babyIds.push(id);
+      //       }
+      //     }
+      //   })
+      //   return res.status(200).send(babyIds);
+      // })
     }    
   } catch (error) {
     next(error);
@@ -348,6 +350,13 @@ async function saveImageFromBuffer(imageBuffer, filepath) {
           console.error('Error saving image:', err);
           throw err;
       });      
+}
+async function downloadContent(stream, downloadPath) {
+
+  const pipelineAsync = util.promisify(pipeline);
+
+  const writable = fs.createWriteStream(downloadPath);
+  await pipelineAsync(stream, writable);
 }
 
 module.exports = {
