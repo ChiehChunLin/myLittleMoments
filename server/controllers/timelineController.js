@@ -168,6 +168,37 @@ const newBabyController = async (req, res, next) => {
     next(error);
   }
 }
+const recognizeBabyFaceTest = async (req, res, next) => {
+  try {
+    const filePath = `faceUploads/validBabyTemp.jpg`;
+    const imageFiles = [ filePath ];
+    faceControl(faceCase.FACE_VALID, imageFiles, (err, resultStr) => {
+      if (err) {
+        return res.status(500).send(err.message);
+      }
+      const babyIds = [];
+      const resultArrays = resultStr.split(/\s+/);
+      // [ 
+      //    '1719820286587-2',
+      //    '0.74',
+      //    'unknown',
+      //    '0.38',
+      //    '' 
+      //  ]
+      resultArrays.map(result => {
+        if(result.includes("-")){
+          const id = result.split('-')[0];
+          if(!babyIds.includes(id)){
+            babyIds.push(id);
+          }
+        }
+      })
+      return res.status(200).send(babyIds);
+    })    
+  } catch (error) {
+    next(error);
+  }
+}
 const recognizeBabyFace = async (req, res, next) => {
   try {
     //req from Lambda, won't have user.id (handle in userRoute)
@@ -356,6 +387,7 @@ module.exports = {
   firstFollowRender,
   firstFollowController,
   newBabyController,
+  recognizeBabyFaceTest,
   recognizeBabyFace,
   healthController,
   babyTimelineTabsData,
