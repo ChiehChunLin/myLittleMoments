@@ -97,12 +97,22 @@ async function setUserFollowBaby(conn, userId, babyId, babyRole, relation) {
   // console.log("setUserFollowBaby:" + JSON.stringify(rows));
   return rows.insertId;
 }
-async function getManagerBabyList(conn, id){
+async function getManagerBabyList(conn, lineId){
   const [rows] = await conn.query(
     `
-      SELECT babyId FROM follows where userId = ? AND babyRole = '${babyRole.MANAGER}'
+      SELECT
+        follows.userId,
+        follows.babyId
+      FROM 
+        users
+      JOIN 
+        follows ON users.id = follows.userId
+      WHERE 
+        users.lineId = ? AND follows.babyRole = '${babyRole.MANAGER}'
+      ORDER BY 
+        follows.id ASC;
     `,
-    [id]
+    [lineId]
   );
   // console.log("getManagerBabyList:" + JSON.stringify(rows));
   return rows;
