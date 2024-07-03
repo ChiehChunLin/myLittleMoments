@@ -1,3 +1,4 @@
+const https = require('https');
 const fs = require("fs");
 const util = require("util");
 const sharp = require("sharp");
@@ -10,7 +11,6 @@ const imageDB = require("../database/imageDB");
 const textDB = require("../database/textDB");
 const awsS3 = require("../utils/awsS3");
 const babyConst = require("../utils/getBabyConst");
-const babyFakeData = require("../utils/babyDailyData");
 const time = require("../utils/getFormattedDate");
 const { getSerialTimeFormat } = require("../utils/getFormattedDate");
 const { pipeline } = require("stream");
@@ -155,15 +155,12 @@ const newBabyController = async (req, res, next) => {
         //   'Success',
         //   ''
         // ]
-        let trainMsg =""
-        if(resultArrays.includes('Success')){
-          trainMsg = " Train"
-        }
-        if(newBabyId && followBaby && resultArrays.includes('Success')){
-          return res.status(200).send({ message: `New Baby${trainMsg} and Follow Successfully!` });
-        }
+        console.log(`newBabyTrain Complete: ${resultArrays}`);
       })        
     }    
+    if(newBabyId && followBaby){
+      return res.status(200).send({ message: `New Baby and Follow Successfully!` }); //老師建議不要讓user等
+    }
   } catch (error) {
     next(error);
   }
@@ -201,42 +198,57 @@ const recognizeBabyFaceTest = async (req, res, next) => {
 }
 const recognizeBabyFace = async (req, res, next) => {
   try {
-    //req from Lambda, won't have user.id (handle in userRoute)
-    const babyId = req.query.id;
-    const key = req.query.path;
+    console.log("recognizeBabyFace");
+    const userId = "U9acc24aec8497b5e7159c861f9079b71"; //req.query.user
+    const babyId = "1682294400000"; //req.query.baby;
+    const key = "2024-07-03/515301315891954148";//req.query.path;
     const filePath = `faceUploads/validBabyTemp.jpg`;
-    await awsS3.dumpImageFromS3(key, filePath, (err, path) => {
-        if(err){
+
+    const babyIds = [];
+    const url = await awsS3.getImageS3(`${babyId}/${key}`);
+    downloadValidImageFromS3(url, filePath)
+    .then((message) => {
+      console.log(message);
+      const imageFiles = [ filePath ];
+      faceControl(faceCase.FACE_VALID, imageFiles, (err, resultStr) => {
+        if (err) {
           return res.status(500).send(err.message);
-        }
-        if(path){
-            const imageFiles = [ path ];
-            console.log(imageFiles);
-            // faceControl(faceCase.FACE_VALID, imageFiles, (err, resultStr) => {
-            //   if (err) {
-            //     return res.status(500).send(err.message);
-            //   }
-            //   const babyIds = [];
-            //   const resultArrays = resultStr.split(/\s+/);
-            //   // [ 
-            //   //    '1719820286587-2',
-            //   //    '0.74',
-            //   //    'unknown',
-            //   //    '0.38',
-            //   //    '' 
-            //   //  ]
-            //   resultArrays.map(result => {
-            //     if(result.includes("-")){
-            //       const id = result.split('-')[0];
-            //       if(!babyIds.includes(id)){
-            //         babyIds.push(id);
-            //       }
-            //     }
-            //   })
-            //   return res.status(200).send(babyIds);
-            // })
-        }
-    })    
+        }        
+        const resultArrays = resultStr.split(/\s+/);
+        console.log(resultArrays);
+        // [ 
+        //    '1719820286587-2',
+        //    '0.74',
+        //    'unknown',
+        //    '0.38',
+        //    '' 
+        //  ]
+        resultArrays.map( result => {
+          if(result.includes("-")){
+            const id = result.split('-')[0];
+            if(!babyIds.includes(id) && id != babyId){
+              babyIds.push(id);
+            }
+          }
+        })
+      })
+    })
+    .catch((error) => console.error(error));
+
+    babyIds.map(async id => {
+      console.log(`detect face id: ${id}`);
+      const awsResult = await awsS3.putImageS3(filePath, `${id}/${key}`);
+      if (awsResult.$metadata.httpStatusCode !== 200) {
+        console.log("S3 result: %j", awsResult);
+        throw new Error("image upload to S3 failed!");
+      }
+      const insertId = await imageDB.setImage(conn, userId, id, "image", key);
+      if( insertId == undefined){
+        console.log("setImage insertId: %j", insertId);
+        throw new Error("image info to DB failed!");
+      }
+    })
+    return res.status(200).send({message : "image faces dispatch OK!"});
   } catch (error) {
     next(error);
   }
@@ -306,7 +318,7 @@ const dailyImages = async (req,res,next) => {
   } 
 }
 
-const uploadImageToS3 = async (req, res, next) => {
+const uploadProfileImageToS3 = async (req, res, next) => {
   try {
     const { babyId, type } = req.body;
 
@@ -332,11 +344,21 @@ const uploadImageToS3 = async (req, res, next) => {
     next(error);
   }
 };
-const testRoute = async(req, res, next) => {
-  const babyId = 1682294400000;
-  const data = await getWeekDailyData(babyId);
-  res.status(200).send({ data });
-}
+const downloadValidImageFromS3 = (url, filePath) => {
+  return new Promise((resolve, reject) => {
+    const request = https.get(url, (response) => {
+      if (response.statusCode === 200) {
+        const fileStream = fs.createWriteStream(filePath);
+        response.pipe(fileStream);
+        fileStream.on('finish', () => resolve('Image downloaded successfully!'));
+      } else {
+        reject(new Error(`Error downloading image: ${response.statusCode}`));
+      }
+    });
+
+    request.on('error', (error) => reject(error));
+  });
+};
 
 async function getWeekDailyData(babyId){
   const dailyData =[];
@@ -383,13 +405,7 @@ async function saveImageFromBuffer(imageBuffer, filepath) {
           throw err;
       });      
 }
-async function downloadContent(stream, downloadPath) {
 
-  const pipelineAsync = util.promisify(pipeline);
-
-  const writable = fs.createWriteStream(downloadPath);
-  await pipelineAsync(stream, writable);
-}
 
 module.exports = {
   firstFollowRender,
@@ -401,6 +417,5 @@ module.exports = {
   babyTimelineTabsData,
   dailyImages,
   timelineRender,
-  uploadImageToS3,
-  testRoute
+  uploadImageToS3: uploadProfileImageToS3
 };

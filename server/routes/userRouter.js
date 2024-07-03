@@ -26,7 +26,7 @@ router.post("/login", user.loginController);
 router.post("/signup", user.signupController);
 router.get("/logout", user.logoutController);
 
-router.get("/validBaby", timeline.recognizeBabyFaceTest);
+router.get("/validBaby", timeline.recognizeBabyFace);
 router.post("/validBaby", timeline.recognizeBabyFace);
 
 module.exports = router;

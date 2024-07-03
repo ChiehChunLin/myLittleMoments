@@ -1,9 +1,9 @@
 require("dotenv").config();
 const fs = require("fs");
-const { CloudFrontClient, CreateInvalidationCommand } = require("@aws-sdk/client-cloudfront");
+// const { CloudFrontClient, CreateInvalidationCommand } = require("@aws-sdk/client-cloudfront");
 const { S3Client, GetObjectCommand, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { Upload } = require("@aws-sdk/lib-storage");
-// const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
 const s3Client = new S3Client({
   region: process.env.AWS_S3_BUCKET_REGION,
@@ -14,52 +14,33 @@ const s3Client = new S3Client({
 });
 const bucketName = process.env.AWS_S3_BUCKET_NAME;
 const cdnURL = process.env.AWS_S3_CDN_URL;
-const cdnRegion = process.env.AWS_S3_CDN_REGION;
-const cdnId = process.env.AWS_S3_CDN_ID;
-const cdnClient = new CloudFrontClient({ region: cdnRegion });
+// const cdnRegion = process.env.AWS_S3_CDN_REGION;
+// const cdnId = process.env.AWS_S3_CDN_ID;
+// const cdnClient = new CloudFrontClient({ region: cdnRegion });
 
 function getImageCDN(key) {
   return cdnURL + key;
 }
-async function createInvalidation(paths) {
-  const command = new CreateInvalidationCommand({
-    DistributionId: cdnId,
-    InvalidationBatch: {
-      CallerReference: `${Date.now().toString()}`, // Unique value for each invalidation
-      Paths: {
-        Quantity: paths.length,
-        Items: paths
-      }
-    }
-  });
-
-  try {
-    const response = await cdnClient.send(command);
-    console.log("Invalidation created:", response);
-  } catch (error) {
-    console.error("Error creating invalidation:", error);
-  }
-}
-async function getImageS3(key) {
+async function getImageS3(key, filename) {
   try {
     const params = {
       Bucket: bucketName,
       Key: key
     };
     let command = new GetObjectCommand(params);
-    // return await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+    return await getSignedUrl(s3Client, command, { expiresIn: 3600 });
   } catch (err) {
     console.error("Error getting image:", err);
     throw err;
   }
 }
-async function putImageS3(file) {
-  const fileStream = fs.createReadStream(file.path);
+async function putImageS3(filePath, fileName) {
+  const fileStream = fs.createReadStream(filePath);
   const params = {
     Bucket: bucketName,
-    Key: file.filename, //s3 wil replace the same name object!
+    Key: fileName, //s3 wil replace the same name object!
     Body: fileStream,
-    ContentType: file.mimetype
+    ContentType: "image/jpg"
   };
 
   const data = await s3Client.send(new PutObjectCommand(params));
@@ -93,6 +74,5 @@ module.exports = {
   getImageCDN,
   getImageS3,
   putImageS3,
-  putStreamImageS3,
-  createInvalidation
+  putStreamImageS3
 };
