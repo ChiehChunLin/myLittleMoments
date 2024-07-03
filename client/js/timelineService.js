@@ -21,6 +21,21 @@ if (window.location.href.includes("/timeline")) {
       userNewBabyAndFolowFetch("/timeline/newBaby", config);
     }
   });
+  $("#inputBabyFront").on("change", function (e) {
+    const fileName = e.target.value.split('\\').pop() || e.target.files[0].name;
+    const label = document.querySelector(`label[for="${e.target.id}"]`);
+    label.textContent = fileName;
+  })
+  $("#inputBabySide").on("change", function (e) {
+    const fileName = e.target.value.split('\\').pop() || e.target.files[0].name;
+    const label = document.querySelector(`label[for="${e.target.id}"]`);
+    label.textContent = fileName;
+  })
+  $("#inputBabyUpward").on("change", function (e) {
+    const fileName = e.target.value.split('\\').pop() || e.target.files[0].name;
+    const label = document.querySelector(`label[for="${e.target.id}"]`);
+    label.textContent = fileName;
+  })
   $("#firstFollowForm").on("submit", function (e) {
     e.preventDefault();
 
@@ -224,6 +239,7 @@ function userUploadFetch(url,config ="") {
     .then((data) => {
       const { message } = data;
       confirm(message);
+      window.location.reload();
     })
     .catch((err) => {
       alert(err.message);

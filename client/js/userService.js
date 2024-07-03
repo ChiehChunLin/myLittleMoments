@@ -1,5 +1,4 @@
 $(".logout").on("click", function (e) {
-  e.preventDefault();
   localStorage.removeItem("accessToken");
   displayLoginMessage("Logout Successfully!");
 });
