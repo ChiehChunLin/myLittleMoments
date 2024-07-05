@@ -1,6 +1,7 @@
 import sys
 import os
 import cv2
+import math
 import config
 import numpy as np
 import sklearn
@@ -23,28 +24,31 @@ faces_db = load_faces(face_sess, inputs_placeholder, embeddings)
 
 # 注册人脸
 def face_register(img_path):
+    angles = [0, 90, 180, 270]
+    filename = os.path.splitext(os.path.basename(img_path))[0]
     image = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8), 1)
-    faces, landmarks = mtcnn_detector.detect(image)
-    if faces.shape[0] != 0:
-        faces_sum = 0
-        bbox = []
-        points = []
-        for i, face in enumerate(faces):
-            if round(faces[i, 4], 6) > 0.95:
-                bbox = faces[i, 0:4]
-                points = landmarks[i, :].reshape((5, 2))
-                faces_sum += 1
-        if faces_sum == 1:
-            filename = os.path.splitext(os.path.basename(img_path))[0]
-            nimg = face_preprocess.preprocess(image, bbox, points, image_size='112,112')
-            cv2.imencode('.png', nimg)[1].tofile('faceTrained/%s.png' % filename)
-            print("{} Success".format(filename))
-        else:
-            print('{} Fail'.format(filename))
-    else:
-        print('{} Fail'.format(filename))
+    
+    for angle in angles:
+        rotated_image = rotate_image(image, angle)
+        faces, landmarks = mtcnn_detector.detect(rotated_image)
+        if faces.shape[0] != 0:
+            faces_sum = 0
+            bbox = []
+            points = []
+            for i, face in enumerate(faces):
+                if round(faces[i, 4], 6) > 0.95:
+                    bbox = faces[i, 0:4]
+                    points = landmarks[i, :].reshape((5, 2))
+                    faces_sum += 1
+            if faces_sum == 1:                
+                nimg = face_preprocess.preprocess(rotated_image, bbox, points, image_size='112,112')
+                cv2.imencode('.png', nimg)[1].tofile('faceTrained/%s.png' % filename)
+                print("{} Success".format(filename))
+                return
 
+    print('{} Fail'.format(filename))
 
+# 人脸识别
 def face_recognition(img_path):
     image = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8), 1)
     faces, landmarks = mtcnn_detector.detect(image)
@@ -95,6 +99,28 @@ def face_recognition(img_path):
 
             for k in range(faces_sum):
                 print(f"{info_name[k]} {'%.2f' % probs[k]}")
+
+# 照片依人臉轉正
+def rotate_image(img, angle):
+    h, w = img.shape[:2]
+    M = cv2.getRotationMatrix2D((w/2, h/2), angle, 1)
+    rotated = cv2.warpAffine(img, M, (w, h))
+    return rotated
+
+def process_image_rotations(image_path, output_base_path):
+    # 读取图像
+    img = cv2.imread(image_path)
+    angles = [0, 90, 180, 270]
+    
+    for angle in angles:
+        rotated_image = rotate_image(img, angle)
+        faces, landmarks = mtcnn_detector.detect(rotated_image)
+        if faces.shape[0] != 0:
+            output_path = f"{output_base_path}_{angle}.jpg"
+            cv2.imwrite(output_path, rotated_image)
+            print(f"检测到人脸和眼睛的图像已保存至: {output_path}")
+        else:
+            print(f"在旋转角度 {angle} 时未检测到人脸或眼睛。")
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:

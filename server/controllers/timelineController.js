@@ -142,8 +142,11 @@ const newBabyController = async (req, res, next) => {
       //child_process
       faceControl(faceCase.FACE_TRAIN, trainPaths, (err, resultStr) => {
         if (err) {
-          console.log(err);
-          return res.status(500).send(err.message);
+          console.log(`newBabyTrain Fail: ${err}`);
+        }
+        if(resultStr === null){
+          console.log(`newBabyTrain result null`);
+          return;
         }
         const resultArrays = resultStr.split(/\s+/);
         // [
@@ -199,13 +202,14 @@ const recognizeBabyFaceTest = async (req, res, next) => {
 const recognizeBabyFace = async (req, res, next) => {
   try {
     console.log("recognizeBabyFace");
-    const userId = "U9acc24aec8497b5e7159c861f9079b71"; //req.query.user
-    const babyId = "1682294400000"; //req.query.baby;
-    const key = "2024-07-03/515301315891954148";//req.query.path;
+    const userId = "U9acc24aec8497b5e7159c861f9079b71"; //req.query.user;
+    const babyId = "1682294400000"; //req.query.baby.split(',');
+    const key = "2024-07-02/1231321321321"
+    const trainPath = `default/defaultTrain`;//req.query.path;
     const filePath = `faceUploads/validBabyTemp.jpg`;
 
-    const babyIds = [];
-    const url = await awsS3.getImageS3(`${babyId}/${key}`);
+    let babyIds = [];
+    const url = await awsS3.getImageS3(trainPath);
     downloadValidImageFromS3(url, filePath)
     .then((message) => {
       console.log(message);
@@ -226,7 +230,7 @@ const recognizeBabyFace = async (req, res, next) => {
         resultArrays.map( result => {
           if(result.includes("-")){
             const id = result.split('-')[0];
-            if(!babyIds.includes(id) && id != babyId){
+            if(!babyIds.includes(id)){
               babyIds.push(id);
             }
           }
@@ -235,6 +239,7 @@ const recognizeBabyFace = async (req, res, next) => {
     })
     .catch((error) => console.error(error));
 
+    babyIds = babyIds.filter( ( el ) => !babyId.includes( el ) );
     babyIds.map(async id => {
       console.log(`detect face id: ${id}`);
       const awsResult = await awsS3.putImageS3(filePath, `${id}/${key}`);
@@ -417,5 +422,5 @@ module.exports = {
   babyTimelineTabsData,
   dailyImages,
   timelineRender,
-  uploadImageToS3: uploadProfileImageToS3
+  uploadProfileImageToS3
 };

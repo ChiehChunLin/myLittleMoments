@@ -25,7 +25,7 @@ router.post("/newBaby", upload.fields([
   { name: "babyFront", maxCount: 1 },
   { name: "babySide", maxCount: 1 },
   { name: "babyUpward", maxCount: 1 }]),timeline.newBabyController);
-router.post("/uploadImage", upload.fields([{ name: "file", maxCount: 1 }]), timeline.uploadImageToS3);
+router.post("/uploadImage", upload.fields([{ name: "file", maxCount: 1 }]), timeline.uploadProfileImageToS3);
 router.post("/health", timeline.healthController);
 router.post("/babyProfile", timeline.babyTimelineTabsData);
 router.post("/image/daily", timeline.dailyImages);
