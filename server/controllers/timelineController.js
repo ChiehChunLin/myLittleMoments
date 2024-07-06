@@ -203,16 +203,19 @@ const recognizeBabyFace = async (req, res, next) => {
   try {
     console.log("recognizeBabyFace");
     const userId = req.query.user; //1718868972609
-    const babyId = req.query.baby.split(',').filter( x => x != ""); //[] "1682294400000"; manager baby
-    const key = req.query.path; //"2024-07-02/1231321321321"
+    // const babyId = req.query.baby.split(',').filter( x => x != ""); //[] "1682294400000"; manager baby
+    // const key = req.query.path; //"2024-07-02/1231321321321"
     const trainPath = `default/defaultTrain`;
     const filePath = `faceUploads/validBabyTemp.jpg`;
 
     let babyIds = [];
+    const managerBabyList = userDB.getUserManagerBabys(conn, userId);
     const url = await awsS3.getImageS3(trainPath);
-    downloadValidImageFromS3(url, filePath)
+    await downloadValidImageFromS3(url, filePath)
     .then((message) => {
       console.log(message);
+
+      //face recognition
       const imageFiles = [ filePath ];
       faceControl(faceCase.FACE_VALID, imageFiles, (err, resultStr) => {
         if (err) {
@@ -227,6 +230,9 @@ const recognizeBabyFace = async (req, res, next) => {
         //    '0.38',
         //    '' 
         //  ]
+        managerBabyList.forEach(babyId => {
+          babyIds.push(babyId);
+        });  
         resultArrays.map( result => {
           if(result.includes("-")){
             const id = result.split('-')[0];
@@ -238,16 +244,15 @@ const recognizeBabyFace = async (req, res, next) => {
       })
     })
     .catch((error) => console.error(error));
-
-    babyIds = babyIds.filter( ( el ) => !babyId.includes( el ) );
-    babyIds.map(async id => {
-      console.log(`detect face id: ${id}`);
-      const awsResult = await awsS3.putImageS3(filePath, `${id}/${key}`);
+    console.log(babyIds);
+    babyIds.map(async babyId => {
+      console.log(`detect face id: ${babyId}`);
+      const awsResult = await awsS3.putImageS3(filePath, `${babyId}/${key}`);
       if (awsResult.$metadata.httpStatusCode !== 200) {
         console.log("S3 result: %j", awsResult);
         throw new Error("image upload to S3 failed!");
       }
-      const insertId = await imageDB.setImage(conn, userId, id, "image", key);
+      const insertId = await imageDB.setImage(conn, userId, babyId, "image", key);
       if( insertId == undefined){
         console.log("setImage insertId: %j", insertId);
         throw new Error("image info to DB failed!");
@@ -349,6 +354,7 @@ const uploadProfileImageToS3 = async (req, res, next) => {
     next(error);
   }
 };
+
 const downloadValidImageFromS3 = (url, filePath) => {
   return new Promise((resolve, reject) => {
     const request = https.get(url, (response) => {
@@ -409,6 +415,18 @@ async function saveImageFromBuffer(imageBuffer, filepath) {
           console.error('Error saving image:', err);
           throw err;
       });      
+}
+async function uploadTimelineImageToS3AndRDS(filePath, userId, babyId, key) {
+  const awsResult = await awsS3.putImageS3(filePath, `${babyId}/${key}`);
+  if (awsResult.$metadata.httpStatusCode !== 200) {
+    console.log("S3 result: %j", awsResult);
+    throw new Error("image upload to S3 failed!");
+  }
+  const insertId = await imageDB.setImage(conn, userId, babyId, "image", key);
+  if( insertId == undefined){
+    console.log("setImage insertId: %j", insertId);
+    throw new Error("image info to DB failed!");
+  }
 }
 
 

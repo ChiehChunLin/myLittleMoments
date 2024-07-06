@@ -97,22 +97,43 @@ async function setUserFollowBaby(conn, userId, babyId, babyRole, relation) {
   // console.log("setUserFollowBaby:" + JSON.stringify(rows));
   return rows.insertId;
 }
-async function getManagerBabyList(conn, lineId){
+async function getUserFollowsByLineID(conn, lineId, funcDB){
+  const condiction = ( funcDB == funcDB.GET_MAIN_BABYS) ? `AND follows.babyRole = 'manager'` : ``;
+  const [rows] = await conn.query(
+   `
+     SELECT
+         follows.userId AS userId,
+         JSON_ARRAYAGG(
+             JSON_OBJECT(
+                 'babyId', follows.babyId,
+                 'babyRole', follows.babyRole
+             )
+         ) AS babys
+     FROM 
+         users
+     JOIN 
+         follows ON users.id = follows.userId
+     WHERE 
+         users.lineId = ? ${condiction}
+     GROUP BY
+         follows.userId; 
+   `,
+   [lineId]
+ );
+ // console.log("getManagerBabyList:" + JSON.stringify(rows));
+ return rows;
+}
+async function getUserManagerBabys(conn, userId){
   const [rows] = await conn.query(
     `
       SELECT
-        follows.userId,
-        follows.babyId
+        babyId
       FROM 
-        users
-      JOIN 
-        follows ON users.id = follows.userId
+        follows
       WHERE 
-        users.lineId = ? AND follows.babyRole = '${babyRole.MANAGER}'
-      ORDER BY 
-        follows.id ASC;
+        userId = ? AND babyRole = '${babyRole.MANAGER}'
     `,
-    [lineId]
+    [userId]
   );
   // console.log("getManagerBabyList:" + JSON.stringify(rows));
   return rows;
@@ -125,5 +146,7 @@ module.exports = {
   getUserByEmail,
   getUserInfo,
   getLineUserList,
-  setUserFollowBaby
+  setUserFollowBaby,
+  getUserFollowsByLineID,
+  getUserManagerBabys
 };
