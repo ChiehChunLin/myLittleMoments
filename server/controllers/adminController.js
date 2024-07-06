@@ -2,7 +2,6 @@ const conn = require("../database/connDB");
 const userDB = require("../database/userDB");
 const babyDB = require("../database/babyDB");
 const imageDB = require("../database/imageDB");
-const { getDateDifference } = require("../utils/getFormattedDate");
 const dailyData = require("../utils/babyDailyData");
 
 const lineUserList = async (req,res,next)=>{

@@ -1,6 +1,5 @@
 const https = require('https');
 const fs = require("fs");
-const util = require("util");
 const sharp = require("sharp");
 const moment = require("moment");
 const faceControl = require("./pythonController")
@@ -13,7 +12,6 @@ const awsS3 = require("../utils/awsS3");
 const babyConst = require("../utils/getBabyConst");
 const time = require("../utils/getFormattedDate");
 const { getSerialTimeFormat } = require("../utils/getFormattedDate");
-const { pipeline } = require("stream");
 
 const faceCase ={
   FACE_TRAIN: 1,
@@ -168,50 +166,18 @@ const newBabyController = async (req, res, next) => {
     next(error);
   }
 }
-const recognizeBabyFaceTest = async (req, res, next) => {
-  try {
-    const filePath = `faceUploads/validBabyTemp.jpg`;
-    const imageFiles = [ filePath ];
-    faceControl(faceCase.FACE_VALID, imageFiles, (err, resultStr) => {
-      if (err) {
-        return res.status(500).send(err.message);
-      }
-      const babyIds = [];
-      const resultArrays = resultStr.split(/\s+/);
-      // [ 
-      //    '1719820286587-2',
-      //    '0.74',
-      //    'unknown',
-      //    '0.38',
-      //    '' 
-      //  ]
-      resultArrays.map(result => {
-        if(result.includes("-")){
-          const id = result.split('-')[0];
-          if(!babyIds.includes(id)){
-            babyIds.push(id);
-          }
-        }
-      })
-      return res.status(200).send(babyIds);
-    })    
-  } catch (error) {
-    next(error);
-  }
-}
 const recognizeBabyFace = async (req, res, next) => {
   try {
     console.log("recognizeBabyFace");
     const userId = req.query.user; //1718868972609
-    // const babyId = req.query.baby.split(',').filter( x => x != ""); //[] "1682294400000"; manager baby
-    // const key = req.query.path; //"2024-07-02/1231321321321"
+    const key = req.query.path; //"2024-07-02/1231321321321"
     const trainPath = `default/defaultTrain`;
     const filePath = `faceUploads/validBabyTemp.jpg`;
 
     let babyIds = [];
-    const managerBabyList = userDB.getUserManagerBabys(conn, userId);
+    const managerBabyList = await userDB.getUserManagerBabys(conn, userId);
     const url = await awsS3.getImageS3(trainPath);
-    await downloadValidImageFromS3(url, filePath)
+    downloadValidImageFromS3(url, filePath)
     .then((message) => {
       console.log(message);
 
@@ -230,8 +196,8 @@ const recognizeBabyFace = async (req, res, next) => {
         //    '0.38',
         //    '' 
         //  ]
-        managerBabyList.forEach(babyId => {
-          babyIds.push(babyId);
+        managerBabyList.forEach(baby => {
+          babyIds.push(baby.babyId.toString());
         });  
         resultArrays.map( result => {
           if(result.includes("-")){
@@ -241,23 +207,23 @@ const recognizeBabyFace = async (req, res, next) => {
             }
           }
         })
+        console.log(babyIds);
+        babyIds.map(async babyId => {
+          console.log(`detect face id: ${babyId}`);
+          const awsResult = await awsS3.putImageS3(filePath, `${babyId}/${key}`);
+          if (awsResult.$metadata.httpStatusCode !== 200) {
+            console.log("S3 result: %j", awsResult);
+            throw new Error("image upload to S3 failed!");
+          }
+          const insertId = await imageDB.setImage(conn, userId, babyId, "image", key);
+          if( insertId == undefined){
+            console.log("setImage insertId: %j", insertId);
+            throw new Error("image info to DB failed!");
+          }
+        })        
       })
     })
     .catch((error) => console.error(error));
-    console.log(babyIds);
-    babyIds.map(async babyId => {
-      console.log(`detect face id: ${babyId}`);
-      const awsResult = await awsS3.putImageS3(filePath, `${babyId}/${key}`);
-      if (awsResult.$metadata.httpStatusCode !== 200) {
-        console.log("S3 result: %j", awsResult);
-        throw new Error("image upload to S3 failed!");
-      }
-      const insertId = await imageDB.setImage(conn, userId, babyId, "image", key);
-      if( insertId == undefined){
-        console.log("setImage insertId: %j", insertId);
-        throw new Error("image info to DB failed!");
-      }
-    })
     return res.status(200).send({message : "image faces dispatch OK!"});
   } catch (error) {
     next(error);
@@ -416,25 +382,12 @@ async function saveImageFromBuffer(imageBuffer, filepath) {
           throw err;
       });      
 }
-async function uploadTimelineImageToS3AndRDS(filePath, userId, babyId, key) {
-  const awsResult = await awsS3.putImageS3(filePath, `${babyId}/${key}`);
-  if (awsResult.$metadata.httpStatusCode !== 200) {
-    console.log("S3 result: %j", awsResult);
-    throw new Error("image upload to S3 failed!");
-  }
-  const insertId = await imageDB.setImage(conn, userId, babyId, "image", key);
-  if( insertId == undefined){
-    console.log("setImage insertId: %j", insertId);
-    throw new Error("image info to DB failed!");
-  }
-}
 
 
 module.exports = {
   firstFollowRender,
   firstFollowController,
   newBabyController,
-  recognizeBabyFaceTest,
   recognizeBabyFace,
   healthController,
   babyTimelineTabsData,
