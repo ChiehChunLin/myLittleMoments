@@ -202,10 +202,10 @@ const recognizeBabyFaceTest = async (req, res, next) => {
 const recognizeBabyFace = async (req, res, next) => {
   try {
     console.log("recognizeBabyFace");
-    const userId = "U9acc24aec8497b5e7159c861f9079b71"; //req.query.user;
-    const babyId = "1682294400000"; //req.query.baby.split(',');
-    const key = "2024-07-02/1231321321321"
-    const trainPath = `default/defaultTrain`;//req.query.path;
+    const userId = req.query.user; //1718868972609
+    const babyId = req.query.baby.split(',').filter( x => x != ""); //[] "1682294400000"; manager baby
+    const key = req.query.path; //"2024-07-02/1231321321321"
+    const trainPath = `default/defaultTrain`;
     const filePath = `faceUploads/validBabyTemp.jpg`;
 
     let babyIds = [];
