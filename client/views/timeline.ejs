@@ -38,10 +38,12 @@
         <!-- baby followed list -->
         <%- include ("partials/babyList", { follows }) %>
         <div class="post-content">
+          <% if (babyData) { %>
           <!-- babyProfile: babyCover, babyHeadshot, babyInfo -->
           <%- include ("partials/babyProfile", { babyData }) %>
           <!-- babyNav: Timeline, Diary, Tags, Health -->
           <%- include ("partials/babyNav") %>
+          <% } %>
 
           <div class="posts" id="postsContainer">
             <%- include ("partials/babyImageBlock", { imageData }) %>

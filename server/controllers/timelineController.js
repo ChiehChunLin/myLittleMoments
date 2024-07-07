@@ -25,7 +25,7 @@ const timelineRender = async (req, res, next) => {
     if (userData.follows == null) {
       return res.status(200).render("timeline", {
         follows: [],
-        babyData: [],
+        babyData: undefined,
         imageData: [],
         textData: [],
         tagData: [],

@@ -150,7 +150,9 @@ if (window.location.href.includes("/timeline")) {
     document.getElementById("coverInput").click();
   })
   $("#profilePic").on("click", function (e) {
-    document.getElementById("profileInput").click();
+    if(e.target.getAttribute("title") != ""){
+      document.getElementById("profileInput").click();
+    }    
   })
 
   $("#profileInput").on("change", function(e) {
@@ -388,6 +390,10 @@ function fetchChartData(date, babyId) {
     });
 }
 function displayBabyProfilePage(babyData, imageData, textData, healthData){
+  if(babyData.userRole != 'manager'){
+    document.querySelector("#changeCoverBtn").style.display = "none"; 
+    document.querySelector("#profilePic img").setAttribute("title", ""); //點擊更換大頭貼
+  }
   document.querySelector("#profilePic").setAttribute("value", babyData.id);
   document.querySelector("#coverPhoto").children[0].setAttribute("src", babyData.cover);
   document.querySelector("#profilePic").children[0].setAttribute("src", babyData.headshot);
