@@ -352,7 +352,7 @@ async function getWeekDailyData(babyId){
           item.starttime = moment(item.endtime).subtract(item.quantity, 'hours').format('YYYY-MM-DD HH:mm:ss');          
           item.unit = babyConst.babyActivityUnit[item.activity.toUpperCase()]; 
         } else{
-          item.starttime = moment(item.endtime).subtract(1, 'hours').format('YYYY-MM-DD HH:mm:ss');
+          item.starttime = moment(item.endtime).subtract(0.5, 'hours').format('YYYY-MM-DD HH:mm:ss');
           item.unit = babyConst.babyActivityUnit[item.activity.toUpperCase()]; 
         }
            

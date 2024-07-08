@@ -589,7 +589,7 @@ function showBabyDailyChart(dailyData) {
   const height = chartHeight - margin.top - margin.bottom;
 
   const x = d3.scaleBand().domain(labels).range([0, width]).padding(0.1);
-  const y = d3.scaleLinear().domain([0, 24]).range([height, 0]);
+  const y = d3.scaleLinear().domain([24, 0]).range([height, 0]);
 
   const svg = d3
     .select("#babyActivityChart")
@@ -607,16 +607,17 @@ function showBabyDailyChart(dailyData) {
       const endTime = new Date(activity.endtime);
       const activityDuration = (endTime - startTime) / 3600000; // 小時
       const activityStartHour =
-        startTime.getHours() + startTime.getMinutes() / 60;
+      endTime.getHours() + endTime.getMinutes() / 60;
+
 
       svg
         .append("rect")
         .attr("x", x(day.date))
-        .attr("y", y(activityStartHour + activityDuration))
+        .attr("y", y(activityStartHour))
         .attr("width", x.bandwidth())
         .attr(
           "height",
-          y(activityStartHour) - y(activityStartHour + activityDuration)
+          y(activityDuration)
         )
         .attr("fill", activityColors[activity.activity])
         .attr("class", "activity-rect");
