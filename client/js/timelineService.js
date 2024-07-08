@@ -607,7 +607,7 @@ function showBabyDailyChart(dailyData) {
       const endTime = new Date(activity.endtime);
       const activityDuration = (endTime - startTime) / 3600000; // 小時
       const activityStartHour =
-      endTime.getHours() + endTime.getMinutes() / 60;
+      startTime.getHours() + startTime.getMinutes() / 60;
 
 
       svg

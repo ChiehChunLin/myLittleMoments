@@ -341,21 +341,41 @@ const downloadValidImageFromS3 = (url, filePath) => {
 
 async function getWeekDailyData(babyId){
   const dailyData =[];
+  let crossItem = { date: undefined, daily: undefined};
   for (let i=0; i< 7 ; i++) {
     const currentDate = moment().subtract(i, 'd').format('YYYY-MM-DD');
     const dailys = await babyDB.getBabyDailyDay(conn, babyId, currentDate);
-
+    
     if(dailys.length > 0){
       const currentDaily = dailys[0];
+      
       currentDaily.daily.map(item => {
+        if(currentDaily.date == crossItem.date){
+          currentDaily.daily.push(crossItem.daily);
+          crossItem.date = undefined;
+          crossItem.daily = undefined;
+        }
         if(item.activity == babyConst.babyActivity.SLEEP){
           item.starttime = moment(item.endtime).subtract(item.quantity, 'hours').format('YYYY-MM-DD HH:mm:ss');          
           item.unit = babyConst.babyActivityUnit[item.activity.toUpperCase()]; 
+          
+          const startDate = moment(item.starttime).format('YYYY-MM-DD');
+          const endDate = moment(item.endtime).format('YYYY-MM-DD');
+          if( startDate != endDate){
+            crossItem.date = startDate;
+            crossItem.daily = Object.assign({}, item);
+
+            item.starttime = moment(`${endDate} 00:00:00`).format('YYYY-MM-DD HH:mm:ss');
+            item.quantity = moment(item.endtime).diff(moment(item.starttime), 'hours');
+
+            crossItem.daily.endtime = moment(`${startDate} 24:00:00`).format('YYYY-MM-DD HH:mm:ss');
+            crossItem.daily.quantity = moment(crossItem.daily.endtime).diff(moment(crossItem.daily.starttime), 'hours');
+          // console.log(crossItem);
+          }
         } else{
           item.starttime = moment(item.endtime).subtract(0.5, 'hours').format('YYYY-MM-DD HH:mm:ss');
           item.unit = babyConst.babyActivityUnit[item.activity.toUpperCase()]; 
-        }
-           
+        }        
       })
       dailyData.push(currentDaily);
     } else {
