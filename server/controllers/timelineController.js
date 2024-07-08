@@ -107,7 +107,7 @@ const newBabyController = async (req, res, next) => {
     if(!user){
       return res.status(500).send({ message: "user is not defined" });
     }
-    const { babyRole, babyCall, babyName, babyGender, babyBirth, babyId } = req.body;   
+    const { babyRole, babyCall, babyName, babyGender, babyBirth } = req.body;   
     const trainFiles = [];
     if(req.files.babyFront){
       trainFiles.push(req.files.babyFront[0]);
@@ -126,7 +126,7 @@ const newBabyController = async (req, res, next) => {
     //   buffer: <Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 01 00 00 48 00 48 00 00 ff e1 00 58 45 78 69 66 00 00 4d 4d 00 2a 00 00 00 08 00 02 01 12 00 03 00 00 00 01 00 01 ... 219324 more bytes>,
     //   size: 219374
     // }
-    const newBabyId = await babyDB.newBaby(conn, babyName, babyGender, babyBirth, babyId);
+    const newBabyId = await babyDB.newBaby(conn, babyName, babyGender, babyBirth);
     const followBaby = await userDB.setUserFollowBaby(conn, user.id, newBabyId, babyRole, babyCall);
 
     const trainPaths = [];
