@@ -34,13 +34,14 @@ async function getImageS3(key, filename) {
     throw err;
   }
 }
-async function putImageS3(filePath, fileName) {
+async function putImageS3(filePath, type, fileName) {
+  const mimetype = (type =="image") ? "image/jpg" : "video/mp4";
   const fileStream = fs.createReadStream(filePath);
   const params = {
     Bucket: bucketName,
     Key: fileName, //s3 wil replace the same name object!
     Body: fileStream,
-    ContentType: "image/jpg"
+    ContentType: mimetype
   };
 
   const data = await s3Client.send(new PutObjectCommand(params));

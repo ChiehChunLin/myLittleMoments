@@ -173,6 +173,7 @@ const recognizeBabyFace = async (req, res, next) => {
     console.log("recognizeBabyFace");
     const userId = req.query.user; //1718868972609
     const key = req.query.path; //"2024-07-02/1231321321321"
+    const type = req.query.type; // "image" or "video"
     const trainPath = `default/defaultTrain`;
     const filePath = `faceUploads/validBabyTemp.jpg`;
 
@@ -183,47 +184,45 @@ const recognizeBabyFace = async (req, res, next) => {
     .then((message) => {
       console.log(message);
 
-      //face recognition
-      const imageFiles = [ filePath ];
-      faceControl(faceCase.FACE_VALID, imageFiles, (err, resultStr) => {
-        if (err) {
-          return res.status(500).send(err.message);
-        }        
-        const resultArrays = resultStr.split(/\s+/);
-        console.log(resultArrays);
-        // [ 
-        //    '1719820286587-2',
-        //    '0.74',
-        //    'unknown',
-        //    '0.38',
-        //    '' 
-        //  ]
-        managerBabyList.forEach(baby => {
-          babyIds.push(baby.babyId.toString());
-        });  
-        resultArrays.map( result => {
-          if(result.includes("-")){
-            const id = result.split('-')[0];
-            if(!babyIds.includes(id)){
-              babyIds.push(id);
-            }
-          }
-        })
-        console.log(babyIds);
-        babyIds.map(async babyId => {
-          console.log(`detect face id: ${babyId}`);
-          const awsResult = await awsS3.putImageS3(filePath, `${babyId}/${key}`);
-          if (awsResult.$metadata.httpStatusCode !== 200) {
-            console.log("S3 result: %j", awsResult);
-            throw new Error("image upload to S3 failed!");
-          }
-          const insertId = await imageDB.setImage(conn, userId, babyId, "image", key);
-          if( insertId == undefined){
-            console.log("setImage insertId: %j", insertId);
-            throw new Error("image info to DB failed!");
-          }
+      if(type === "video") {
+        managerBabyList.map(async babyId => {
+          console.log(`video manager baby id: ${babyId}`);
+          await uploadTimelineImageToS3(filePath, type, userId, babyId, key);
         })        
-      })
+      } else {
+        //face recognition
+        const imageFiles = [ filePath ];
+        faceControl(faceCase.FACE_VALID, imageFiles, (err, resultStr) => {
+          if (err) {
+            return res.status(500).send(err.message);
+          }        
+          const resultArrays = resultStr.split(/\s+/);
+          console.log(resultArrays);
+          // [ 
+          //    '1719820286587-2',
+          //    '0.74',
+          //    'unknown',
+          //    '0.38',
+          //    '' 
+          //  ]
+          managerBabyList.forEach(baby => {
+            babyIds.push(baby.babyId.toString());
+          });  
+          resultArrays.map( result => {
+            if(result.includes("-")){
+              const id = result.split('-')[0];
+              if(!babyIds.includes(id)){
+                babyIds.push(id);
+              }
+            }
+          })
+          console.log(babyIds);
+          babyIds.map(async babyId => {
+            console.log(`detect face id: ${babyId}`);
+            await uploadTimelineImageToS3(filePath, type, userId, babyId, key);
+          })        
+        })
+      }      
     })
     .catch((error) => console.error(error));
     return res.status(200).send({message : "image faces dispatch OK!"});
@@ -403,6 +402,18 @@ async function saveImageFromBuffer(imageBuffer, filepath) {
           console.error('Error saving image:', err);
           throw err;
       });      
+}
+async function uploadTimelineImageToS3 (filePath, type, userId, babyId, key){
+  const awsResult = await awsS3.putImageS3(filePath, type, `${babyId}/${key}`);
+  if (awsResult.$metadata.httpStatusCode !== 200) {
+    console.log("S3 result: %j", awsResult);
+    throw new Error("image upload to S3 failed!");
+  }
+  const insertId = await imageDB.setImage(conn, userId, babyId, type, key);
+  if( insertId == undefined){
+    console.log("setImage insertId: %j", insertId);
+    throw new Error("image info to DB failed!");
+  }
 }
 
 
