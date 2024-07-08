@@ -32,9 +32,10 @@
     </button>
     <% if (user) { %>
       <div class="dropdown-menu" style="left: -70px;">
+        <a class="dropdown-item" href="#"><%= user.id%></a>
         <a class="dropdown-item addMyBot" href="#">Add myBot</a>
         <!-- <a class="dropdown-item">User Setting</a> -->
-        <a class="dropdown-item" href="/logout">Logout</a>
+        <a class="dropdown-item logout" href="/logout">Logout</a>
       </div>
     <% } %>    
   </div>
