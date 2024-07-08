@@ -9,3 +9,4 @@ myenv/*
 faceHandler/__pycache__/*
 faceHandler/detection/__pycache__/*
 faceHandler/utils/__pycache__/*
+faceHandler/networks/__pycache__/*
