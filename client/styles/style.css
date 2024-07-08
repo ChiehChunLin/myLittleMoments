@@ -244,21 +244,25 @@ input[type="number"] {
 /* ================================= 
                Baby List
 ==================================== */
-.babyFollow {
+.babyFollow,
+.myBotDiv {
   background-color: rgba(255, 255, 255, 0.8);
   height: calc(100% - 60px);
   width: 100%;
   position: absolute;
   z-index: 1;
 }
-.babyFollow .home{
+.babyFollow .home,
+.myBotDiv .home{
   height: calc(100% - 60px);
   margin: auto;
 }
-.cancelFollow{
+.cancelFollow,
+.cancelMyBot{
   display: flex;
 }
-.cancelFollow img{
+.cancelFollow img,
+.cancelMyBot img{
   margin-left: auto;
   text-align: right;
   width: 30px; 
@@ -269,8 +273,12 @@ input[type="number"] {
   border: 2px solid lightgray;
 }
 
-.cancelFollow img:hover {
+.cancelFollow img:hover,
+.cancelMyBot img:hover {
   content: url("/public/images/cancel_icon_hover.png");
+}
+.myBotCode {
+  margin-bottom: 2rem;
 }
 /* ================================= 
                Baby List

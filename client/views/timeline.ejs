@@ -6,7 +6,24 @@
   </head>
   <body>
     <!------------ baby Nav ------------>
-    <%- include ("partials/nav") %>
+    <%- include ("partials/nav", { user }) %>
+    <!-------- add/follow baby ------------>
+    <div class="myBotDiv divHide">
+      <div class="home" >
+        <div class="home-col3">
+          <div class="cancelMyBot">
+            <img id="cancelMyBot" src="/public/images/cancel_icon.png" alt="cancel" >
+          </div>
+          <div class="fromGroup" style="background-color: white; opacity: 1; z-index: 2;">
+            <h5 style="font-weight: bolder; color: #007bff;">小時光服務機器人</h5>
+            <span>紀錄生活重要的每一刻</span>
+            <div class="myBotCode">
+              <img src="/public/images/myBot.png" alt="myBot QRcode">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-------- add/follow baby ------------>
     <div class="babyFollow <%=newFollow%>">
       <div class="home" >

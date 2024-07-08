@@ -26,10 +26,12 @@ async function getBaby(conn, id) {
         b.birthday AS birthday,
         b.headshot AS headshot,
         b.cover AS cover,
+        f.babyRole AS userRole,
         COUNT(*) AS followed
       FROM babys b
       JOIN follows f ON b.id = f.babyId
       WHERE b.id = ?
+      GROUP BY b.id, b.name, b.birthday, b.headshot, b.cover, f.babyRole;
     `,
     [id]
   );

@@ -1,9 +1,11 @@
 <div class="profile">
+  <% const coverBtnDisplay = (babyData.userRole == 'manager') ? "inline-block" : "none"; %>
+  <% const profilePicTitle = (babyData.userRole == 'manager') ? "點擊更換大頭照" : ""; %>
   <div class="imageContainer cover" id="coverPhoto">
     <img src="<%=babyData.cover%>" alt="Profile Cover" />
 
     <div class="upload-btn-wrapper">
-      <button id="changeCoverBtn" class="btn btn-light btn-sm">Change Cover</button>
+      <button id="changeCoverBtn" class="btn btn-light btn-sm" style="display: <%=coverBtnDisplay%>;">Change Cover</button>
     </div>
   </div>
   <div
@@ -12,14 +14,18 @@
     style="background-color: orange"
     value="<%=babyData.id%>"
   >
-    <img src="<%=babyData.headshot%>" alt="Profile Headshot" title="點擊更換大頭照"/>
+    <img src="<%=babyData.headshot%>" alt="Profile Headshot" title="<%=profilePicTitle%>>"/>
   </div>
   <div class="upload-btn-wrapper" style="display: none;">
     <input type="file" id="profileInput" name="profile" accept="image/*" />
     <input type="file" id="coverInput" name="cover" accept="image/*" />
   </div>
   <div class="profile-info">
-    <h4><%=babyData.name%></h4>
+    <% if (babyData.userRole == 'manager') { %>
+      <h4><%=babyData.name%><span style="margin:0rem 1rem; color:grey; font-size:small;"><%=babyData.id%></span></h4>
+    <% } else { %>
+      <h4><%=babyData.name%></h4>
+    <% } %>
     <p><%=babyData.old%> | <%=babyData.followsCount%> family memebers</p>
   </div>
 </div>

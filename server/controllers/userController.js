@@ -90,7 +90,7 @@ const lineCallback = async (req, res, next) => {
 };
 const loginRender = async (req, res, next) => {
   try {
-    res.status(200).render("login", { message: undefined });
+    res.status(200).render("login", { user: undefined, message: undefined });
   } catch (error) {
     next(error);
   }

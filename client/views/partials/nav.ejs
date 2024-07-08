@@ -25,7 +25,20 @@
       </li>
     </ul>
   </div>
-  <a class="logout" href="/logout"
+
+  <div class="btn-group">
+    <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <img class="account" src="/public/images/member.png" alt="User Account">
+    </button>
+    <% if (user) { %>
+      <div class="dropdown-menu" style="left: -70px;">
+        <a class="dropdown-item addMyBot" href="#">Add myBot</a>
+        <!-- <a class="dropdown-item">User Setting</a> -->
+        <a class="dropdown-item" href="/logout">Logout</a>
+      </div>
+    <% } %>    
+  </div>
+  <!-- <a class="logout" href="/logout"
     ><img class="account" src="/public/images/member.png" alt="logout" title="logout"
-  /></a>
+  /></a> -->
 </nav>

@@ -24,6 +24,7 @@ const timelineRender = async (req, res, next) => {
     const userData = await userDB.getUserInfo(conn, user.id);
     if (userData.follows == null) {
       return res.status(200).render("timeline", {
+        user,
         follows: [],
         babyData: undefined,
         imageData: [],
@@ -58,6 +59,7 @@ const timelineRender = async (req, res, next) => {
     // console.log(textData);
     // res.status(200).send({ data });
     res.status(200).render("timeline", {
+      user,
       follows,
       babyData,
       imageData,

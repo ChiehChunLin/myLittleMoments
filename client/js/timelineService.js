@@ -74,6 +74,13 @@ if (window.location.href.includes("/timeline")) {
     $(".babyFollow").removeClass("divShow").addClass("divHide");
   })
 
+  $(".addMyBot").on("click", function (e){
+    $(".myBotDiv").removeClass("divHide").addClass("divShow");
+  })
+  $("#cancelMyBot").on("click", function (e){
+    $(".myBotDiv").removeClass("divShow").addClass("divHide");
+  })
+
   $(".newBaby-a").on("click", function (e) {
     $(".newBabyForm-div").removeClass("divHide").addClass("divShow");
     $(".firstFollow-div").removeClass("divShow").addClass("divHide");
@@ -206,7 +213,6 @@ if (window.location.href.includes("/timeline")) {
       fetchImagesToCarousel(date, babyId);
     });
   });
- 
 }
 
 const chartWidth = $(window).width() * 0.5;
@@ -390,14 +396,24 @@ function fetchChartData(date, babyId) {
     });
 }
 function displayBabyProfilePage(babyData, imageData, textData, healthData){
+  console.log(babyData.userRole)
   if(babyData.userRole != 'manager'){
     document.querySelector("#changeCoverBtn").style.display = "none"; 
-    document.querySelector("#profilePic img").setAttribute("title", ""); //點擊更換大頭貼
-  }
+    document.querySelector("#profilePic img").setAttribute("title", "");
+    document.querySelector(".profile-info").children[0].textContent = babyData.name;
+  } else {
+    document.querySelector("#changeCoverBtn").style.display = "inline-block"; 
+    document.querySelector("#profilePic img").setAttribute("title", "點擊更換大頭貼");
+    const profileTitle = `
+      ${babyData.name}
+      <span style="margin:0rem 1rem; color:grey; font-size:small;">${babyData.id}</span>
+    `; 
+    document.querySelector(".profile-info").children[0].innerHTML = '';
+    document.querySelector(".profile-info").children[0].insertAdjacentHTML('afterbegin', profileTitle);
+  }   
   document.querySelector("#profilePic").setAttribute("value", babyData.id);
   document.querySelector("#coverPhoto").children[0].setAttribute("src", babyData.cover);
   document.querySelector("#profilePic").children[0].setAttribute("src", babyData.headshot);
-  document.querySelector(".profile-info").children[0].textContent = babyData.name;
   document.querySelector(".profile-info").children[1].textContent = `${babyData.old} | ${babyData.followed} family members`;
   
   displayTimelineImages(imageData);
