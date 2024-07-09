@@ -17,6 +17,7 @@ function getSerialTimeFormat () {
 function getLogTimeFormat () {
   // YYYY-MM-DD HH:mm:ss
   return new Date().toLocaleString('af-ZA', { hour12: false })
+  // return moment().utc().add(8, 'h').format('YYYY-MM-DD HH:mm:ss');
 }
 function getCalendarDate (date) {
   return moment(date).format('MMM Do YY')

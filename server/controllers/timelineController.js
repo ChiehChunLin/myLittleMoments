@@ -185,9 +185,9 @@ const recognizeBabyFace = async (req, res, next) => {
       console.log(message);
 
       if(type === "video") {
-        managerBabyList.map(async babyId => {
-          console.log(`video manager baby id: ${babyId}`);
-          await uploadTimelineImageToS3(filePath, type, userId, babyId, key);
+        managerBabyList.map(async baby => {
+          console.log(`video manager baby id: ${baby.babyId}`);
+          await uploadTimelineImageToS3(filePath, type, userId, baby.babyId, key);
         })        
       } else {
         //face recognition
