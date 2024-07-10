@@ -23,13 +23,24 @@ const userCheckAuth = async (req, res, next) => {
       .status(200)
       .send({ accessJwtToken, accessExpired, user, message: undefined });
   }
-  return res.status(401).send({ message: "Please Login to continue." });
+  return res.status(401).send({ message: "請登入使用小時光" });
 };
 const lineCallback = async (req, res, next) => {
-  const { code } = req.query;
+  const { code, error } = req.query;
+  if (error) {
+    return res.status(200).redirect("/login");
+  }
+  //============ normal case ================
   // {
   //   code: '2NIQOipvfxePtTfyYALZ',             // deliver by LINE
   //   state: 'e83212f595634b668df31795f701bee8' //according to the req from client
+  // }
+  //============ error format ================
+  // {
+  //   error:{
+  //     error: "invalid_request",
+  //     error_description: "code is required."
+  //   }
   // }
   try {
     // Request an access token
@@ -100,7 +111,7 @@ const loginController = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await userDB.getUserByEmail(conn, email);
     if (!user) {
-      return res.status(403).send({ message: "User account doesn't exit!" });
+      return res.status(403).send({ message: "使用者信箱帳號不存在" });
     }
     const match = await bcrypt.compare(password, user.password);
     if (match) {
@@ -113,10 +124,10 @@ const loginController = async (req, res, next) => {
         accessJwtToken,
         accessExpired,
         user,
-        message: ""
+        message: "小時光登入成功！"
       });
     } else {
-      const message = "Wrong email or password!";
+      const message = "使用者登入帳號或密碼錯誤";
       return res.status(403).send({ message });
     }
   } catch (error) {
@@ -129,20 +140,20 @@ const signupController = async (req, res, next) => {
 
     const messagePW = verificationOfPassword(password);
     if (messagePW != undefined) {
-      req.flash("message", messagePW);
-      return res.status(403).send(messagePW);
+      // console.log(messagePW);
+      return res.status(403).send({ message: messagePW });
     }
     const messageEmail = verificationOfEmail(email);
     if (messageEmail != undefined) {
-      req.flash("message", messageEmail);
-      return res.status(400).send(messageEmail);
+      // console.log(messagePW);
+      return res.status(400).send({ message: messageEmail });
     }
     const user = await userDB.getUserByEmail(conn, email);
     if (user != undefined) {
       console.log("signup user duplicated:" + JSON.stringify(user));
       return res
         .status(403)
-        .send({ message: "Email has already been registered." });
+        .send({ message: "信箱重複註冊" });
     } else {
       const passwordHash = await bcrypt.hash(password, saltRounds); //length:60
       const user = await userDB.newNativeUser(conn, name, email, passwordHash);
@@ -154,7 +165,7 @@ const signupController = async (req, res, next) => {
         accessJwtToken,
         accessExpired,
         user,
-        message: ""
+        message: "小時光登入成功！"
       });
     }
   } catch (error) {
@@ -177,15 +188,15 @@ const logoutController = async (req, res, next) => {
 function verificationOfPassword(password) {
   //Check Complexity Of Password
   if (password.length < 8) {
-    return "password should be at least 8 characters.";
+    return "密碼輸入請至少8碼";
   }
   // else if (!/[A-Z]/.test(password)) {
   //   return "password should be at least one UpperCase";
   // }
   else if (!/[a-z]/.test(password)) {
-    return "password should be at least one LowerCase";
+    return "密碼輸入請包含數字和英文大小寫";
   } else if (!/\d/.test(password)) {
-    return "password should be at least one Number";
+    return "密碼輸入請包含數字和英文大小寫";
   } else {
     return undefined;
   }
@@ -196,7 +207,7 @@ function verificationOfPassword(password) {
 function verificationOfEmail(email) {
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if (!emailPattern.test(email)) {
-    return "email without domain address.";
+    return "請輸入正確信箱格式";
   } else {
     return undefined;
   }

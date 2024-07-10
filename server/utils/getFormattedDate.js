@@ -31,7 +31,7 @@ function getDateDifference (date) {
   const today = moment([todays[0], todays[1], todays[2]])
   const dateBirth = moment([dates[0], dates[1], dates[2]])
   const diffDuration = moment.duration(today.diff(dateBirth))
-  return `${diffDuration.years()}Y-${diffDuration.months()}M-${diffDuration.days()}D old`
+  return `${diffDuration.years()}Y-${diffDuration.months()}M-${diffDuration.days()}D`
 }
 function getDateBefore30days () {
   return moment().subtract(30, 'd').format('YYYY-MM-DD')

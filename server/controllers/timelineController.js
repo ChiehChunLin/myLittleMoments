@@ -81,23 +81,19 @@ const firstFollowRender = async (req, res, next) => {
 const firstFollowController = async (req, res, next) => {
   try {
     const { user } = req;
-
-    if (user) {
-      const { babyId, babyRole, relation } = req.body;
-      const followBaby = await userDB.setUserFollowBaby(
-        conn,
-        user.id,
-        babyId,
-        babyRole,
-        relation
-      );
-
-      if (followBaby) {
-        return res.status(200).send({ message: "Follow Successfully!" });
-      }
-    }
-    return res.status(500).send({ message: "user is not defined" });
+    const { babyId, babyRole, relation } = req.body;
+    const followBaby = await userDB.setUserFollowBaby(
+      conn,
+      user.id,
+      babyId,
+      babyRole,
+      relation
+    );
+    return res.status(200).send({ message: "寶寶追蹤成功!" });
   } catch (error) {
+    if(error.message.includes("Duplicate")){
+      return res.status(200).send({ message: "寶寶追蹤成功!" });
+    }
     next(error);
   }
 };
