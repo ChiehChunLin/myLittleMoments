@@ -1,5 +1,5 @@
 if (window.location.href.includes("/timeline")) {
-
+  const checkAuth = userCheckAuth();
   //=====================================================
   //============  Add Baby Follow Form  =================
   //=====================================================
