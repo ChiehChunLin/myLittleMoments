@@ -53,7 +53,12 @@ if (window.location.href.includes("/login")) {
     const name = formData.get("name");
     const email = formData.get("email");
     const password = formData.get("password");
+    const confirmPassword = formData.get("confirmPassword");
 
+    if(password != confirmPassword){
+      displayLoginMessage("密碼輸入不一致");
+      return;
+    }
     const config = {
       method: "POST",
       headers: {
@@ -72,7 +77,7 @@ function userCheckinFetch(url, config = "") {
       if (data) {
         const { accessJwtToken, accessExpired, user, message } = data;
         // console.log("data: %j", data);
-
+        
         if (accessJwtToken && user) {
           localStorage.setItem("accessToken", accessJwtToken);
           if (user.picture != "") {
@@ -83,12 +88,12 @@ function userCheckinFetch(url, config = "") {
             }
           }
           if (url != "/authCheck") {
-            displayLoginMessage("Login Successfully!");
+            displayLoginMessage("小時光登入成功！");
             window.location.href = "/timeline";
           }
         } else {
           console.error("Login data failed:", data);
-          throw new Error("Something went wrong with login authentication");
+          displayLoginMessage(message);
         }
       }
     })

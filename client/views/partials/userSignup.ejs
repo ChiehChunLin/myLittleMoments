@@ -1,56 +1,58 @@
 <div class="signup-div formHide">
   <form id="signupForm" action="/user/signup" method="POST">
     <div class="sign-group">
-      <label for="inputName">Username：</label>
+      <label for="inputName">使用者名稱</label>
       <input
         class="sign-control"
         type="text"
         id="myname"
-        placeholder="please enter username"
+        placeholder="請輸入您的使用者名稱"
         name="name"
+        maxlength="20"
         required
       />
     </div>
     <br />
     <div class="sign-group">
-      <label for="inputEmail">Email address：</label>
+      <label for="inputEmail">信箱</label>
       <input
         class="sign-control"
         type="email"
         id="inputEmail"
-        placeholder="your email"
+        placeholder="請輸入您的信箱"
         name="email"
+        maxlength="50"
         required
       />
     </div>
     <br />
     <div class="sign-group">
-      <label for="inputSignupPassword">Password：</label>
+      <label for="inputSignupPassword">密碼</label>
       <input
         class="sign-control"
         type="password"
         id="inputSignupPassword"
-        placeholder="strong password required"
+        placeholder="請輸入您的密碼"
         name="password"
+        maxlength="50"
         required
       />
-      <div class="showPwBox">
-        <input id="showPw" type="checkbox" onclick="mySignupPwFunction()" />
-        <label for="showPw" style="font-size: 1rem">Show Password</label>
-      </div>
-      <script>
-        function mySignupPwFunction() {
-          var pw = document.getElementById("inputSignupPassword");
-          if (pw.type == "password") {
-            pw.type = "text";
-          } else {
-            pw.type = "password";
-          }
-        }
-      </script>
     </div>
     <br />
-    <button type="submit" class="sign-btn sign-btn-primary">Submit</button>
-    <p>已有小時光帳號，我要去 <a class="login-a">登錄</a></p>
+    <div class="sign-group">
+      <label for="inputSignupConfirmPassword">密碼確認</label>
+      <input
+        class="sign-control"
+        type="password"
+        id="inputSignupConfirmPassword"
+        placeholder="請再次輸入您的密碼"
+        name="confirmPassword"
+        maxlength="50"
+        required
+      />
+    </div>
+    <br />
+    <button type="submit" class="sign-btn sign-btn-primary">註冊</button>
+    <p>已有小時光帳號，我要去 <a class="login-a">登入</a></p>
   </form>
 </div>

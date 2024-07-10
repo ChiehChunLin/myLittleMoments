@@ -1,45 +1,33 @@
 <div class="login-div formShow">
   <form id="loginForm" action="/user/login" method="POST">
     <div class="sign-group">
-      <label for="inputEmail">Email address：</label>
+      <label for="inputEmail">信箱</label>
       <input
         class="sign-control"
         type="email"
         id="inputEmail"
-        placeholder="Enter Email"
+        placeholder="請輸入您的信箱"
         name="email"
+        maxlength="50"
         required
       />
     </div>
     <br />
     <div class="sign-group">
-      <label for="inputLoginPassword">Password：</label>
+      <label for="inputLoginPassword">密碼</label>
       <input
         class="sign-control"
         type="password"
         id="inputLoginPassword"
-        placeholder="Enter Password"
+        placeholder="請輸入您的密碼"
         name="password"
+        maxlength="50"
         required
       />
-      <div class="showPwBox">
-        <input id="showPw" type="checkbox" onclick="myLoginPwFunction()" />
-        <label for="showPw" style="font-size: 1rem">Show Password</label>
-      </div>
-      <script>
-        function myLoginPwFunction() {
-          var pw = document.getElementById("inputLoginPassword");
-          if (pw.type == "password") {
-            pw.type = "text";
-          } else {
-            pw.type = "password";
-          }
-        }
-      </script>
     </div>
     <br />
-    <button type="submit" class="sign-btn sign-btn-primary">Login</button>
-    <button type="click" id="lineBtn" class="sign-btn">Login with LINE</button>
+    <button type="submit" class="sign-btn sign-btn-primary">登入</button>
+    <button type="click" id="lineBtn" class="sign-btn">使用 LINE 帳號登入</button>
     <p>沒有小時光帳號，我要去 <a class="signin-a">註冊</a></p>
   </form>
 </div>

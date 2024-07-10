@@ -241,7 +241,7 @@ function userNewBabyAndFolowFetch(url, config = "") {
       console.error(err);
     });
 }
-function userUploadFetch(url,config ="") {
+function userUploadFetch(url,config = "") {
   fetch(url, config)
     .then((res) => res.json())
     .then((data) => {
@@ -585,8 +585,8 @@ function showBabyDailyChart(dailyData) {
   const labels = dailyData.map((day) => day.date);
 
   const margin = { top: 20, right: 100, bottom: 40, left: 50 };
-  const width = chartWidth - margin.left - margin.right;
-  const height = chartHeight - margin.top - margin.bottom;
+  const width = chartWidth;
+  const height = chartHeight;
 
   const x = d3.scaleBand().domain(labels).range([0, width]).padding(0.1);
   const y = d3.scaleLinear().domain([24, 0]).range([height, 0]);
@@ -658,8 +658,8 @@ function showBabyDailyChart(dailyData) {
 }
 function showBabyWeightLength(title, cdcData, babyData) {
   const margin = { top: 20, right: 30, bottom: 40, left: 50 };
-  const width = chartWidth - margin.left - margin.right;
-  const height = chartHeight - margin.top - margin.bottom;
+  const width = chartWidth;
+  const height = chartHeight;
 
   let selectedDiv = "#babyGrowthWeight";
   if (title == babyActivity.HEIGHT) selectedDiv = "#babyGrowthLength";
@@ -770,6 +770,7 @@ function showBabyWeightLength(title, cdcData, babyData) {
 function summeryWeekTable(weeklyData) {
   const weeklySummaryDiv = document.getElementById("weeklySummary");
   const table = document.createElement("table");
+  table.style.width = chartWidth;
 
   // Create header row
   const thead = document.createElement("thead");
@@ -818,6 +819,7 @@ function summeryWeekTable(weeklyData) {
 function recordTable(title, data) {
   const recordDiv = document.getElementById(title + "Records");
   const table = document.createElement("table");
+  table.style.width = chartWidth;
 
   // Create header row
   const thead = document.createElement("thead");

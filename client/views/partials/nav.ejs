@@ -1,45 +1,26 @@
-<nav class="navbar navbar-expand-lg navbar-light sticky-top box-shadow">
-  <a class="navbar-brand" href="#">
+<nav class="navbar navbar-light sticky-top box-shadow">
+  <a class="navbar-brand" href="/timeline">
     <img
       src="/public/images/Logo.png"
-      style="width: 30px; height: 30px"
+      style="width: 30px; height: 30px; margin-right: 0.5rem;"
       class="d-inline-block align-top"
       alt=""
       loading="lazy"
     />
     小小時光
   </a>
-  <div class="collapse navbar-collapse">
-    <ul class="navbar-nav mx-auto ulShow">
-      <li class="nav-item nav-hover">
-        <a class="nav-link imageBlock">Timeline</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link diaryBlock">Diary</a>
-      </li>
-      <!-- <li class="nav-item">
-        <a class="nav-link tagsBlock">Tags</a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link healthBlock">Health</a>
-      </li>
-    </ul>
-  </div>
 
-  <div class="btn-group">
-    <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <img class="account" src="/public/images/member.png" alt="User Account">
-    </button>
+  <div class="btn-group">    
     <% if (user) { %>
+      <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <img class="account" src="/public/images/member.png" alt="User Account">
+      </button>
       <div class="dropdown-menu" style="left: -70px;">
         <a class="dropdown-item" href="#"><%= user.id%></a>
-        <a class="dropdown-item addMyBot" href="#">Add myBot</a>
+        <a class="dropdown-item addMyBot" href="#">小時光服務機器人</a>
         <!-- <a class="dropdown-item">User Setting</a> -->
-        <a class="dropdown-item logout" href="/logout">Logout</a>
+        <a class="dropdown-item logout" href="/logout">登出</a>
       </div>
     <% } %>    
   </div>
-  <!-- <a class="logout" href="/logout"
-    ><img class="account" src="/public/images/member.png" alt="logout" title="logout"
-  /></a> -->
 </nav>
