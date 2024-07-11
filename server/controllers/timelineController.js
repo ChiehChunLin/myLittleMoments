@@ -161,6 +161,9 @@ const newBabyController = async (req, res, next) => {
       return res.status(200).send({ message: `New Baby and Follow Successfully!` }); //老師建議不要讓user等
     }
   } catch (error) {
+    if(error.message.includes("Duplicate")){
+      return res.status(200).send({ message: "寶寶新增成功!" });
+    }
     next(error);
   }
 }
