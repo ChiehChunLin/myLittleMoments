@@ -38,6 +38,12 @@ app.use("/admin", auth.authJwtCheckLogin, auth.authAdminCheck, adminRoute);
 app.use("/admin", auth.authJwtCheckLogin, auth.authAdminCheck, express.static("./admin"));
 app.use("/public", express.static("../client"));
 
+app.use((req, res, next) => {
+  const err = new Error(`Not Found!`);
+  err.status = 404;
+  next(err);
+});
+
 // app.use(errorHandler);
 app.use((err, req, res, next) => {
   console.log(err);
