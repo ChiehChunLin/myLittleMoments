@@ -109,6 +109,10 @@ const loginRender = async (req, res, next) => {
 const loginController = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    const messageEmail = verificationOfEmail(email);
+    if (messageEmail != undefined) {
+      return res.status(400).send({ message: messageEmail });
+    }
     const user = await userDB.getUserByEmail(conn, email);
     if (!user) {
       return res.status(403).send({ message: "使用者信箱帳號不存在" });
@@ -140,12 +144,10 @@ const signupController = async (req, res, next) => {
 
     const messagePW = verificationOfPassword(password);
     if (messagePW != undefined) {
-      // console.log(messagePW);
       return res.status(403).send({ message: messagePW });
     }
     const messageEmail = verificationOfEmail(email);
     if (messageEmail != undefined) {
-      // console.log(messagePW);
       return res.status(400).send({ message: messageEmail });
     }
     const user = await userDB.getUserByEmail(conn, email);
