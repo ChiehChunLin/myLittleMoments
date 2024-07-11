@@ -1,5 +1,6 @@
 const mysql = require("mysql2");
 const dotenv = require("dotenv").config();
+const dbIndex = process.env.MYSQL_DATABASE_CONNDB_INDEX;
 
 const configDB = [
   {
@@ -16,6 +17,6 @@ const configDB = [
   }
 ];
 
-const conn = mysql.createPool(configDB[0]).promise();
+const conn = mysql.createPool(configDB[dbIndex]).promise();
 
 module.exports = conn;
