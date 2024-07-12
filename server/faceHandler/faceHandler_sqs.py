@@ -1,5 +1,7 @@
 import sys
 import os
+import json
+import boto3
 import cv2
 import math
 import config
@@ -122,26 +124,42 @@ def process_image_rotations(image_path, output_base_path):
         else:
             print(f"在旋转角度 {angle} 时未检测到人脸或眼睛。")
 
+def process_queue(message):
+    try:
+        data = json.loads(message['Body'])
+        case = data['case']
+        paths = data['path'].split(',')
+
+        if case == '1':
+            for path in paths:
+                result = face_register(path)
+        elif case == '2':
+            result = face_recognition(paths[0])
+        else:
+            print("功能选择错误")
+    except Exception as e:
+        print(f"Error processing message: {e}")
+
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print("Usage: script.py <arg1> <arg2>")
-        sys.exit(1)
-    
-    # Get the arguments
-    case = sys.argv[1]
-    paths = sys.argv[2:][0].split(',')
-    # print("python paths: {}".format(paths))
+    sqs = boto3.client('sqs', region_name='your-region')
+    queue_url = 'your-queue-url'
 
-    if case == '1':                
-        # print('case 1')
-        for path in paths:
-            result = face_register(path)
+    while True:
+        # Receive message from SQS queue
+        response = sqs.receive_message(
+            QueueUrl=queue_url,
+            MaxNumberOfMessages=1,
+            WaitTimeSeconds=10
+        )
 
-    elif case == '2':
-        # print('case 2')
-        result = face_recognition(paths[0])
+        if 'Messages' in response:
+            for message in response['Messages']:
+                process_message(message)
 
-    else:
-        print("功能选择错误")
-        
+                # Delete the processed message from the queue
+                sqs.delete_message(
+                    QueueUrl=queue_url,
+                    ReceiptHandle=message['ReceiptHandle']
+                )
+
     

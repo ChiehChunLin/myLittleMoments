@@ -11,6 +11,7 @@ const textDB = require("../database/textDB");
 const awsS3 = require("../utils/awsS3");
 const babyConst = require("../utils/getBabyConst");
 const time = require("../utils/getFormattedDate");
+const redis = require("../database/connRedis");
 const { getSerialTimeFormat } = require("../utils/getFormattedDate");
 
 const faceCase ={
@@ -155,6 +156,15 @@ const newBabyController = async (req, res, next) => {
         //   ''
         // ]
         console.log(`newBabyTrain Complete: ${resultArrays}`);
+        trainPaths.forEach(path => {
+          fs.unlink(path, (err) => {
+            if (err) {
+                console.error('File deletion failed:', err);
+            } else {
+                // console.log(`${path} deleted successfully`);
+            }
+          });
+        })        
       })        
     }    
     if(newBabyId && followBaby){
@@ -169,14 +179,13 @@ const newBabyController = async (req, res, next) => {
 }
 const recognizeBabyFace = async (req, res, next) => {
   try {
-    console.log("recognizeBabyFace");
+    console.log("recognizeBabyFace");    
     const userId = req.query.user; //1718868972609
     const key = req.query.path; //"2024-07-02/1231321321321"
     const type = req.query.type; // "image" or "video"
     const trainPath = `default/defaultTrain`;
-    const filePath = `faceUploads/validBabyTemp.jpg`;
+    const filePath = `faceUploads/validBaby_${key.split('/')[1]}.jpg`;
 
-    let babyIds = [];
     const managerBabyList = await userDB.getUserManagerBabys(conn, userId);
     const url = await awsS3.getImageS3(trainPath);
     downloadValidImageFromS3(url, filePath)
@@ -189,42 +198,21 @@ const recognizeBabyFace = async (req, res, next) => {
           await uploadTimelineImageToS3(filePath, type, userId, baby.babyId, key);
         })        
       } else {
-        //face recognition
-        const imageFiles = [ filePath ];
-        faceControl(faceCase.FACE_VALID, imageFiles, (err, resultStr) => {
-          if (err) {
-            return res.status(500).send(err.message);
-          }        
-          const resultArrays = resultStr.split(/\s+/);
-          console.log(resultArrays);
-          // [ 
-          //    '1719820286587-2',
-          //    '0.74',
-          //    'unknown',
-          //    '0.38',
-          //    '' 
-          //  ]
-          managerBabyList.forEach(baby => {
-            babyIds.push(baby.babyId.toString());
-          });  
-          resultArrays.map( result => {
-            if(result.includes("-")){
-              const id = result.split('-')[0];
-              if(!babyIds.includes(id)){
-                babyIds.push(id);
-              }
-            }
-          })
-          console.log(babyIds);
-          babyIds.map(async babyId => {
-            console.log(`detect face id: ${babyId}`);
-            await uploadTimelineImageToS3(filePath, type, userId, babyId, key);
-          })        
-        })
-      }      
+        //face recognition downlad image ok -> enqueue
+        const queueMsg = {
+          userId,
+          managerBabyList,
+          key,
+          filePath
+        }
+        redis.rpush(process.env.REDIS_LIST, JSON.stringify(queueMsg));
+      }
+      return res.status(200).send({message : "image faces dispatch OK!"});
     })
-    .catch((error) => console.error(error));
-    return res.status(200).send({message : "image faces dispatch OK!"});
+    .catch((error) => {
+      console.error(error)
+      throw error;
+    });    
   } catch (error) {
     next(error);
   }

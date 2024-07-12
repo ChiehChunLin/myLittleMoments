@@ -46,6 +46,9 @@ app.use((req, res, next) => {
 
 // app.use(errorHandler);
 app.use((err, req, res, next) => {
+  if (err.status = 404) {
+    return res.status(200).send({message: "404 Not Found!"});
+  }
   console.log(err);
   res.locals.error = err;
   const status = err.status || 500;

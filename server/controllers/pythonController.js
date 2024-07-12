@@ -24,7 +24,7 @@ function faceControl(caseCode, imagePaths, callback) {
     pythonProcess.stderr.on('data', (data) => {
         // console.log("stderr")
         // console.log(data.toString())
-        // error += data.toString();
+        error += data.toString();
     });
 
     // When the process is done

@@ -143,5 +143,5 @@ if __name__ == '__main__':
 
     else:
         print("功能选择错误")
-        
+
     
