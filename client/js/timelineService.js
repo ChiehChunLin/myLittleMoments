@@ -604,6 +604,13 @@ function showBabyDailyChart(dailyData) {
     medicine: "#4BC0C0",
     play: "#FFCE56"
   };
+  const activityNames = {
+    milk: "喝奶",
+    food: "副食",
+    sleep: "睡覺",
+    medicine: "藥水",
+    play: "玩耍"
+  };
 
   const labels = dailyData.map((day) => day.date);
 
@@ -676,7 +683,7 @@ function showBabyDailyChart(dailyData) {
       .append("text")
       .attr("x", 20)
       .attr("y", i * 20 + 9)
-      .text(activity);
+      .text(activityNames[activity]);
   });
 }
 function showBabyWeightLength(title, cdcData, babyData) {
@@ -795,6 +802,14 @@ function summeryWeekTable(weeklyData) {
   const table = document.createElement("table");
   table.style.width = chartWidth;
 
+  const activityNames = {
+    milk: "喝奶",
+    food: "副食",
+    sleep: "睡覺",
+    medicine: "藥水",
+    play: "玩耍"
+  };
+
   // Create header row
   const thead = document.createElement("thead");
   const headersRow = document.createElement("tr");
@@ -823,8 +838,8 @@ function summeryWeekTable(weeklyData) {
       const row = document.createElement("tr");
 
       // Activity name cell
-      const activityCell = document.createElement("td");
-      activityCell.textContent = activity.replace("daily", ""); // Remove 'daily' prefix
+      const activityCell = document.createElement("th");
+      activityCell.textContent = activityNames[activity.replace("daily", "").toLocaleLowerCase()]; // Remove 'daily' prefix
       row.appendChild(activityCell);
 
       // Data cells for each day
@@ -845,6 +860,12 @@ function recordTable(title, data) {
   const table = document.createElement("table");
   table.style.width = chartWidth;
 
+  const activityNames = {
+    age: "月齡",
+    weight: "體重",
+    height: "身高"
+  };
+
   // Create header row
   const thead = document.createElement("thead");
   const headersRow = document.createElement("tr");
@@ -863,7 +884,7 @@ function recordTable(title, data) {
 
     // Activity name cell
     const activityCell = document.createElement("th");
-    activityCell.textContent = activity;
+    activityCell.textContent = activityNames[activity];
     row.appendChild(activityCell);
 
     // Data cells for each day
