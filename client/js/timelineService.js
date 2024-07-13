@@ -120,12 +120,28 @@ if (window.location.href.includes("/timeline")) {
   });
 
   $(".imageBlock").on("click", function (e) {
+    const navItems = document.querySelectorAll(".nav-item");
+    navItems.forEach((item,index) => {
+      if(index === 0){
+        $(item).addClass("navSelected");
+      }else{
+        $(item).removeClass("navSelected");
+      }
+    })
     $("#postsContainer").removeClass("divHide").addClass("divShow");
     $("#diaryContainer").removeClass("divShow").addClass("divHide");
     $("#tagContainer").removeClass("divShow").addClass("divHide");
     $("#healthContainer").removeClass("divShow").addClass("divHide");
   });
   $(".diaryBlock").on("click", function (e) {
+    const navItems = document.querySelectorAll(".nav-item");
+    navItems.forEach((item,index) => {
+      if(index === 1){
+        $(item).addClass("navSelected");
+      }else{
+        $(item).removeClass("navSelected");
+      }
+    })
     $("#postsContainer").removeClass("divShow").addClass("divHide");
     $("#diaryContainer").removeClass("divHide").addClass("divShow");
     $("#tagContainer").removeClass("divShow").addClass("divHide");
@@ -138,6 +154,14 @@ if (window.location.href.includes("/timeline")) {
     $("#healthContainer").removeClass("divShow").addClass("divHide");
   });
   $(".healthBlock").on("click", function (e) {
+    const navItems = document.querySelectorAll(".nav-item");
+    navItems.forEach((item,index) => {
+      if(index === 2){
+        $(item).addClass("navSelected");
+      }else{
+        $(item).removeClass("navSelected");
+      }
+    })
     if(document.querySelector("#healthContainer").getAttribute("loaded") == "false"){
       const babyId = document.querySelector("#profilePic").getAttribute("value");
       const date = new Date().toISOString().slice(0, 10);  //YYYY-MM-DD
@@ -147,7 +171,6 @@ if (window.location.href.includes("/timeline")) {
     $("#diaryContainer").removeClass("divShow").addClass("divHide");
     $("#tagContainer").removeClass("divShow").addClass("divHide");
     $("#healthContainer").removeClass("divHide").addClass("divShow");
-    $(".age-tree").hide();
   });
 
   //=====================================================
@@ -784,7 +807,8 @@ function summeryWeekTable(weeklyData) {
   // Add dates as headers
   weeklyData.forEach((day) => {
     const th = document.createElement("th");
-    th.textContent = day.date;
+    const dateParts = day.date.split('-');
+    th.textContent = `${dateParts[1]}/${dateParts[2]}`;
     headersRow.appendChild(th);
   });
   thead.appendChild(headersRow);
