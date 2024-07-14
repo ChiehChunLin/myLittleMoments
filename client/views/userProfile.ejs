@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include ("partials/head") %>
+    <title>我的小小時光 | Timeline</title>
+  </head>
+  <body>
+    <!------------ baby Nav ------------>
+    <%- include ("partials/nav", { user }) %>
+    <div class="container-fluid">
+        <div class="row h-100">
+          <!-- baby followed list -->
+          <div class="bg-light p-3 baby-list">
+            <ul class="list-group" id="friendList">  
+                <li class="list-group-item user-item user-selected">
+                    個人資料
+                </li>
+                <li class="list-group-item user-item">
+                    管理中心
+                </li>
+            </ul>
+          </div>
+          <div class="post-content">
+            <div class="centerPage userProfile">
+              <div class="userHead">
+                <img src="<%=user.picture%>" alt="headtshot" style="width: 50px; height: 50px;">
+              </div>
+              <div class="userInfo">
+                <h2><%=user.name%></h2>
+                <span><%=user.id%></span>
+              </div>
+              <div class="lineLogin">
+                <span>用LINE登入啟用小時光機器人服務吧！</span>
+                <button type="click" id="nativeLineBtn" class="sign-btn">使用 LINE 帳號登入</button>
+              </div>              
+            </div>
+            <div class="centerPage userManager divHide">
+              <div class="centerPageTitle">
+                <h3>寶寶列表</h3>
+              </div> 
+              <div class="container mt-3">
+                <div id="managesTitle">
+                  <h4>照護寶寶</h4>
+                  <button class="btn btn-sm btn-primary edit-btn">編輯</button>
+                </div>
+                <div id="manages" class="mb-4">
+                  <% for (let i=0 ; i< 2; i++) { %>
+                    <div class="card mb-2">
+                      <div class="card-header managesDiv">
+                        <span>Manager <%=i%></span>
+                        <button class="btn btn-sm toggle-content"><i class="fa-solid fa-angle-down"></i></button>                   
+                        <button class="btn btn-sm delete-btn"><i class="fa-solid fa-xmark"></i></button>                        
+                      </div>
+                      <div class="card-body manager-content" style="display: none;">
+                        <div class="managerList">
+                          <h5>照護權限列表</h5>
+                          <div class="list-group-item assignManager">
+                            <select id="managerSelect" class="followsList" >
+                              <!-- Add more product options here -->
+                              <option value="userId-1">爸爸</option>
+                              <option value="userId-2">姑姑</option>
+                            </select>
+                            <button class="btn btn-sm btn-success">賦予照護權</button>
+                          </div>
+                          <ul class="list-group mb-1">
+                              <li class="list-group-item manager">Team Member 1<button class="btn btn-sm btn-danger rmManager-btn">移除照護</button></li>
+                              <li class="list-group-item manager">Team Member 2<button class="btn btn-sm btn-danger rmManager-btn">移除照護</button></li>
+                          </ul>
+                        </div>
+                        <hr>
+                        <div id="babyTrainBox" class="">
+                          <h5>更新寶寶五官的正臉、側臉、上仰照片</h5>
+                          <div class="trainBox-row sampleBox">
+                              <div class="sample">
+                                  <img src="/public/images/front.png" alt="front">
+                              </div>
+                              <div class="sample">
+                                  <img src="/public/images/side.png" alt="side">
+                              </div>
+                              <div class="sample">
+                                  <img src="/public/images/upward.png" alt="upward">
+                              </div>
+                          </div>
+                          <br>
+                          <div class="trainUploadBox">
+                              <div class="trainUpload">
+                                <div class="input-group mb-3">
+                                  <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="inputBabyFront" name="babyFront">
+                                    <label class="custom-file-label" for="inputBabyFront" aria-describedby="inputGroupFileAddon02">Choose file</label>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="trainUpload">
+                                <div class="input-group mb-3">
+                                  <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="inputBabySide" name="babySide">
+                                    <label class="custom-file-label" for="inputBabySide" aria-describedby="inputGroupFileAddon02">Choose file</label>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="trainUpload">
+                                <div class="input-group mb-3">
+                                  <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="inputBabyUpward" name="babyUpward">
+                                    <label class="custom-file-label" for="inputBabyUpward" aria-describedby="inputGroupFileAddon02">Choose file</label>
+                                  </div>
+                                </div>
+                              </div>
+                          </div>
+                      </div>
+                      </div>
+                    </div>
+                  <% } %>
+                </div>
+                <div id="followsTitle">
+                  <h4>追蹤寶寶</h4>
+                  <button class="btn btn-sm btn-primary edit-btn">編輯</button>
+                </div>
+                <% for (let i=0 ; i< 2; i++) { %>
+                <div class="card mb-2">
+                  <div class="card-header followsDiv">
+                      <span>Employee <%=i%></span>
+                      <button class="btn btn-sm delete-btn"><i class="fa-solid fa-xmark"></i></button>
+                  </div>
+                </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </body>
+</html>

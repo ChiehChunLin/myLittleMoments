@@ -93,6 +93,23 @@ if (window.location.href.includes("/timeline")) {
   //=====================================================
   //============  Timeline Tab Changes  =================
   //=====================================================
+  document.querySelectorAll('.user-item').forEach(item => {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('.user-item').forEach( listItem => {
+        $(listItem).removeClass('user-selected');
+      });
+      $(this).addClass('user-selected');
+      if(this.outerText === "個人資料"){
+        $(".userProfile").removeClass("divHide").addClass("divShow");
+        $(".userManager").removeClass("divShow").addClass("divHide");
+      }
+      if(this.outerText === "管理中心"){
+        $(".userProfile").removeClass("divShow").addClass("divHide");
+        $(".userManager").removeClass("divHide").addClass("divShow");
+      }
+    });
+  });
+
   document.querySelectorAll('.baby-item').forEach(item => {    
     item.addEventListener('click', function() {
       
@@ -236,6 +253,41 @@ if (window.location.href.includes("/timeline")) {
       fetchImagesToCarousel(date, babyId);
     });
   });
+
+  //=====================================================
+  //============  User Management Center  ===============
+  //=====================================================
+  $('#managesTitle .edit-btn').on('click', function() {
+    document.querySelectorAll(".managesDiv .delete-btn").forEach((deleteBtn) => {
+      $(deleteBtn).toggle();
+      deleteBtn.addEventListener('click', function(e) {
+        //fetch to delete follow
+        e.target.closest(".card").remove();
+        
+      });
+    })
+  });
+  
+  $('#followsTitle .edit-btn').on('click', function() {
+    document.querySelectorAll(".followsDiv .delete-btn").forEach((deleteBtn) => {
+      $(deleteBtn).toggle();
+      deleteBtn.addEventListener('click', function(e) {
+        //fetch to delete follow
+        e.target.closest(".card").remove();
+        
+      });
+    })
+  });
+    
+  $('.toggle-content').on('click', function() {
+    var content = $(this).closest('.card').find('.manager-content');
+    content.toggle();
+    if(content.is(':visible')){
+      $(this.children[0]).removeClass("fa-angle-down").addClass("fa-angle-up");
+    } else {
+      $(this.children[0]).removeClass("fa-angle-up").addClass("fa-angle-down");
+    }
+});
 }
 
 const chartWidth = $(window).width() * 0.5;

@@ -19,6 +19,15 @@ const faceCase ={
   FACE_VALID: 2
 }
 
+const profileRender = async (req, res, next) => {
+  try {
+    const { user } = req;
+    const userData = await userDB.getUserInfo(conn, user.id);
+    res.status(200).render("userProfile", { user });
+  } catch (error) {
+    next(error);
+  }
+};
 const timelineRender = async (req, res, next) => {
   try {
     const { user } = req;
@@ -72,6 +81,7 @@ const timelineRender = async (req, res, next) => {
     next(error);
   }
 };
+
 const firstFollowRender = async (req, res, next) => {
   try {
     res.status(200).render("firstFollow");
@@ -405,6 +415,7 @@ async function uploadTimelineImageToS3 (filePath, type, userId, babyId, key){
 
 
 module.exports = {
+  profileRender,
   firstFollowRender,
   firstFollowController,
   newBabyController,

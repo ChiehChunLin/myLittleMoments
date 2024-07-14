@@ -18,6 +18,7 @@ const upload = multer({
 });
 
 router.get("/", timeline.timelineRender);
+router.get("/profile", timeline.profileRender)
 router.get("/firstFollow", timeline.firstFollowRender);
 
 router.post("/firstFollow", timeline.firstFollowController);
