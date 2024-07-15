@@ -1,5 +1,6 @@
 if (window.location.href.includes("/timeline")) {
   const checkAuth = userCheckAuth();
+  console.log(`checkAuth: ${checkAuth}`);
   //=====================================================
   //============  Add Baby Follow Form  =================
   //=====================================================
@@ -9,7 +10,6 @@ if (window.location.href.includes("/timeline")) {
     const newBabyForm = document.getElementById("newBabyForm");
     const formData = new FormData(newBabyForm);
 
-    const checkAuth = userCheckAuth();
     if (checkAuth) {
       const config = {
         method: "POST",
@@ -45,7 +45,6 @@ if (window.location.href.includes("/timeline")) {
     const relation = formData.get("call");
     const babyId = formData.get("babyId");
 
-    const checkAuth = userCheckAuth();
     if (checkAuth) {
       const config = {
         method: "POST",
@@ -108,7 +107,6 @@ if (window.location.href.includes("/timeline")) {
       const formData = new FormData(updateBabyForm);
       formData.set("babyId", babyIdNumber);
   
-      const checkAuth = userCheckAuth();
       if (checkAuth) {
         const config = {
           method: "POST",
@@ -326,11 +324,13 @@ const chartWidth = $(window).width() * 0.5;
 const chartHeight = chartWidth * 0.75;
 
 function userCheckAuth() {
-  if (localStorage.getItem("accessToken") === null) {
+  
+  if (document.cookie.includes("accessToken=")) {
     const accessJwtToken = document.cookie.split("accessToken=")[1];
     localStorage.setItem("accessToken", accessJwtToken);
+    return true;
   }
-  return true;
+  return false;
 }
 function userNewBabyAndFolowFetch(url, config = "") {
   fetch(url, config)
