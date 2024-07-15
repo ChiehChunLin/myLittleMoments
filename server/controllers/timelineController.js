@@ -227,7 +227,7 @@ const recognizeBabyFace = async (req, res, next) => {
     const key = req.query.path; //"2024-07-02/1231321321321"
     const type = req.query.type; // "image" or "video"
     const trainPath = `default/defaultTrain`;
-    const filePath = `faceUploads/validBaby_${key.split('/')[1]}.jpg`;
+    const filePath = "faceUploads/validBaby_517097435026162077.jpg"; //`faceUploads/validBaby_${key.split('/')[1]}.jpg`;
 
     const managerBabyList = await userDB.getUserManagerBabys(conn, userId);
     const url = await awsS3.getImageS3(trainPath);
@@ -249,7 +249,7 @@ const recognizeBabyFace = async (req, res, next) => {
           managerBabyList,
           key
         }
-        redis.rpush(process.env.REDIS_LIST, JSON.stringify(prcoessCase, imageFiles, queueMsg));
+        redis.rpush(process.env.REDIS_LIST, JSON.stringify({ prcoessCase, imageFiles, queueMsg }));
       }
       return res.status(200).send({message : "image faces dispatch OK!"});
     })
