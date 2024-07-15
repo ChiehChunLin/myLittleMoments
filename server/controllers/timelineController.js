@@ -22,7 +22,9 @@ const faceCase ={
 const profileRender = async (req, res, next) => {
   try {
     const { user } = req;
-    // console.log(user)
+    if(!user.picture.includes("https")){
+      user.picture = awsS3.getImageCDN(user.picture);
+    }
     const managerData = await userDB.getUserManagerBabyInfo(conn, user.id);
     managerData.map(mData => {
       mData.babyHeadshot = awsS3.getImageCDN(mData.babyHeadshot);

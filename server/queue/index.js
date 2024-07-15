@@ -205,7 +205,7 @@ async function worker() {
           const message = await redis.blpop(process.env.REDIS_LIST, 10); // 0 means the command will block indefinitely
           const [key, dataStr] = message;
           const data = JSON.parse(dataStr);
-          console.log("data: %j", data);
+          // console.log("data: %j", data);
           if (data) { 
             // await testFunction(data);
             const { prcoessCase, imageFiles, queueMsg } = data;
@@ -229,7 +229,7 @@ async function worker() {
             });                
           }
       } catch (err) {
-        console.log(typeof err.message)
+        // console.log(typeof err.message)
         if(err.message.includes("message is not iterable")) {
           //nothing in queue, wait for next message
           continue;

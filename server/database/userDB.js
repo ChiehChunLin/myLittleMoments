@@ -29,7 +29,7 @@ async function newLineUser(conn, lineId, name, email, picture, id = 0) {
 async function getUser(conn, id) {
   const [rows] = await conn.query(
     `
-      SELECT * FROM users where id = ?
+      SELECT * FROM users WHERE id = ?
     `,
     [id]
   );
@@ -39,7 +39,7 @@ async function getUser(conn, id) {
 async function getUserByEmail(conn, email) {
   const [rows] = await conn.query(
     `
-      SELECT * FROM users where email = ?
+      SELECT * FROM users WHERE email = ?
     `,
     [email]
   );
@@ -135,7 +135,7 @@ async function getUserFollowsBabyList(conn, id){
 async function getLineUserList(conn) {
   const [rows] = await conn.query(
     `
-      SELECT id,lineId,name FROM users where provider = 'line'
+      SELECT id,lineId,name FROM users WHERE provider = 'line'
     `,
   );
   // console.log("getLineUserList:" + JSON.stringify(rows));
