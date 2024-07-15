@@ -46,17 +46,41 @@ async function testFunction(data){
   await new Promise(resolve => setTimeout(resolve, 2000)); // wait for 3 seconds
   console.log('Processed message:', data);
 }
-function faceRecognition(data) {
-  // {
+function faceTrain(imageFiles){
+
+  return new Promise((resolve, reject) => {
+    faceControl(faceCase.FACE_TRAIN, imageFiles, (err, resultStr) => {
+      if (err) {
+        console.log(`newBabyTrain Fail: ${err}`);
+      }
+      if(resultStr === null){
+        console.log(`newBabyTrain result null`);
+        return;
+      }
+      const resultArrays = resultStr.split(/\s+/);
+      // [
+      //   '1719820286587-1',
+      //   'Success',
+      //   '1719820286587-2',
+      //   'Success',
+      //   '1719820286587-3',
+      //   'Success',
+      //   ''
+      // ]
+      console.log(`newBabyTrain Complete: ${resultArrays}`);
+      return resolve(imageFiles);
+    })
+  })  
+}
+function faceRecognition(imageFiles, queueMsg) {
+  // queueMsg: {
   //   userId: '1718868972609',
   //   managerBabyList: [ { babyId: 1682294400000 }, { babyId: 1719291894152 } ],
   //   key: '2024-07-12/1231321321321',
-  //   filePath: 'faceUploads/validBaby_20240712110046.jpg'
   // }
   return new Promise((resolve, reject) => {
-    const { userId, managerBabyList, key, filePath  } = data;
+    const { userId, managerBabyList, key  } = queueMsg;
     let babyIds = [];
-    const imageFiles = [ `../${filePath}` ];
 
     faceControl(faceCase.FACE_VALID, imageFiles, (err, resultStr) => {
       if (err) {
@@ -113,7 +137,7 @@ function faceControl(caseCode, imagePaths, callback) {
   pythonProcess.stderr.on('data', (data) => {
       // console.log("stderr")
       // console.log(data.toString())
-      // error += data.toString();
+      error += data.toString();
   });
 
   pythonProcess.on('close', (code) => {
@@ -181,11 +205,20 @@ async function worker() {
           const message = await redis.blpop(process.env.REDIS_LIST, 10); // 0 means the command will block indefinitely
           const [key, dataStr] = message;
           const data = JSON.parse(dataStr);
-          
+          console.log("data: %j", data);
           if (data) { 
             // await testFunction(data);
-            const imageFiles = await faceRecognition(data);
-            imageFiles.forEach(path =>{
+            const { prcoessCase, imageFiles, queueMsg } = data;
+            let uploadFiles = [];
+            switch(prcoessCase){
+              case faceCase.FACE_TRAIN:
+                uploadFiles = await faceTrain(imageFiles);
+                break;
+              case faceCase.FACE_VALID:
+                uploadFiles = await faceRecognition(imageFiles, queueMsg);
+                break;
+            }            
+            uploadFiles.forEach(path =>{
               fs.unlink(path, (err) => {
                 if (err) {
                     console.error('File deletion failed:', err);
@@ -196,7 +229,7 @@ async function worker() {
             });                
           }
       } catch (err) {
-        //console.log(typeof err.message)
+        console.log(typeof err.message)
         if(err.message.includes("message is not iterable")) {
           //nothing in queue, wait for next message
           continue;

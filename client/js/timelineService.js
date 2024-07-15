@@ -66,24 +66,6 @@ if (window.location.href.includes("/timeline")) {
       $(".showNewBabyLink")[0].style.display = "none";
     }
   })
-  $("#updateBabyForm").on("submit", function(e){
-    e.preventDefault();
-
-    const updateBabyForm = document.getElementById("updateBabyForm");
-    const formData = new FormData(updateBabyForm);
-
-    const checkAuth = userCheckAuth();
-    if (checkAuth) {
-      const config = {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        body: formData
-      };
-      userNewBabyAndFolowFetch("/", config);
-    }
-  });
 
   $("#addBabyBtn").on("click", function (e){
     $(".babyFollow").removeClass("divHide").addClass("divShow");
@@ -106,6 +88,38 @@ if (window.location.href.includes("/timeline")) {
   $(".followBaby-a").on("click", function (e) {
     $(".firstFollow-div").removeClass("divHide").addClass("divShow");
     $(".newBabyForm-div").removeClass("divShow").addClass("divHide");
+  })
+  //=====================================================
+  //============  Update Baby User Form  =================
+  //=====================================================
+  document.querySelectorAll(".custom-file-input").forEach(input =>{
+    input.addEventListener("change", function (e) {
+      const fileName = e.target.value.split('\\').pop() || e.target.files[0].name;
+      const label = input.nextElementSibling;
+      label.textContent = fileName;
+    })
+  })
+  document.querySelectorAll(".updateBabyForm").forEach(form =>{
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+  
+      const updateBabyForm = e.target
+      const babyIdNumber = updateBabyForm.parentElement.getAttribute("value");
+      const formData = new FormData(updateBabyForm);
+      formData.set("babyId", babyIdNumber);
+  
+      const checkAuth = userCheckAuth();
+      if (checkAuth) {
+        const config = {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          body: formData
+        };
+        userUpdateBabyFetch("/timeline/updateBaby", config);
+      }
+    })
   })
 
   //=====================================================
@@ -327,6 +341,20 @@ function userNewBabyAndFolowFetch(url, config = "") {
         confirm(message);
         $(".babyFollow").removeClass("divShow").addClass("divHide");
         window.location.href = "/timeline";
+      }      
+    })
+    .catch((err) => {
+      alert(err.message);
+      console.error(err);
+    });
+}
+function userUpdateBabyFetch(url, config = "") {
+  fetch(url, config)
+    .then((res) => res.json())
+    .then((data) => {
+      const { message } = data;      
+      if(message){
+        confirm(message);
       }      
     })
     .catch((err) => {

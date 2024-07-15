@@ -20,12 +20,12 @@
                 border-radius: 50%;
                 margin-right: 1rem;
               "
-            />        
-            <span style="margin-right: auto;"><%=managerData[i].babyName%></span>
+            />
+            <span style="margin-right: auto;" value="<%=managerData[i].babyId%>"><%=managerData[i].babyName%></span>
             <button class="btn btn-sm toggle-content"><i class="fa-solid fa-angle-down"></i></button>                   
             <button class="btn btn-sm delete-btn" title="移除照護權"><i class="fa-solid fa-xmark"></i></button>                        
           </div>
-          <div class="card-body manager-content" style="display: none;">
+          <div class="card-body manager-content" style="display: none;" value="<%=managerData[i].babyId%>">
             <div class="managerList">
               <h5>照護權限列表</h5>
               <div class="list-group-item assignManager" style="border: none;">
@@ -44,7 +44,7 @@
               </ul>
             </div>
             <hr>
-            <form id="updateBabyForm" style="margin: 2rem 0;" enctype="multipart/form-data">
+            <form id="updateBabyForm" class="updateBabyForm" style="margin: 2rem 0;">
               <div id="babyTrainBox" class="">
                 <h5>更新寶寶五官的正臉、側臉、上仰照片</h5>
                 <div class="trainBox-row sampleBox">
@@ -63,7 +63,7 @@
                     <div class="trainUpload">
                       <div class="input-group mb-3">
                         <div class="custom-file">
-                          <input type="file" class="custom-file-input" id="inputBabyFront" name="babyFront">
+                          <input type="file" class="custom-file-input" class="inputBabyFront" name="babyFront">
                           <label class="custom-file-label" for="inputBabyFront" aria-describedby="inputGroupFileAddon02">Choose file</label>
                         </div>
                       </div>
@@ -71,7 +71,7 @@
                     <div class="trainUpload">
                       <div class="input-group mb-3">
                         <div class="custom-file">
-                          <input type="file" class="custom-file-input" id="inputBabySide" name="babySide">
+                          <input type="file" class="custom-file-input" class="inputBabySide" name="babySide">
                           <label class="custom-file-label" for="inputBabySide" aria-describedby="inputGroupFileAddon02">Choose file</label>
                         </div>
                       </div>
@@ -79,14 +79,14 @@
                     <div class="trainUpload">
                       <div class="input-group mb-3">
                         <div class="custom-file">
-                          <input type="file" class="custom-file-input" id="inputBabyUpward" name="babyUpward">
+                          <input type="file" class="custom-file-input" class="inputBabyUpward" name="babyUpward">
                           <label class="custom-file-label" for="inputBabyUpward" aria-describedby="inputGroupFileAddon02">Choose file</label>
                         </div>
                       </div>
                     </div>
-                </div>
-                <button type="submit" class="btn btn-primary" style="margin-left: auto;">更新照片</button>
+                </div>                
               </div>
+              <button type="submit" class="btn btn-primary" style="margin-left: auto;">更新照片</button>
             </form>
           </div>
         </div>

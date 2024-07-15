@@ -42,7 +42,7 @@ def face_register(img_path):
                     faces_sum += 1
             if faces_sum == 1:                
                 nimg = face_preprocess.preprocess(rotated_image, bbox, points, image_size='112,112')
-                cv2.imencode('.png', nimg)[1].tofile('faceTrained/%s.png' % filename)
+                cv2.imencode('.png', nimg)[1].tofile('../faceTrained/%s.png' % filename)
                 print("{} Success".format(filename))
                 return
 

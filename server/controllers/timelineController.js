@@ -148,50 +148,69 @@ const newBabyController = async (req, res, next) => {
     const newBabyId = await babyDB.newBaby(conn, babyName, babyGender, babyBirth);
     const followBaby = await userDB.setUserFollowBaby(conn, user.id, newBabyId, babyRole, babyCall);
 
-    const trainPaths = [];
+    const imageFiles = [];
     for(let i = 0; i < trainFiles.length ; i++){
       const filename = `${newBabyId}-${i + 1}`;
       const fileExtension = trainFiles[i].mimetype.split('/')[1];
       const filePath = `faceUploads/${filename}.${fileExtension}`;
       await saveImageFromBuffer(trainFiles[i].buffer, filePath);
-      trainPaths.push(filePath);
+      imageFiles.push(`../${filePath}`);  //relative to queue entry point
     }
 
-    if(trainPaths.length > 0){
-      //child_process
-      faceControl(faceCase.FACE_TRAIN, trainPaths, (err, resultStr) => {
-        if (err) {
-          console.log(`newBabyTrain Fail: ${err}`);
-        }
-        if(resultStr === null){
-          console.log(`newBabyTrain result null`);
-          return;
-        }
-        const resultArrays = resultStr.split(/\s+/);
-        // [
-        //   '1719820286587-1',
-        //   'Success',
-        //   '1719820286587-2',
-        //   'Success',
-        //   '1719820286587-3',
-        //   'Success',
-        //   ''
-        // ]
-        console.log(`newBabyTrain Complete: ${resultArrays}`);
-        trainPaths.forEach(path => {
-          fs.unlink(path, (err) => {
-            if (err) {
-                console.error('File deletion failed:', err);
-            } else {
-                // console.log(`${path} deleted successfully`);
-            }
-          });
-        })        
-      })        
+    if(imageFiles.length > 0){
+      const prcoessCase = faceCase.FACE_TRAIN;
+      redis.rpush(process.env.REDIS_LIST, JSON.stringify({ prcoessCase, imageFiles }));
     }    
     if(newBabyId && followBaby){
-      return res.status(200).send({ message: `New Baby and Follow Successfully!` }); //老師建議不要讓user等
+      return res.status(200).send({ message: `寶寶新增＆追蹤成功!` });
     }
+  } catch (error) {
+    if(error.message.includes("Duplicate")){
+      return res.status(200).send({ message: "寶寶新增成功!" });
+    }
+    next(error);
+  }
+}
+const updateBabyController = async (req, res, next) => {
+  try {
+    const { user } = req;
+    if(!user){
+      return res.status(500).send({ message: "user is not defined" });
+    }
+    const { babyId } = req.body;   
+    const trainFiles = [];
+    if(req.files.babyFront){
+      trainFiles.push(req.files.babyFront[0]);
+    }
+    if(req.files.babySide){
+      trainFiles.push(req.files.babySide[0]);
+    }
+    if(req.files.babyUpward){
+      trainFiles.push(req.files.babyUpward[0]);
+    }
+    // {
+    //   fieldname: 'babyFront',
+    //   originalname: '1682294400000-1.jpg',
+    //   encoding: '7bit',
+    //   mimetype: 'image/jpeg',
+    //   buffer: <Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 01 00 00 48 00 48 00 00 ff e1 00 58 45 78 69 66 00 00 4d 4d 00 2a 00 00 00 08 00 02 01 12 00 03 00 00 00 01 00 01 ... 219324 more bytes>,
+    //   size: 219374
+    // }
+
+    const imageFiles = [];
+    for(let i = 0; i < trainFiles.length ; i++){
+      const filename = `${babyId}-${i + 1}`;
+      const fileExtension = trainFiles[i].mimetype.split('/')[1];
+      const filePath = `faceUploads/${filename}.${fileExtension}`;
+      await saveImageFromBuffer(trainFiles[i].buffer, filePath);
+      imageFiles.push(`../${filePath}`);  //relative to queue entry point
+    }
+
+    if(imageFiles.length > 0){
+      const prcoessCase = faceCase.FACE_TRAIN;
+      redis.rpush(process.env.REDIS_LIST, JSON.stringify({ prcoessCase, imageFiles }));
+    }    
+    return res.status(200).send({ message: `寶寶更新成功!` });
   } catch (error) {
     if(error.message.includes("Duplicate")){
       return res.status(200).send({ message: "寶寶新增成功!" });
@@ -221,13 +240,14 @@ const recognizeBabyFace = async (req, res, next) => {
         })        
       } else {
         //face recognition downlad image ok -> enqueue
+        const prcoessCase = faceCase.FACE_VALID;
+        const imageFiles = [ `../${filePath}` ]; //relative to queue entry point
         const queueMsg = {
           userId,
           managerBabyList,
-          key,
-          filePath
+          key
         }
-        redis.rpush(process.env.REDIS_LIST, JSON.stringify(queueMsg));
+        redis.rpush(process.env.REDIS_LIST, JSON.stringify(prcoessCase, imageFiles, queueMsg));
       }
       return res.status(200).send({message : "image faces dispatch OK!"});
     })
@@ -431,6 +451,7 @@ module.exports = {
   firstFollowRender,
   firstFollowController,
   newBabyController,
+  updateBabyController,
   recognizeBabyFace,
   healthController,
   babyTimelineTabsData,
