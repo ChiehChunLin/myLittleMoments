@@ -66,6 +66,24 @@ if (window.location.href.includes("/timeline")) {
       $(".showNewBabyLink")[0].style.display = "none";
     }
   })
+  $("#updateBabyForm").on("submit", function(e){
+    e.preventDefault();
+
+    const updateBabyForm = document.getElementById("updateBabyForm");
+    const formData = new FormData(updateBabyForm);
+
+    const checkAuth = userCheckAuth();
+    if (checkAuth) {
+      const config = {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        body: formData
+      };
+      userNewBabyAndFolowFetch("/", config);
+    }
+  });
 
   $("#addBabyBtn").on("click", function (e){
     $(".babyFollow").removeClass("divHide").addClass("divShow");

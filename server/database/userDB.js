@@ -76,6 +76,62 @@ async function getUserInfo(conn, id) {
   // console.log("getUserInfo:" + JSON.stringify(rows[0]));
   return rows[0];
 }
+async function getUserManagerBabyInfo(conn, id){
+  const [rows] = await conn.query(
+    `
+      SELECT 
+          f.babyId,
+          b.name AS babyName,
+          b.headshot AS babyHeadshot,
+          (
+              SELECT JSON_ARRAYAGG(JSON_OBJECT('userId', uf.userId, 'userName', u.name))
+              FROM follows uf
+              JOIN users u ON uf.userId = u.id
+              WHERE uf.babyId = f.babyId 
+              AND uf.babyRole = '${babyRole.MANAGER}'
+              AND uf.userId != ?
+          ) AS otherManagers,
+          (
+              SELECT JSON_ARRAYAGG(JSON_OBJECT('userId', uf.userId, 'userName', u.name))
+              FROM follows uf
+              JOIN users u ON uf.userId = u.id
+              WHERE uf.babyId = f.babyId 
+              AND uf.babyRole != '${babyRole.MANAGER}'
+              AND uf.userId != ?
+          ) AS otherFollows
+      FROM 
+          follows f
+      JOIN 
+          babys b ON f.babyId = b.id
+      WHERE 
+          f.userId = ? 
+          AND f.babyRole = '${babyRole.MANAGER}';
+    `,
+    [id, id, id]
+  );
+  // console.log("getUserManagerBabyInfo:" + JSON.stringify(rows));
+  return rows;
+}
+async function getUserFollowsBabyList(conn, id){
+  const [rows] = await conn.query(
+    `
+      SELECT 
+          f.babyId, 
+          b.name AS babyName, 
+          b.headshot AS babyHeadshot
+      FROM 
+          follows f
+      JOIN 
+          babys b ON f.babyId = b.id
+      WHERE 
+          f.userId = ? 
+          AND f.babyRole != '${babyRole.MANAGER}';
+    `,
+    [id]
+  );
+  // console.log("getUserFollowsBabyList:" + JSON.stringify(rows));
+  return rows;
+}
 async function getLineUserList(conn) {
   const [rows] = await conn.query(
     `
@@ -145,6 +201,8 @@ module.exports = {
   getUser,
   getUserByEmail,
   getUserInfo,
+  getUserManagerBabyInfo,
+  getUserFollowsBabyList,
   getLineUserList,
   setUserFollowBaby,
   getUserFollowsByLineID,

@@ -1,15 +1,29 @@
-<div class="container mt-3">
+<div class="centerPage userManager divHide">
+  <div class="centerPageTitle">
+    <h3>寶寶列表</h3>
+  </div> 
+  <div class="container mt-3">
     <div id="managesTitle">
       <h4>照護寶寶</h4>
       <button class="btn btn-sm btn-primary edit-btn">編輯</button>
     </div>
     <div id="manages" class="mb-4">
-      <% for (let i=0 ; i< 2; i++) { %>
+      <% for (let i=0 ; i< managerData.length; i++) { %>
         <div class="card mb-2">
           <div class="card-header managesDiv">
-            <span>Manager <%=i%></span>
+            <img
+              src="<%=managerData[i].babyHeadshot%>"
+              alt="babyshot"
+              style="
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                margin-right: 1rem;
+              "
+            />        
+            <span style="margin-right: auto;"><%=managerData[i].babyName%></span>
             <button class="btn btn-sm toggle-content"><i class="fa-solid fa-angle-down"></i></button>                   
-            <button class="btn btn-sm delete-btn"><i class="fa-solid fa-xmark"></i></button>                        
+            <button class="btn btn-sm delete-btn" title="移除照護權"><i class="fa-solid fa-xmark"></i></button>                        
           </div>
           <div class="card-body manager-content" style="display: none;">
             <div class="managerList">
@@ -17,18 +31,20 @@
               <div class="list-group-item assignManager" style="border: none;">
                 <select id="managerSelect" class="followsList" >
                   <!-- Add more product options here -->
-                  <option value="userId-1">爸爸</option>
-                  <option value="userId-2">姑姑</option>
+                  <% managerData[i].otherFollows.forEach((follower) => { %>
+                  <option value="<%=follower.userId%>"><%=follower.userName%></option>
+                  <% }); %>
                 </select>
                 <button class="btn btn-sm btn-success">賦予照護權</button>
               </div>
               <ul class="list-group mb-1">
-                  <li class="list-group-item manager">Team Member 1<button class="btn btn-sm btn-danger rmManager-btn">移除照護</button></li>
-                  <li class="list-group-item manager">Team Member 2<button class="btn btn-sm btn-danger rmManager-btn">移除照護</button></li>
+                <% managerData[i].otherManagers.forEach((manager) => { %>
+                  <li class="list-group-item manager" value="<%=manager.userId%>"><%=manager.userName%><button class="btn btn-sm btn-danger rmManager-btn">移除照護權</button></li>
+                <% }); %>
               </ul>
             </div>
             <hr>
-            <form id="newBabyForm" style="margin: 2rem 0;" enctype="multipart/form-data">
+            <form id="updateBabyForm" style="margin: 2rem 0;" enctype="multipart/form-data">
               <div id="babyTrainBox" class="">
                 <h5>更新寶寶五官的正臉、側臉、上仰照片</h5>
                 <div class="trainBox-row sampleBox">
@@ -75,17 +91,28 @@
           </div>
         </div>
       <% } %>
-    </div>
-    <div id="followsTitle">
-      <h4>追蹤寶寶</h4>
-      <button class="btn btn-sm btn-primary edit-btn">編輯</button>
-    </div>
-    <% for (let i=0 ; i< 2; i++) { %>
-    <div class="card mb-2">
-      <div class="card-header followsDiv">
-          <span>Employee <%=i%></span>
-          <button class="btn btn-sm delete-btn"><i class="fa-solid fa-xmark"></i></button>
       </div>
-    </div>
-    <% } %>
+      <div id="followsTitle">
+        <h4>追蹤寶寶</h4>
+        <button class="btn btn-sm btn-primary edit-btn">編輯</button>
+      </div>
+      <% for (let i=0 ; i< followsData.length; i++) { %>
+      <div class="card mb-2 followsRow">
+        <div class="card-header followsDiv">
+          <img
+            src="<%=followsData[i].babyHeadshot%>"
+            alt="babyshot"
+            style="
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              margin-right: 1rem;
+            "
+          />        
+          <span style="margin-right: auto;"><%=followsData[i].babyName%></span>
+          <button class="btn btn-sm delete-btn" title="取消追蹤"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+      <% } %>
   </div>
+</div>

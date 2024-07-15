@@ -22,8 +22,20 @@ const faceCase ={
 const profileRender = async (req, res, next) => {
   try {
     const { user } = req;
-    const userData = await userDB.getUserInfo(conn, user.id);
-    res.status(200).render("userProfile", { user });
+    // console.log(user)
+    const managerData = await userDB.getUserManagerBabyInfo(conn, user.id);
+    managerData.map(mData => {
+      mData.babyHeadshot = awsS3.getImageCDN(mData.babyHeadshot);
+      if(!mData.otherManagers){ mData.otherManagers = []};
+      if(!mData.otherFollows){ mData.otherFollows = []};
+    });
+    // console.log(managerData);
+    const followsData = await userDB.getUserFollowsBabyList(conn, user.id);
+    followsData.map(fData => {
+      fData.babyHeadshot = awsS3.getImageCDN(fData.babyHeadshot);
+    });
+    // console.log(followsData);
+    res.status(200).render("userProfile", { user, managerData, followsData});
   } catch (error) {
     next(error);
   }

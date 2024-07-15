@@ -455,7 +455,7 @@ input[type="number"] {
 #managesTitle,
 #followsTitle,
 .assignManager,
-.manager {
+.manager{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -464,10 +464,13 @@ input[type="number"] {
 .managesDiv,
 .followsDiv {
   display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 .managesDiv span,
 .followsDiv span {
-margin-right: auto;
+  margin-right: auto;
 }
 .toggle-content,
 .delete-btn{

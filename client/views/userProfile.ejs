@@ -21,25 +21,10 @@
             </ul>
           </div>
           <div class="post-content">
-            <div class="centerPage userProfile">
-              <div class="userHead">
-                <img src="<%=user.picture%>" alt="headtshot" style="width: 50px; height: 50px;">
-              </div>
-              <div class="userInfo">
-                <h2><%=user.name%></h2>
-                <span><%=user.id%></span>
-              </div>
-              <div class="lineLogin">
-                <span>用LINE登入啟用小時光機器人服務吧！</span>
-                <button type="click" id="nativeLineBtn" class="sign-btn">使用 LINE 帳號登入</button>
-              </div>              
-            </div>
-            <div class="centerPage userManager divHide">
-              <div class="centerPageTitle">
-                <h3>寶寶列表</h3>
-              </div> 
-              <%- include ("partials/userUpdateBaby") %>
-            </div>
+            <!-- userProfile -->
+            <%- include ("partials/userProfileInfo", { user }) %>
+            <!-- userManager -->            
+            <%- include ("partials/userUpdateBaby", { managerData, followsData}) %>
           </div>
           <div class="col-md-3">
             <div class="fixedBtn toTop">
@@ -47,6 +32,6 @@
             </div>            
           </div>
         </div>
-      </div>
+    </div>
   </body>
 </html>
