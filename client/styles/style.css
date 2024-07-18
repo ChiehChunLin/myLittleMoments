@@ -297,7 +297,7 @@ input[type="number"] {
 .post-content,
 .age-tree {
   height: auto;
-  min-height: 100%;
+  min-height: 100vh;
 }
 .baby-list {
   flex: 0 0 20%;
@@ -493,7 +493,7 @@ input[type="number"] {
 }
 .followsList{
   display: block;
-  width: 75%;
+  width: auto;
   height: calc(1.5em + .75rem + 2px);
   padding: .375rem .75rem;
   font-size: 1rem;

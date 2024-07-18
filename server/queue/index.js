@@ -230,7 +230,7 @@ async function worker() {
           }
       } catch (err) {
         // console.log(typeof err.message)
-        if(err.message.includes("message is not iterable")) {
+        if(err.message && err.message.includes("message is not iterable")) {
           //nothing in queue, wait for next message
           continue;
         }

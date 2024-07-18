@@ -227,7 +227,7 @@ const recognizeBabyFace = async (req, res, next) => {
     const key = req.query.path; //"2024-07-02/1231321321321"
     const type = req.query.type; // "image" or "video"
     const trainPath = `default/defaultTrain`;
-    const filePath = "faceUploads/validBaby_517097435026162077.jpg"; //`faceUploads/validBaby_${key.split('/')[1]}.jpg`;
+    const filePath = `faceUploads/validBaby_${key.split('/')[1]}.jpg`;
 
     const managerBabyList = await userDB.getUserManagerBabys(conn, userId);
     const url = await awsS3.getImageS3(trainPath);
@@ -359,7 +359,7 @@ const downloadValidImageFromS3 = (url, filePath) => {
       if (response.statusCode === 200) {
         const fileStream = fs.createWriteStream(filePath);
         response.pipe(fileStream);
-        fileStream.on('finish', () => resolve('Image downloaded successfully!'));
+        fileStream.on('finish', () => resolve(`Image downloaded ${filePath} successfully!`));
       } else {
         reject(new Error(`Error downloading image: ${response.statusCode}`));
       }

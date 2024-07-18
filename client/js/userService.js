@@ -1,6 +1,6 @@
 $(".logout").on("click", function (e) {
   localStorage.removeItem("accessToken");
-  displayLoginMessage("Logout Successfully!");
+  displayLoginMessage("小時光登出成功!");
 });
 
 if (window.location.href.includes("/login")) {

@@ -88,37 +88,6 @@ if (window.location.href.includes("/timeline")) {
     $(".firstFollow-div").removeClass("divHide").addClass("divShow");
     $(".newBabyForm-div").removeClass("divShow").addClass("divHide");
   })
-  //=====================================================
-  //============  Update Baby User Form  =================
-  //=====================================================
-  document.querySelectorAll(".custom-file-input").forEach(input =>{
-    input.addEventListener("change", function (e) {
-      const fileName = e.target.value.split('\\').pop() || e.target.files[0].name;
-      const label = input.nextElementSibling;
-      label.textContent = fileName;
-    })
-  })
-  document.querySelectorAll(".updateBabyForm").forEach(form =>{
-    form.addEventListener("submit", function(e){
-      e.preventDefault();
-  
-      const updateBabyForm = e.target
-      const babyIdNumber = updateBabyForm.parentElement.getAttribute("value");
-      const formData = new FormData(updateBabyForm);
-      formData.set("babyId", babyIdNumber);
-  
-      if (checkAuth) {
-        const config = {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-          body: formData
-        };
-        userUpdateBabyFetch("/timeline/updateBaby", config);
-      }
-    })
-  })
 
   //=====================================================
   //============  Timeline Tab Changes  =================
@@ -288,37 +257,70 @@ if (window.location.href.includes("/timeline")) {
   //============  User Management Center  ===============
   //=====================================================
   $('#managesTitle .edit-btn').on('click', function() {
-    document.querySelectorAll(".managesDiv .delete-btn").forEach((deleteBtn) => {
-      $(deleteBtn).toggle();
-      deleteBtn.addEventListener('click', function(e) {
-        //fetch to delete follow
-        e.target.closest(".card").remove();
-        
-      });
-    })
+    $('#manages .delete-btn').toggle();
   });
-  
+
   $('#followsTitle .edit-btn').on('click', function() {
-    document.querySelectorAll(".followsDiv .delete-btn").forEach((deleteBtn) => {
-      $(deleteBtn).toggle();
-      deleteBtn.addEventListener('click', function(e) {
-        //fetch to delete follow
-        e.target.closest(".card").remove();
-        
-      });
-    })
+      $('#follows .delete-btn').toggle();
   });
-    
+
   $('.toggle-content').on('click', function() {
-    var content = $(this).closest('.card').find('.manager-content');
+    const content = $(this).closest('.card').find('.manager-content');
     content.toggle();
     if(content.is(':visible')){
       $(this.children[0]).removeClass("fa-angle-down").addClass("fa-angle-up");
     } else {
       $(this.children[0]).removeClass("fa-angle-up").addClass("fa-angle-down");
     }
-});
+  });
+
+  $('#manages').on('click', '.delete-btn', function() {
+      const card = $(this).closest('.card');
+      card.find('.toggle-content').remove();
+      card.find('.manager-content').remove();
+      card.appendTo('#follows');
+      $(this).hide();
+
+      // const userId = $(".userInfo span")[0].textContent;
+      // const babyId = e.target.closest(".card").getAttribute("value");
+      
+  });
+
+
+
+  //=====================================================
+  //============  Update Baby User Form  =================
+  //=====================================================
+  document.querySelectorAll(".custom-file-input").forEach(input =>{
+    input.addEventListener("change", function (e) {
+      const fileName = e.target.value.split('\\').pop() || e.target.files[0].name;
+      const label = input.nextElementSibling;
+      label.textContent = fileName;
+    })
+  })
+  document.querySelectorAll(".updateBabyForm").forEach(form =>{
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+  
+      const updateBabyForm = e.target
+      const babyIdNumber = updateBabyForm.parentElement.getAttribute("value");
+      const formData = new FormData(updateBabyForm);
+      formData.set("babyId", babyIdNumber);
+  
+      if (checkAuth) {
+        const config = {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          body: formData
+        };
+        userUpdateBabyFetch("/timeline/updateBaby", config);
+      }
+    })
+  })
 }
+
 
 const chartWidth = $(window).width() * 0.5;
 const chartHeight = chartWidth * 0.75;
@@ -331,6 +333,13 @@ function userCheckAuth() {
     return true;
   }
   return false;
+}
+function updateBabyRole(userId, babyId, babyRole){
+  const url = "";
+  const config ={
+    method: "POST",
+    body: formData,
+  }
 }
 function userNewBabyAndFolowFetch(url, config = "") {
   fetch(url, config)
@@ -486,7 +495,7 @@ function fetchChartData(date, babyId) {
     .then((data) => {
       if (data) {
         const { dailyData, weightData, heightData } = data;
-        // console.log("%j", data);
+
         if (dailyData) {
           showBabyDailyChart(dailyData);
           summeryWeekTable(dailyData);
@@ -517,7 +526,7 @@ function fetchChartData(date, babyId) {
     });
 }
 function displayBabyProfilePage(babyData, imageData, textData, healthData){
-  console.log(babyData.userRole)
+
   if(babyData.userRole != 'manager'){
     document.querySelector("#changeCoverBtn").style.display = "none"; 
     document.querySelector("#profilePic img").setAttribute("title", "");
@@ -655,11 +664,12 @@ function displayHealthCharts(healthData){
   document.getElementById("heightRecords").innerHTML="";
 
   const { dailyData, weightData, heightData } = healthData;
-
+  
   if (dailyData) {
     showBabyDailyChart(dailyData);
     summeryWeekTable(dailyData);
   }
+
   if (weightData) {
     const cdcWeight = getCdcData(weightData.gender, babyActivity.WEIGHT);
     showBabyWeightLength(
@@ -668,6 +678,10 @@ function displayHealthCharts(healthData){
       weightData.weights
     );
     recordTable(babyActivity.WEIGHT, weightData.weights);
+  } else {
+    const dailyDiv = document.getElementById("babyGrowthWeight");
+    const html = `<h5 class="card" style="margin: auto; padding: 1.5rem 0.5rem; color: gray;">快快開始紀錄寶寶的身高體重吧！</h5>`
+    dailyDiv.insertAdjacentHTML('afterbegin', html);
   }
   if (heightData) {
     const cdcHeight = getCdcData(heightData.gender, babyActivity.HEIGHT);
@@ -677,6 +691,10 @@ function displayHealthCharts(healthData){
       heightData.heights
     );
     recordTable(babyActivity.HEIGHT, heightData.heights);
+  } else {
+    const dailyDiv = document.getElementById("babyGrowthLength");
+    const html = `<h5 class="card" style="margin: auto; padding: 1.5rem 0.5rem; color: gray;">快快開始紀錄寶寶的身高體重吧！</h5>`
+    dailyDiv.insertAdjacentHTML('afterbegin', html);
   }
 }
 function getCdcData(gender, type) {
