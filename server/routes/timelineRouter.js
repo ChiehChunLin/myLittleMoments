@@ -26,10 +26,11 @@ router.post("/newBaby", upload.fields([
   { name: "babyFront", maxCount: 1 },
   { name: "babySide", maxCount: 1 },
   { name: "babyUpward", maxCount: 1 }]),timeline.newBabyController);
-  router.post("/updateBaby", upload.fields([
-    { name: "babyFront", maxCount: 1 },
-    { name: "babySide", maxCount: 1 },
-    { name: "babyUpward", maxCount: 1 }]),timeline.updateBabyController);
+router.post("/updateBabyFace", upload.fields([
+  { name: "babyFront", maxCount: 1 },
+  { name: "babySide", maxCount: 1 },
+  { name: "babyUpward", maxCount: 1 }]),timeline.updateBabyFaceController);
+router.post("/updateBabyRole", timeline.updateBabyRoleController);
 router.post("/uploadImage", upload.fields([{ name: "file", maxCount: 1 }]), timeline.uploadProfileImageToS3);
 router.post("/health", timeline.healthController);
 router.post("/babyProfile", timeline.babyTimelineTabsData);

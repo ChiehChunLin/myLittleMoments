@@ -21,7 +21,7 @@
                 margin-right: 1rem;
               "
             />
-            <span style="margin-right: auto;"><%=managerData[i].babyName%></span>
+            <span class="baby-name" style="margin-right: auto;"><%=managerData[i].babyName%></span>
             <button class="btn btn-sm toggle-content"><i class="fa-solid fa-angle-down"></i></button>                   
             <button class="btn btn-sm delete-btn rmUserManager-btn" title="移除照護權"><i class="fa-solid fa-xmark"></i></button>                        
           </div>
@@ -40,7 +40,9 @@
               </div>
               <ul class="list-group mb-1">
                 <% managerData[i].otherManagers.forEach((manager) => { %>
-                  <li class="list-group-item manager" value="<%=manager.userId%>"><%=manager.userName%><button class="btn btn-sm btn-danger rmFamilyManager-btn">移除照護權</button></li>
+                  <li class="list-group-item manager" data-value="<%=manager.userId%>" data-name="<%=manager.userName%>"><%=manager.userName%>
+                    <button class="btn btn-sm btn-danger rmFamilyManager-btn">移除照護權</button>
+                  </li>
                 <% }); %>
               </ul>
             </div>
@@ -114,7 +116,7 @@
               margin-right: 1rem;
             "
           />        
-          <span style="margin-right: auto;"><%=followsData[i].babyName%></span>
+          <span class="baby-name" style="margin-right: auto;"><%=followsData[i].babyName%></span>
           <button class="btn btn-sm delete-btn unFollowBaby-btn" title="取消追蹤"><i class="fa-solid fa-xmark"></i></button>
         </div>
       </div>

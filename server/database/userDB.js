@@ -194,6 +194,34 @@ async function getUserManagerBabys(conn, userId){
   // console.log("getManagerBabyList:" + JSON.stringify(rows));
   return rows;
 }
+async function updateUserBabyRole(conn, userId, babyId, babyRole){
+  const [rows] = await conn.query(
+    `
+      UPDATE
+        follows
+      SET 
+        babyRole = ?
+      WHERE 
+        userId = ? AND babyId = ?
+    `,
+    [babyRole, userId, babyId]
+  );
+  // console.log("updateUserBabyRole:" + JSON.stringify(rows));
+  return rows;
+}
+async function userUnfollowBaby(conn, userId, babyId){
+  const [rows] = await conn.query(
+    `
+      DELETE FROM 
+        follows
+      WHERE 
+        userId = ? AND babyId = ?
+    `,
+    [userId, babyId]
+  );
+  // console.log("userUnfollowBaby:" + JSON.stringify(rows));
+  return rows;
+}
 
 module.exports = {
   newNativeUser,
@@ -206,5 +234,7 @@ module.exports = {
   getLineUserList,
   setUserFollowBaby,
   getUserFollowsByLineID,
-  getUserManagerBabys
+  getUserManagerBabys,
+  updateUserBabyRole,
+  userUnfollowBaby
 };

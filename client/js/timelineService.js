@@ -259,9 +259,113 @@ if (window.location.href.includes("/timeline")) {
   $('#managesTitle .edit-btn').on('click', function() {
     $('#manages .delete-btn').toggle();
   });
-
   $('#followsTitle .edit-btn').on('click', function() {
       $('#follows .delete-btn').toggle();
+  });
+
+  $('#manages').on('click', '.delete-btn', function() {
+      const card = $(this).closest('.card');
+      card.find('.toggle-content').remove();
+      card.find('.manager-content').remove();
+      card.appendTo('#follows');
+      $(this).hide();
+
+      // fetch server update babyRole= 'family'
+      if (checkAuth) {
+        const userId = $(".userInfo span")[0].textContent;
+        const babyId = card[0].getAttribute("value");
+        const config = {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ userId, babyId, babyRole: 'family'})
+        };
+        userUpdateBabyFetch("/timeline/updateBabyRole", config);
+      }
+  });
+  $('#follows').on('click', '.delete-btn', function() {
+    const card = $(this).closest('.card'); 
+    card[0].remove();
+
+    // fetch server delete follows
+    if (checkAuth) {
+      const userId = $(".userInfo span")[0].textContent;
+      const babyId = card[0].getAttribute("value");
+      const config = {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ userId, babyId, babyRole: 'unfollow'})
+      };
+      userUpdateBabyFetch("/timeline/updateBabyRole", config);
+    }
+  });
+
+  $('#manages').on('click', '.addFamilyManager-btn', function() {
+    const managerSelect = document.getElementById("managerSelect");
+    const selectedIndex = managerSelect.selectedIndex;
+    const candidateId = managerSelect[selectedIndex].value;
+    const candidateName = managerSelect[selectedIndex].textContent;
+
+    const newLi = document.createElement('li');
+    newLi.className = 'list-group-item manager';
+    newLi.textContent = candidateName;
+    newLi.setAttribute("data-value", candidateId);
+    newLi.setAttribute("data-name", candidateName);
+    const newButton = document.createElement('button');
+    newButton.className = 'btn btn-sm btn-danger rmFamilyManager-btn';
+    newButton.innerText = '移除照護權';
+    newLi.appendChild(newButton);
+    document.querySelector('.list-group.mb-1').appendChild(newLi);
+
+    const  options = document.querySelectorAll(`#managerSelect option[value="${candidateId}"]`);
+    options.forEach(function(option) { option.remove() });
+    
+    //fetch update babyRole to manager
+    if (checkAuth) {
+      const userId = candidateId;
+      const babyId = $(this).closest('.card')[0].getAttribute("value");
+      const config = {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ userId, babyId, babyRole: 'manager'})
+      };
+      userUpdateBabyFetch("/timeline/updateBabyRole", config);
+    }
+  });
+  $('#manages').on('click', '.rmFamilyManager-btn', function() {
+    console.log("yo")
+    const manager = $(this).closest('.manager');
+    const userId = manager[0].getAttribute("data-value");
+    const userName = manager[0].getAttribute("data-name");
+
+    const select = document.getElementById("managerSelect");
+    const newOption = document.createElement("option");
+    newOption.value = userId;
+    newOption.textContent = userName;
+    select.appendChild(newOption);
+    manager.remove();
+
+    //fetch update babyRole to family
+    if (checkAuth) {
+      const babyId = select.closest('.card').getAttribute("value");
+      const config = {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ userId, babyId, babyRole: 'family'})
+      };
+      userUpdateBabyFetch("/timeline/updateBabyRole", config);
+    }
   });
 
   $('.toggle-content').on('click', function() {
@@ -273,20 +377,6 @@ if (window.location.href.includes("/timeline")) {
       $(this.children[0]).removeClass("fa-angle-up").addClass("fa-angle-down");
     }
   });
-
-  $('#manages').on('click', '.delete-btn', function() {
-      const card = $(this).closest('.card');
-      card.find('.toggle-content').remove();
-      card.find('.manager-content').remove();
-      card.appendTo('#follows');
-      $(this).hide();
-
-      // const userId = $(".userInfo span")[0].textContent;
-      // const babyId = e.target.closest(".card").getAttribute("value");
-      
-  });
-
-
 
   //=====================================================
   //============  Update Baby User Form  =================
@@ -315,7 +405,7 @@ if (window.location.href.includes("/timeline")) {
           },
           body: formData
         };
-        userUpdateBabyFetch("/timeline/updateBaby", config);
+        userUpdateBabyFetch("/timeline/updateBabyFace", config);
       }
     })
   })
@@ -333,13 +423,6 @@ function userCheckAuth() {
     return true;
   }
   return false;
-}
-function updateBabyRole(userId, babyId, babyRole){
-  const url = "";
-  const config ={
-    method: "POST",
-    body: formData,
-  }
 }
 function userNewBabyAndFolowFetch(url, config = "") {
   fetch(url, config)

@@ -173,7 +173,22 @@ const newBabyController = async (req, res, next) => {
     next(error);
   }
 }
-const updateBabyController = async (req, res, next) => {
+const updateBabyRoleController = async (req, res, next) => {
+  try {
+    const { userId, babyId, babyRole } = req.body;
+
+    if (babyRole === "unfollow") {
+      const rmResult = await userDB.userUnfollowBaby(conn, userId, babyId);
+      return res.status(200).send({message: "寶寶取消追蹤成功！"});
+    }else{
+      const updateResult = await userDB.updateUserBabyRole(conn, userId, babyId, babyRole);
+      return res.status(200).send({message: "寶寶權限更新成功！"});
+    }
+  } catch (error) {
+    next(error);
+  }
+}
+const updateBabyFaceController = async (req, res, next) => {
   try {
     const { user } = req;
     if(!user){
@@ -453,7 +468,8 @@ module.exports = {
   firstFollowRender,
   firstFollowController,
   newBabyController,
-  updateBabyController,
+  updateBabyRoleController,
+  updateBabyFaceController,
   recognizeBabyFace,
   healthController,
   babyTimelineTabsData,
