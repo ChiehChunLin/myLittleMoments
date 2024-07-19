@@ -6,9 +6,11 @@
         class="sign-control"
           id="inputRole"
           name="babyRole"
-          value="family"
+          value=""
         />
+            <% if (user.lineId !== "") { %>
             <option value="family">家人</option>
+            <% } %>
             <option value="fans">粉絲</option>
         </select>
     </div>
@@ -27,7 +29,9 @@
     </div>
     <br />
     <button type="submit" class="sign-btn sign-btn-primary">追蹤寶寶</button>
+    <% if (user.lineId !== "") { %>
     <p class="showNewBabyLink">沒有寶寶代碼，我要<a class="newBaby-a">新增寶寶</a></p>
+    <% } %>
   </form>
 </div>
 
