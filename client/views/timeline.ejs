@@ -7,7 +7,67 @@
   <body>
     <!------------ baby Nav ------------>
     <%- include ("partials/nav", { user }) %>
-    <!-------- add/follow baby ------------>
+    <!-------- myMoments Guideline ------------>
+    <div class="myGuidelineDiv <%=newFollow%>">
+      <div class="" >
+        <div class="home-guide">
+          <div class="cancelGuideline">
+            <img id="cancelGuideline" src="/public/images/cancel_icon.png" alt="cancel" >
+          </div>
+          <div class="fromGroup" style="background-color: white; opacity: 1; z-index: 2;">
+            <div class="guide-header">
+              <h5 style="font-weight: bolder; color: #007bff;">小時光使用指南</h5>
+              <br>
+              <span>針對有小孩的家庭，提供全家人簡易紀錄寶寶作息及生活點滴的使用平台</span>
+              <span style="display: block;">寶寶專屬的小天地，瀏覽成長照片、影片, 紀錄會心一笑的生活日誌以及生活作息</span>
+              <span style="display: block;">小時光協助新手爸媽度過艱困的新生兒時期，也給全家人一個暖心回憶的空間</span>
+            </div>
+            <div class="section">
+              <h6><b>操作介紹</b></h6>
+              <ul>
+                <li>1. 點擊左方按鈕：擁有寶寶ID可追蹤寶寶動態，新手爸媽可新增寶寶建立寶寶頁面</li>
+                <li>2. LINE 登入使用者可點選右下角機器人掃描二維條碼加入小時光服務</li>
+                <li>3. 照護者可依照指令格式開始使用小時光服務機器人紀錄寶寶生活</li>
+                <li>4. 點選右上方使用者開啟管理中心，可管理照護權限及寶寶追蹤狀態</li>
+              </ul>
+            </div>
+            <div class="section">
+              <div class="guide-row">
+                <div class="guide-col">
+                  <h6><b>小時光關係設定</b></h6>
+                  <ul>
+                    <li>關係權限分為照護者、家人、粉絲</li>
+                    <li>用戶新增寶寶時預設為照護者</li>
+                    <li>照護者可賦予或移除家人關係的照護權</li>
+                    <li>照護者可透過小時光服務機器人紀錄寶寶作息</li>
+                    <li>粉絲僅能瀏覽寶寶生活動態，無法使用機器人</li>
+                  </ul>
+                </div>
+                <div class="guide-col">
+                  <h6><b>指令格式</b></h6>
+                  <ul style="font-size: smaller;">
+                      <li>牛奶(ml)：M 160</li>
+                      <li>副食(ml)：F 50</li>
+                      <li>睡覺(hr)：S 10</li>
+                      <li>藥水(cc)：MED 3</li>
+                      <li>身高(cm)：H 75</li>
+                      <li>體重(kg)：W 6.5</li>
+                      <li>日記：D 妹妹長牙了</li>
+                  </ul>
+                </div>
+              </div>
+            </div>            
+            <div class="guide-footer">
+              <span style="color: #007bff;"><b> ❀ 我的小小時光，隨時陪伴你身旁 ❀ </b></span>
+              <br>
+              <span style="display: block;">寶寶範例可用粉絲關係加入寶寶代碼 1682294400000 瀏覽頁面</span>
+              <br>            
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-------- line bot QRcode ------------>
     <div class="myBotDiv divHide">
       <div class="home" >
         <div class="home-col3">
@@ -25,7 +85,7 @@
       </div>
     </div>
     <!-------- add/follow baby ------------>
-    <div class="babyFollow <%=newFollow%>">
+    <div class="babyFollow divHide">
       <div class="home" >
         <div class="home-col3">
           <div class="message" style="margin-bottom: 1rem"></div>

@@ -249,7 +249,8 @@ input[type="number"] {
                Baby Form
 ==================================== */
 .babyFollow,
-.myBotDiv {
+.myBotDiv,
+.myGuidelineDiv {
   background-color: rgba(255, 255, 255, 0.8);
   height: calc(100% - 60px);
   width: 100%;
@@ -257,16 +258,52 @@ input[type="number"] {
   z-index: 1;
 }
 .babyFollow .home,
-.myBotDiv .home{
+.myBotDiv .home,
+.myGuidelineDiv .home{
   height: calc(100% - 60px);
   margin: auto;
 }
+.home-guide{
+  width: auto;
+  height: auto;
+  margin: auto 5rem;
+}
+.guide-header,
+.guide-footer {
+  text-align: center;
+}
+.section{
+  margin: 1rem;
+  text-align: left;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.guide-row {
+  width: 75%;
+  display: flex;
+  justify-content: space-between;
+}
+.guide-col{
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content:flex-start;
+  align-items: center;
+}
+.guide-margin{
+  margin-right: auto;
+}
 .cancelFollow,
-.cancelMyBot{
+.cancelMyBot,
+.cancelGuideline{
   display: flex;
 }
 .cancelFollow img,
-.cancelMyBot img{
+.cancelMyBot img,
+.cancelGuideline img{
   margin-left: auto;
   text-align: right;
   width: 30px; 
@@ -278,7 +315,8 @@ input[type="number"] {
 }
 
 .cancelFollow img:hover,
-.cancelMyBot img:hover {
+.cancelMyBot img:hover,
+.cancelGuideline img:hover{
   content: url("/public/images/cancel_icon_hover.png");
 }
 .myBotCode {

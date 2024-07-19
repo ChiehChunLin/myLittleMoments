@@ -42,7 +42,6 @@ if (window.location.href.includes("/timeline")) {
     const followForm = document.getElementById("firstFollowForm");
     const formData = new FormData(followForm);
     const babyRole = formData.get("babyRole");
-    const relation = formData.get("call");
     const babyId = formData.get("babyId");
 
     if (checkAuth) {
@@ -53,13 +52,13 @@ if (window.location.href.includes("/timeline")) {
           "Content-Type": "application/json",
           "Cache-Control": "no-cache" // without this config, the page return "304 Not Modified"
         },
-        body: JSON.stringify({ babyId, babyRole, relation })
+        body: JSON.stringify({ babyId, babyRole })
       };
       userNewBabyAndFolowFetch("/timeline/firstFollow", config);
     }
   });
   $("#inputRole").on("change", function(e){
-    if(e.target.value === "manager"){
+    if(e.target.value === "family"){
       $(".showNewBabyLink")[0].style.display = "block";
     }else{
       $(".showNewBabyLink")[0].style.display = "none";
@@ -73,6 +72,12 @@ if (window.location.href.includes("/timeline")) {
     $(".babyFollow").removeClass("divShow").addClass("divHide");
   })
 
+  $(".showGuideline").on("click", function (e){
+    $(".myGuidelineDiv").removeClass("divHide").addClass("divShow");
+  })
+  $("#cancelGuideline").on("click", function (e){
+    $(".myGuidelineDiv").removeClass("divShow").addClass("divHide");
+  })
   $(".addMyBot").on("click", function (e){
     $(".myBotDiv").removeClass("divHide").addClass("divShow");
   })

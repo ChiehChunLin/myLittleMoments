@@ -106,13 +106,13 @@ const firstFollowRender = async (req, res, next) => {
 const firstFollowController = async (req, res, next) => {
   try {
     const { user } = req;
-    const { babyId, babyRole, relation } = req.body;
+    const { babyId, babyRole } = req.body;
     const followBaby = await userDB.setUserFollowBaby(
       conn,
       user.id,
       babyId,
       babyRole,
-      relation
+      babyRole
     );
     return res.status(200).send({ message: "寶寶追蹤成功!" });
   } catch (error) {
@@ -128,7 +128,7 @@ const newBabyController = async (req, res, next) => {
     if(!user){
       return res.status(500).send({ message: "user is not defined" });
     }
-    const { babyRole, babyCall, babyName, babyGender, babyBirth } = req.body;   
+    const { babyRole, babyName, babyGender, babyBirth } = req.body;   
     const trainFiles = [];
     if(req.files.babyFront){
       trainFiles.push(req.files.babyFront[0]);
@@ -148,7 +148,7 @@ const newBabyController = async (req, res, next) => {
     //   size: 219374
     // }
     const newBabyId = await babyDB.newBaby(conn, babyName, babyGender, babyBirth);
-    const followBaby = await userDB.setUserFollowBaby(conn, user.id, newBabyId, babyRole, babyCall);
+    const followBaby = await userDB.setUserFollowBaby(conn, user.id, newBabyId, babyRole, babyRole);
 
     const imageFiles = [];
     for(let i = 0; i < trainFiles.length ; i++){
