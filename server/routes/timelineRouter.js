@@ -18,8 +18,7 @@ const upload = multer({
 });
 
 router.get("/", timeline.timelineRender);
-router.get("/profile", timeline.profileRender)
-router.get("/firstFollow", timeline.firstFollowRender);
+router.get("/profile", timeline.userProfileRender)
 
 router.post("/firstFollow", timeline.firstFollowController);
 router.post("/newBaby", upload.fields([
@@ -32,9 +31,8 @@ router.post("/updateBabyFace", upload.fields([
   { name: "babyUpward", maxCount: 1 }]),timeline.updateBabyFaceController);
 router.post("/updateBabyRole", timeline.updateBabyRoleController);
 router.post("/uploadImage", upload.fields([{ name: "file", maxCount: 1 }]), timeline.uploadProfileImageToS3);
-router.post("/health", timeline.healthController);
+router.post("/health", timeline.babyDailyHealthData);
 router.post("/babyProfile", timeline.babyTimelineTabsData);
-router.post("/image/daily", timeline.dailyImages);
-
+router.post("/image/daily", timeline.babyDailyImagesData);
 
 module.exports = router;

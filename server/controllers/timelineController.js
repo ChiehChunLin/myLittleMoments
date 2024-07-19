@@ -2,7 +2,6 @@ const https = require('https');
 const fs = require("fs");
 const sharp = require("sharp");
 const moment = require("moment");
-const faceControl = require("./pythonController")
 const conn = require("../database/connDB");
 const userDB = require("../database/userDB");
 const babyDB = require("../database/babyDB");
@@ -19,7 +18,7 @@ const faceCase ={
   FACE_VALID: 2
 }
 
-const profileRender = async (req, res, next) => {
+const userProfileRender = async (req, res, next) => {
   try {
     const { user } = req;
     if(!user.picture.includes("https")){
@@ -96,32 +95,6 @@ const timelineRender = async (req, res, next) => {
   }
 };
 
-const firstFollowRender = async (req, res, next) => {
-  try {
-    res.status(200).render("firstFollow");
-  } catch (error) {
-    next(error);
-  }
-};
-const firstFollowController = async (req, res, next) => {
-  try {
-    const { user } = req;
-    const { babyId, babyRole } = req.body;
-    const followBaby = await userDB.setUserFollowBaby(
-      conn,
-      user.id,
-      babyId,
-      babyRole,
-      babyRole
-    );
-    return res.status(200).send({ message: "寶寶追蹤成功!" });
-  } catch (error) {
-    if(error.message.includes("Duplicate")){
-      return res.status(200).send({ message: "寶寶追蹤成功!" });
-    }
-    next(error);
-  }
-};
 const newBabyController = async (req, res, next) => {
   try {
     const { user } = req;
@@ -150,19 +123,8 @@ const newBabyController = async (req, res, next) => {
     const newBabyId = await babyDB.newBaby(conn, babyName, babyGender, babyBirth);
     const followBaby = await userDB.setUserFollowBaby(conn, user.id, newBabyId, babyRole, babyRole);
 
-    const imageFiles = [];
-    for(let i = 0; i < trainFiles.length ; i++){
-      const filename = `${newBabyId}-${i + 1}`;
-      const fileExtension = trainFiles[i].mimetype.split('/')[1];
-      const filePath = `faceUploads/${filename}.${fileExtension}`;
-      await saveImageFromBuffer(trainFiles[i].buffer, filePath);
-      imageFiles.push(`../${filePath}`);  //relative to queue entry point
-    }
+    await pythonWorkerFaceTrain(newBabyId, trainFiles);
 
-    if(imageFiles.length > 0){
-      const prcoessCase = faceCase.FACE_TRAIN;
-      redis.rpush(process.env.REDIS_LIST, JSON.stringify({ prcoessCase, imageFiles }));
-    }    
     if(newBabyId && followBaby){
       return res.status(200).send({ message: `寶寶新增＆追蹤成功!` });
     }
@@ -173,6 +135,25 @@ const newBabyController = async (req, res, next) => {
     next(error);
   }
 }
+const firstFollowController = async (req, res, next) => {
+  try {
+    const { user } = req;
+    const { babyId, babyRole } = req.body;
+    const followBaby = await userDB.setUserFollowBaby(
+      conn,
+      user.id,
+      babyId,
+      babyRole,
+      babyRole
+    );
+    return res.status(200).send({ message: "寶寶追蹤成功!" });
+  } catch (error) {
+    if(error.message.includes("Duplicate")){
+      return res.status(200).send({ message: "寶寶追蹤成功!" });
+    }
+    next(error);
+  }
+};
 const updateBabyRoleController = async (req, res, next) => {
   try {
     const { userId, babyId, babyRole } = req.body;
@@ -213,20 +194,8 @@ const updateBabyFaceController = async (req, res, next) => {
     //   buffer: <Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 01 00 00 48 00 48 00 00 ff e1 00 58 45 78 69 66 00 00 4d 4d 00 2a 00 00 00 08 00 02 01 12 00 03 00 00 00 01 00 01 ... 219324 more bytes>,
     //   size: 219374
     // }
+    await pythonWorkerFaceTrain(babyId, trainFiles);
 
-    const imageFiles = [];
-    for(let i = 0; i < trainFiles.length ; i++){
-      const filename = `${babyId}-${i + 1}`;
-      const fileExtension = trainFiles[i].mimetype.split('/')[1];
-      const filePath = `faceUploads/${filename}.${fileExtension}`;
-      await saveImageFromBuffer(trainFiles[i].buffer, filePath);
-      imageFiles.push(`../${filePath}`);  //relative to queue entry point
-    }
-
-    if(imageFiles.length > 0){
-      const prcoessCase = faceCase.FACE_TRAIN;
-      redis.rpush(process.env.REDIS_LIST, JSON.stringify({ prcoessCase, imageFiles }));
-    }    
     return res.status(200).send({ message: `寶寶更新成功!` });
   } catch (error) {
     if(error.message.includes("Duplicate")){
@@ -235,7 +204,7 @@ const updateBabyFaceController = async (req, res, next) => {
     next(error);
   }
 }
-const recognizeBabyFace = async (req, res, next) => {
+const validBabyFaceController = async (req, res, next) => {
   try {
     console.log("recognizeBabyFace");    
     const userId = req.query.user; //1718868972609
@@ -253,18 +222,20 @@ const recognizeBabyFace = async (req, res, next) => {
       if(type === "video") {
         managerBabyList.map(async baby => {
           console.log(`video manager baby id: ${baby.babyId}`);
-          await uploadTimelineImageToS3(filePath, type, userId, baby.babyId, key);
+          const awsResult = await awsS3.putImageS3(filePath, type, `${baby.babyId}/${key}`);
+          if (awsResult.$metadata.httpStatusCode !== 200) {
+            console.log("S3 result: %j", awsResult);
+            throw new Error("image upload to S3 failed!");
+          }
+          const insertId = await imageDB.setImage(conn, userId, baby.babyId, type, key);
+          if( insertId == undefined){
+            console.log("setImage insertId: %j", insertId);
+            throw new Error("image info to DB failed!");
+          }
         })        
       } else {
         //face recognition downlad image ok -> enqueue
-        const prcoessCase = faceCase.FACE_VALID;
-        const imageFiles = [ `../${filePath}` ]; //relative to queue entry point
-        const queueMsg = {
-          userId,
-          managerBabyList,
-          key
-        }
-        redis.rpush(process.env.REDIS_LIST, JSON.stringify({ prcoessCase, imageFiles, queueMsg }));
+        pythonWorkerFaceRecognition( filePath, userId, managerBabyList, key);
       }
       return res.status(200).send({message : "image faces dispatch OK!"});
     })
@@ -277,7 +248,7 @@ const recognizeBabyFace = async (req, res, next) => {
   }
 }
 
-const healthController = async (req, res, next) => {
+const babyDailyHealthData = async (req, res, next) => {
   try {
     const { babyId, date } = req.body;
 
@@ -328,7 +299,7 @@ const babyTimelineTabsData = async (req,res,next) => {
     next(error);
   } 
 }
-const dailyImages = async (req,res,next) => {
+const babyDailyImagesData = async (req,res,next) => {
   try{
     const { babyId, date } = req.body;
     const images = await imageDB.getImageByDate(conn, babyId, date);
@@ -367,7 +338,6 @@ const uploadProfileImageToS3 = async (req, res, next) => {
     next(error);
   }
 };
-
 const downloadValidImageFromS3 = (url, filePath) => {
   return new Promise((resolve, reject) => {
     const request = https.get(url, (response) => {
@@ -437,43 +407,50 @@ async function getWeekDailyData(babyId){
   }
   return dailyData;
 }
-async function saveImageFromBuffer(imageBuffer, filepath) {
-  
-  await sharp(imageBuffer)
-      .toFile(filepath)
+async function pythonWorkerFaceTrain(babyId, trainFiles){
+  const imageFiles = [];
+  for(let i = 0; i < trainFiles.length ; i++){
+    const filename = `${babyId}-${i + 1}`;
+    const fileExtension = trainFiles[i].mimetype.split('/')[1];
+    const filePath = `faceUploads/${filename}.${fileExtension}`;
+    await sharp(trainFiles[i].buffer)
+      .toFile(filePath)
       .then(() => {
-          console.log(`Image saved as ${filepath}`);
+          console.log(`Image saved as ${filePath}`);
+          imageFiles.push(`../${filePath}`);  //relative to queue entry point
       })
       .catch(err => {
           console.error('Error saving image:', err);
           throw err;
-      });      
-}
-async function uploadTimelineImageToS3 (filePath, type, userId, babyId, key){
-  const awsResult = await awsS3.putImageS3(filePath, type, `${babyId}/${key}`);
-  if (awsResult.$metadata.httpStatusCode !== 200) {
-    console.log("S3 result: %j", awsResult);
-    throw new Error("image upload to S3 failed!");
+      });
   }
-  const insertId = await imageDB.setImage(conn, userId, babyId, type, key);
-  if( insertId == undefined){
-    console.log("setImage insertId: %j", insertId);
-    throw new Error("image info to DB failed!");
-  }
+  console.log(`imageFiles.length: ${imageFiles.length}`)
+  if(imageFiles.length > 0){
+    const prcoessCase = faceCase.FACE_TRAIN;
+    redis.rpush(process.env.REDIS_LIST, JSON.stringify({ prcoessCase, imageFiles }));
+  } 
 }
-
+async function pythonWorkerFaceRecognition(filePath, userId, managerBabyList, key ){
+  const prcoessCase = faceCase.FACE_VALID;
+  const imageFiles = [ `../${filePath}` ]; //relative to queue entry point
+  const queueMsg = {
+    userId,
+    managerBabyList,
+    key
+  }
+  redis.rpush(process.env.REDIS_LIST, JSON.stringify({ prcoessCase, imageFiles, queueMsg }));
+}
 
 module.exports = {
-  profileRender,
-  firstFollowRender,
-  firstFollowController,
+  userProfileRender,
+  timelineRender,
   newBabyController,
+  firstFollowController,  
   updateBabyRoleController,
   updateBabyFaceController,
-  recognizeBabyFace,
-  healthController,
-  babyTimelineTabsData,
-  dailyImages,
-  timelineRender,
+  validBabyFaceController,
+  babyDailyHealthData,
+  babyDailyImagesData,  
+  babyTimelineTabsData,  
   uploadProfileImageToS3
 };
