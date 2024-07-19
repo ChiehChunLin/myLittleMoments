@@ -9,9 +9,9 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const userRoute = require("./routes/userRouter");
 const adminRoute = require("./routes/adminRouter");
+const lambdaRoute = require("./routes/lambdaRouter");
 const timelineRoute = require("./routes/timelineRouter");
 const auth = require("./middlewares/authHandler");
-const { errorHandler } = require("./middlewares/errorHandler");
 
 app.set("views", path.join(path.dirname(__dirname), "/client/views"));
 app.set("view engine", "ejs");
@@ -25,14 +25,15 @@ app.use(
     saveUninitialized: false, // false to store anything before user logs in.
     cookie: {
       httpOnly: true,
-      sameSite: "none"
-      // secure: true, //secure makes flash doesn't work
-      // maxAge: 24 * 60 * 60 * 1000,
+      sameSite: "none",
+      secure: true, //secure makes flash doesn't work
+      maxAge: 24 * 60 * 60 * 1000,
     }
   })
 );
 
 app.use("/", userRoute);
+app.use("/validBaby", lambdaRoute);
 app.use("/timeline", auth.authJwtCheckLogin, timelineRoute);
 app.use("/admin", auth.authJwtCheckLogin, auth.authAdminCheck, adminRoute);
 app.use("/admin", auth.authJwtCheckLogin, auth.authAdminCheck, express.static("./admin"));
@@ -44,15 +45,14 @@ app.use((req, res, next) => {
   next(err);
 });
 
-// app.use(errorHandler);
 app.use((err, req, res, next) => {
   if (err.status = 404) {
-    return res.status(200).render("errorPage", { user : undefined});
+    return res.status(200).render("notFound", { user : undefined });
   }
   console.log(err);
   res.locals.error = err;
   const status = err.status || 500;
-  res.status(status).send({ message: `Oops!! ${err}` });
+  res.status(status).render("errorPage", { user : undefined, errorMessage : err });
 });
 
 const port = process.env.PORT || 3000;
