@@ -12,13 +12,4 @@ const lineUserList = async (req,res,next)=>{
     next(error);
   }
 }
-const newBaby = async (req,res,next)=>{
-  try {
-    const { name , gender, birthday } = req.body;
-    const newBabyId = await babyDB.newBaby(conn, name , gender, birthday);
-    res.status(200).send({ newBabyId });
-  } catch (error) {
-    next(error);
-  }
-}
-module.exports = { lineUserList, newBaby };
+module.exports = { lineUserList };
