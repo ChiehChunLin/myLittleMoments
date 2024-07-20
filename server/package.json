@@ -34,7 +34,9 @@
     "npm": "^10.8.1",
     "path": "^0.12.7",
     "qs": "^6.12.1",
-    "sharp": "^0.33.4"
+    "sharp": "^0.33.4",
+    "supertest": "^7.0.0",
+    "vitest": "^2.0.3"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
