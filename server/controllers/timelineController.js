@@ -208,10 +208,7 @@ const validBabyFaceController = async (req, res, next) => {
   //This controller is only for Lambda using and res error directly instead of next(error);
   try {
     console.log("recognizeBabyFace");  
-    console.log(req.body);
     const { username, password } = req.body;
-    console.log(username);
-    console.log(password);
 
     if( username != process.env.AWS_LAMBDA_USERNAME || password != process.env.AWS_LAMBDA_PASSWORD ){
       return res.status(401).send({ message : "Authentication Error! Wrong lambda username or password", error : "Lambda Authentication Error!" });
