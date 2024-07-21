@@ -205,8 +205,18 @@ const updateBabyFaceController = async (req, res, next) => {
   }
 }
 const validBabyFaceController = async (req, res, next) => {
+  //This controller is only for Lambda using and res error directly instead of next(error);
   try {
-    console.log("recognizeBabyFace");    
+    console.log("recognizeBabyFace");  
+    console.log(req.body);
+    const { username, password } = req.body;
+    console.log(username);
+    console.log(password);
+
+    if( username != process.env.AWS_LAMBDA_USERNAME || password != process.env.AWS_LAMBDA_PASSWORD ){
+      return res.status(401).send({ message : "Authentication Error! Wrong lambda username or password", error : "Lambda Authentication Error!" });
+    }
+
     const userId = req.query.user; //1718868972609
     const key = req.query.path; //"2024-07-02/1231321321321"
     const type = req.query.type; // "image" or "video"
@@ -225,12 +235,12 @@ const validBabyFaceController = async (req, res, next) => {
           const awsResult = await awsS3.putImageS3(filePath, type, `${baby.babyId}/${key}`);
           if (awsResult.$metadata.httpStatusCode !== 200) {
             console.log("S3 result: %j", awsResult);
-            throw new Error("image upload to S3 failed!");
+            return res.status(500).send({ message : "Server Error!", error: "server image upload to S3 failed!" });
           }
           const insertId = await imageDB.setImage(conn, userId, baby.babyId, type, key);
           if( insertId == undefined){
             console.log("setImage insertId: %j", insertId);
-            throw new Error("image info to DB failed!");
+            return res.status(500).send({ message : "Server Error!", error: "server image info to DB failed!" });
           }
         })        
       } else {
@@ -241,10 +251,10 @@ const validBabyFaceController = async (req, res, next) => {
     })
     .catch((error) => {
       console.error(error)
-      throw error;
+      return res.status(500).send({message : "Server Error!", error });
     });    
   } catch (error) {
-    next(error);
+    return res.status(500).send({message : "Server Error!", error });
   }
 }
 
