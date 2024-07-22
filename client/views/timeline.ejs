@@ -116,6 +116,7 @@
         <!-- baby followed list -->
         <%- include ("partials/babyList", { follows }) %>
         <div class="post-content">
+          <div id="messageContainer"></div>
           <% if (babyData) { %>
           <!-- babyProfile: babyCover, babyHeadshot, babyInfo -->
           <%- include ("partials/babyProfile", { babyData }) %>

@@ -1,6 +1,12 @@
 if (window.location.href.includes("/timeline")) {
   const checkAuth = userCheckAuth();
   console.log(`checkAuth: ${checkAuth}`);
+
+  const messageData = JSON.parse(localStorage.getItem('timelineMessage'));
+  if (messageData) {
+    showTimelineMessage(messageData.type, messageData.message);
+    localStorage.removeItem('timelineMessage');
+  }
   //=====================================================
   //============  Add Baby Follow Form  =================
   //=====================================================
@@ -451,13 +457,16 @@ function userNewBabyAndFolowFetch(url, config = "") {
     .then((data) => {
       const { message } = data;      
       if(message){
-        confirm(message);
+        //confirm(message);
+        localStorage.setItem('timelineMessage', JSON.stringify({ type: 'success', message: message}));
         $(".babyFollow").removeClass("divShow").addClass("divHide");
         window.location.href = "/timeline";
       }      
     })
     .catch((err) => {
-      alert(err.message);
+      // alert(err.message);
+      $(".babyFollow").removeClass("divShow").addClass("divHide"); 
+      showTimelineMessage('danger', err.message);
       console.error(err);
     });
 }
@@ -467,11 +476,11 @@ function userUpdateBabyFetch(url, config = "") {
     .then((data) => {
       const { message } = data;      
       if(message){
-        confirm(message);
+        showTimelineMessage('success', message);
       }      
     })
     .catch((err) => {
-      alert(err.message);
+      showTimelineMessage('danger', err.message);
       console.error(err);
     });
 }
@@ -480,11 +489,16 @@ function userUploadFetch(url,config = "") {
     .then((res) => res.json())
     .then((data) => {
       const { message } = data;
-      confirm(message);
-      window.location.reload();
+      if(message){
+        //confirm(message);
+        localStorage.setItem('timelineMessage', JSON.stringify({ type: 'success', message: message}));
+        $(".babyFollow").removeClass("divShow").addClass("divHide");
+        window.location.href = "/timeline";
+      }  
     })
     .catch((err) => {
-      alert(err.message);
+      // alert(err.message);
+      showTimelineMessage('danger', err.message);
       console.error(err);
     });
 }
@@ -1119,6 +1133,20 @@ function recordTable(title, data) {
   table.appendChild(tbody);
   recordDiv.appendChild(table);
 }
+function showTimelineMessage(type, message){
+  const messageContainer = document.getElementById('messageContainer');
+  const messagePlaceholder = document.createElement('div');
+  messagePlaceholder.innerHTML = `
+    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+      ${message}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        &times;
+      </button>
+    </div>
+  `;
+  messageContainer.appendChild(messagePlaceholder);
+}
+
 
 //================================================================================
 //Ref:https://www.cdc.gov/growthcharts/html_charts/lenageinf.htm#females

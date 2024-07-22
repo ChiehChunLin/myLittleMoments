@@ -431,7 +431,6 @@ async function pythonWorkerFaceTrain(babyId, trainFiles){
           throw err;
       });
   }
-  console.log(`imageFiles.length: ${imageFiles.length}`)
   if(imageFiles.length > 0){
     const prcoessCase = faceCase.FACE_TRAIN;
     redis.rpush(process.env.REDIS_LIST, JSON.stringify({ prcoessCase, imageFiles }));

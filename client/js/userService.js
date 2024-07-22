@@ -1,6 +1,6 @@
 $(".logout").on("click", function (e) {
   localStorage.removeItem("accessToken");
-  displayLoginMessage("小時光登出成功!");
+  displayLoginMessage('success', "小時光登出成功!");
 });
 
 if (window.location.href.includes("/login")) {
@@ -56,7 +56,7 @@ if (window.location.href.includes("/login")) {
     const confirmPassword = formData.get("confirmPassword");
 
     if(password != confirmPassword){
-      displayLoginMessage("密碼輸入不一致");
+      displayLoginMessage('danger', "密碼輸入不一致");
       return;
     }
     const config = {
@@ -88,28 +88,31 @@ function userCheckinFetch(url, config = "") {
             }
           }
           if (url != "/authCheck") {
-            displayLoginMessage("小時光登入成功！");
+            displayLoginMessage('success', "小時光登入成功!");            
             window.location.href = "/timeline";
           }
         } else {
           console.error("Login data failed:", data);
-          displayLoginMessage(message);
+          displayLoginMessage('danger', message);
         }
       }
     })
     .catch((err) => {
-      displayLoginMessage(err.message);
+      displayLoginMessage('danger', err.message);
       console.error(err);
     });
 }
 
-function displayLoginMessage(message) {
-  if (message) {
-    const messageDiv = document.querySelector(".message");
-    messageDiv.textContent = message;
-
-    setTimeout(() => {
-      messageDiv.textContent = "";
-    }, 5000); // Hide after 5 seconds
-  }
+function displayLoginMessage(type, message){
+  const loginMessage = document.getElementById('loginMessage');
+  const messagePlaceholder = document.createElement('div');
+  messagePlaceholder.innerHTML = `
+    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+      ${message}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        &times;
+      </button>
+    </div>
+  `;
+  loginMessage.appendChild(messagePlaceholder);
 }
