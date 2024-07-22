@@ -9,20 +9,20 @@ from PIL import ImageFont, ImageDraw, Image
 from utils import face_preprocess
 from utils.utils import feature_compare, load_mtcnn, load_faces, load_mobilefacenet, add_faces
 
-# 人脸识别阈值
+# 人臉辨識閥值
 VERIFICATION_THRESHOLD = config.VERIFICATION_THRESHOLD
 
-# 检测人脸检测模型
+# mtcnn人臉檢測模型
 mtcnn_detector = load_mtcnn()
-# 加载人脸识别模型
+# mobilefacenet人臉檢測模型
 face_sess, inputs_placeholder, embeddings = load_mobilefacenet()
-# 添加人脸
+# 偵測人臉位置
 add_faces(mtcnn_detector)
-# 加载已经注册的人脸
+# 讀取已訓練的人臉庫
 faces_db = load_faces(face_sess, inputs_placeholder, embeddings)
 
 
-# 注册人脸
+# 註冊人臉
 def face_register(img_path):
     angles = [0, 90, 180, 270]
     filename = os.path.splitext(os.path.basename(img_path))[0]
@@ -48,7 +48,7 @@ def face_register(img_path):
 
     print('{} Fail'.format(filename))
 
-# 人脸识别
+# 人臉識別
 def face_recognition(img_path):
     image = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8), 1)
     faces, landmarks = mtcnn_detector.detect(image)
@@ -59,12 +59,12 @@ def face_recognition(img_path):
             if round(faces[i, 4], 6) > 0.95:
                 faces_sum += 1
         if faces_sum > 0:
-            # 人脸信息
+            # 人臉訊息
             info_location = np.zeros(faces_sum)
             info_location[0] = 1
             info_name = []
             probs = []
-            # 提取图像中的人脸
+            # 提取照片中的人臉
             input_images = np.zeros((faces.shape[0], 112, 112, 3))
             for i, face in enumerate(faces):
                 if round(faces[i, 4], 6) > 0.95:
@@ -75,7 +75,7 @@ def face_recognition(img_path):
                     nimg = nimg * 0.0078125
                     input_images[i, :] = nimg
 
-            # 进行人脸识别
+            # 進行人臉識別
             feed_dict = {inputs_placeholder: input_images}
             emb_arrays = face_sess.run(embeddings, feed_dict=feed_dict)
             # print(emb_arrays.shape)
@@ -84,7 +84,7 @@ def face_recognition(img_path):
             for i, embedding in enumerate(emb_arrays):
                 embedding = embedding.flatten()
                 temp_dict = {}
-                # 比较已经存在的人脸数据库
+                # 比較已存在的人臉資料庫
                 for com_face in faces_db:
                     ret, sim = feature_compare(embedding, com_face["feature"], 0.70)
                     temp_dict[com_face["name"]] = sim
@@ -108,7 +108,7 @@ def rotate_image(img, angle):
     return rotated
 
 def process_image_rotations(image_path, output_base_path):
-    # 读取图像
+    # 讀取圖像
     img = cv2.imread(image_path)
     angles = [0, 90, 180, 270]
     
@@ -118,9 +118,9 @@ def process_image_rotations(image_path, output_base_path):
         if faces.shape[0] != 0:
             output_path = f"{output_base_path}_{angle}.jpg"
             cv2.imwrite(output_path, rotated_image)
-            print(f"检测到人脸和眼睛的图像已保存至: {output_path}")
+            print(f"檢測到人臉和眼睛的照面已保存至: {output_path}")
         else:
-            print(f"在旋转角度 {angle} 时未检测到人脸或眼睛。")
+            print(f"在旋轉角度 {angle} 時為檢測到人臉或眼睛。")
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
@@ -142,6 +142,6 @@ if __name__ == '__main__':
         result = face_recognition(paths[0])
 
     else:
-        print("功能选择错误")
+        print("功能選擇錯誤")
         
     

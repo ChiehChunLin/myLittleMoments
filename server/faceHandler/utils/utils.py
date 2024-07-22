@@ -12,7 +12,7 @@ import tensorflow.compat.v1 as tf
 import config
 
 
-# 比较人脸相似度
+# 比較人臉相似度
 def feature_compare(feature1, feature2, threshold):
     dist = np.sum(np.square(feature1 - feature2))
     sim = np.dot(feature1, feature2.T)
@@ -22,7 +22,7 @@ def feature_compare(feature1, feature2, threshold):
         return False, sim
 
 
-# 加载人脸检测模型
+# 加載人臉檢測模型
 def load_mtcnn():
     MODEL_PATH = config.MTCNN_MODEL_PATH
     MIN_FACE_SIZE = int(config.MIN_FACE_SIZE)
@@ -46,7 +46,7 @@ def load_mtcnn():
     return mtcnn_detector
 
 
-# 加载已经注册的人脸
+# 加載已經註冊的人臉
 def load_faces(sess, inputs_placeholder, embeddings):
     FACE_DB_PATH = config.FACE_DB_PATH
     face_db = []
@@ -77,7 +77,7 @@ def load_faces(sess, inputs_placeholder, embeddings):
     return face_db
 
 
-# 检测并裁剪人脸
+# 檢測並剪裁人臉
 def add_faces(mtcnn_detector):
     face_db_path = config.FACE_DB_PATH
     faces_name = os.listdir(face_db_path)
@@ -93,7 +93,7 @@ def add_faces(mtcnn_detector):
                 cv2.imwrite(os.path.join(face_db_path, os.path.basename(file)), nimg)
 
 
-# 加载人脸识别模型
+# 加載人臉辨識模型
 def load_mobilefacenet():
     MODEL_PATH = config.MOBILEFACENET_MODEL_PATH
     # print('Model filename: %s' % MODEL_PATH)
@@ -101,15 +101,15 @@ def load_mobilefacenet():
         graph_def = tf.GraphDef()
         graph_def.ParseFromString(f.read())
         tf.import_graph_def(graph_def, name='')
-    # 获取人脸输入层
+    # 獲取人臉輸入
     inputs_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
-    # 获取人脸特征层输出
+    # 獲取人臉特徵輸出
     embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
     sess = tf.Session()
     return sess, inputs_placeholder, embeddings
 
 
-# list 转成json格式数据
+# list 轉成json格式數據
 def list_to_json(lst):
     keys = [str(x) for x in np.arange(len(lst))]
     list_json = dict(zip(keys, lst))

@@ -1,28 +1,8 @@
 const moment = require("moment");
 const mysql = require("mysql2");
 const dotenv = require("dotenv").config();
-const { babyGender, babyRole, babyActivity } = require("./utils/getBabyConst");
 const pool = require("./database/connDB");
-const {
-  newNativeUser,
-  newLineUser,
-  setUserFollowBaby
-} = require("./database/userDB");
-const { newBaby, setBabyDaily } = require("./database/babyDB");
-const { setImage } = require("./database/imageDB");
 
-const cherryId = "U9acc24aec8497b5e7159c861f9079b71";
-const puffId = 1682294400000;
-const puffBirth = "2023-03-24";
-
-function getDateDifference(dateOld, dateNew) {
-  const todays = dateNew.split("-");
-  const dates = dateOld.split("-");
-  const today = moment([todays[0], todays[1], todays[2]]);
-  const dateBirth = moment([dates[0], dates[1], dates[2]]);
-  const diffDuration = moment.duration(today.diff(dateBirth));
-  return `${diffDuration.years()}Y-${diffDuration.months()}M`;
-}
 
 async function createUserTable() {
   const userTable = await pool.query(
@@ -134,61 +114,16 @@ async function createBabyDailyTable() {
   }
 }
 
-// const commands = [
-//   createUserTable(),
-//   createBabyTable(),
-//   createFollowTable(),
-//   createImageTable(),
-//   createTextTable(),
-//   createBabyDailyTable(),
-//   newNativeUser(
-//     pool,
-//     "aaa123456",
-//     "aaa123456@fakemail.com",
-//     "$2b$10$tzcVE8bVVv6k151knLPC1.xuA5GbFpuRtDO3ekKhDsiu85td5i6by",
-//     true
-//   ),
-//   newLineUser(
-//     pool,
-//     "U1e7165f3c3db2ce3142eb75643c61ec6",
-//     "林潔君",
-//     "justme11012@gmail.com",
-//     "moonday0815",
-//     true,
-//     cherryId
-//   ),
-//   newBaby(pool, "puff", babyGender.GIRL, "2023-03-24", puffId)
-// ];
+const commands = [
+  createUserTable(),
+  createBabyTable(),
+  createFollowTable(),
+  createImageTable(),
+  createTextTable(),
+  createBabyDailyTable()
+];
 
-// const imgCommands = [
-//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148621525352675"),
-//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148622834499683"),
-//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148623538880651"),
-//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148624075751624"),
-//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148624713285958"),
-//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148625502077219"),
-//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148626592596177"),
-//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148627078611379"),
-//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148627733708916"),
-//   setImage(pool, cherryId, puffId, old2, "image", "2024-06-18/513148628471120059")
-// ];
-// const dailyCommands = [
-//   setUserFollowBaby(pool, cherryId, puffId, babyRole.MANAGER, "mama"),
-//   setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 51, "2023-05-01"),
-//   setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 63, "2023-10-02"),
-//   setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 63, "2023-10-02"),
-//   setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 63, "2023-11-02"),
-//   setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 65.5, "2024-01-06"),
-//   setBabyDaily(pool, cherryId, puffId, babyActivity.HEIGHT, 69, "2024-06-08"),
-//   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 3.6, "2023-05-01"),
-//   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 5.6, "2023-10-02"),
-//   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 6.3, "2023-11-02"),
-//   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 6.3, "2023-12-11"),
-//   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 6.6, "2024-01-06"),
-//   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 7.1, "2024-05-01"),
-//   setBabyDaily(pool, cherryId, puffId, babyActivity.WEIGHT, 7.5, "2024-06-08")
-// ];
-Promise.all(imgCommands)
+Promise.all(commands)
   .then((result) => {
     console.log("result %j", result);
   })

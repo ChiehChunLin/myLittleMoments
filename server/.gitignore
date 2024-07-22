@@ -1,12 +1,15 @@
 node_modules/
 .env
+.vscode
 logs/
 downloaded/*
 faceUploads/*
 faceTrained/*
 faceTest/*
 myenv/*
+script/*
 faceHandler/__pycache__/*
 faceHandler/detection/__pycache__/*
 faceHandler/utils/__pycache__/*
 faceHandler/networks/__pycache__/*
+faceHandler/detection/__init__.py
