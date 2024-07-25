@@ -9,10 +9,12 @@
 * Face recognition with Tensorflow to auto grab images from LINE group
 
 ## Views
+![myMoments_interface](https://github.com/user-attachments/assets/4adbb8a5-ea40-4aa3-9541-8b0fd33d4f57)
 
 
 # Technics
 
+## Front-End
 | Front-End           | Items                          |  Details |
 | :------------------ | :----------------------------- | :------- |
 | VanillaJS           | HTML<br>CSS<br>JavaScript      | Developed basic views and interactive elements for the website. |
@@ -30,7 +32,7 @@
 
 
 # Architecture
-
+![myMoments_architecture](https://github.com/user-attachments/assets/7e7e1300-1857-46fd-8596-b75c597d2715)
 
 ## Structure
 ```
