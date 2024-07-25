@@ -291,10 +291,10 @@ input[type="number"] {
 }
 .guide-col{
   padding: 0 1rem;
-  display: flex;
+  /* display: flex;
   flex-direction: column;
   justify-content:flex-start;
-  align-items: center;
+  align-items: center; */
 }
 .guide-margin{
   margin-right: auto;
