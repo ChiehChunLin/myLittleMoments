@@ -213,7 +213,10 @@ const validBabyFaceController = async (req, res, next) => {
     if( username != process.env.AWS_LAMBDA_USERNAME || password != process.env.AWS_LAMBDA_PASSWORD ){
       return res.status(401).send({ message : "Authentication Error! Wrong lambda username or password", error : "Lambda Authentication Error!" });
     }
-
+    if (!fs.existsSync('./faceUploads')) {
+      fs.mkdirSync('./faceUploads', { recursive: true });
+      console.log(`Directory ${'./faceUploads'} is created.`);
+    } 
     const userId = req.query.user; //1718868972609
     const key = req.query.path; //"2024-07-02/1231321321321"
     const type = req.query.type; // "image" or "video"
