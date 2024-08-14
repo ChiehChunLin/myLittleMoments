@@ -1,4 +1,4 @@
-name: Deploy to EC2 on develop branch push
+name: Deploy to EC2 on main branch push
 
 on:
   push:
