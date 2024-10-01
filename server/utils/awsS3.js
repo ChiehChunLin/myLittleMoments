@@ -1,6 +1,5 @@
 require("dotenv").config();
 const fs = require("fs");
-// const { CloudFrontClient, CreateInvalidationCommand } = require("@aws-sdk/client-cloudfront");
 const { S3Client, GetObjectCommand, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { Upload } = require("@aws-sdk/lib-storage");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
@@ -14,9 +13,6 @@ const s3Client = new S3Client({
 });
 const bucketName = process.env.AWS_S3_BUCKET_NAME;
 const cdnURL = process.env.AWS_S3_CDN_URL;
-// const cdnRegion = process.env.AWS_S3_CDN_REGION;
-// const cdnId = process.env.AWS_S3_CDN_ID;
-// const cdnClient = new CloudFrontClient({ region: cdnRegion });
 
 function getImageCDN(key) {
   return cdnURL + key;

@@ -47,7 +47,7 @@ async function createFollowTable() {
                 \`babyRole\` VARCHAR(255) NOT NULL COMMENT 'Baby role',
                 \`relation\` VARCHAR(255) NOT NULL COMMENT 'Baby relation',
                 \`timestamp\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (userId) REFERENCES users(id),
+                FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
                 FOREIGN KEY (babyId) REFERENCES babys(id) ON DELETE CASCADE,
                 UNIQUE KEY (userId, babyId)
               );`
@@ -77,17 +77,15 @@ async function createImageTable() {
 }
 async function createTextTable() {
   const textTable = await pool.query(
-    `
-      CREATE TABLE IF NOT EXISTS \`texts\` (
+    `CREATE TABLE IF NOT EXISTS \`texts\` (
                   \`id\` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT 'Text id',
                   \`userId\` BIGINT UNSIGNED NOT NULL COMMENT 'User id',
                   \`babyId\` BIGINT UNSIGNED NOT NULL COMMENT 'Baby id',
                   \`content\` TEXT NOT NULL COMMENT 'Text content',
-                  \`timestamp\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Text date'
+                  \`timestamp\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Text date',
                   FOREIGN KEY (userId) REFERENCES users(id),
                   FOREIGN KEY (babyId) REFERENCES babys(id) ON DELETE CASCADE
-                );
-    `
+                );`
   );
   if (textTable) {
     return "textTable ok";
@@ -100,10 +98,10 @@ async function createBabyDailyTable() {
                   \`id\` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT 'Text id',
                   \`userId\` BIGINT UNSIGNED NOT NULL COMMENT 'User id',
                   \`babyId\` BIGINT UNSIGNED NOT NULL COMMENT 'Baby id',
-                  \`week\` INT NOT NULL DEFAULT '' COMMENT 'Activity week',
+                  \`week\` INT NOT NULL DEFAULT '0' COMMENT 'Activity week',
                   \`activity\` VARCHAR(255) NOT NULL COMMENT 'Baby activity',
                   \`quantity\` FLOAT NOT NULL COMMENT 'Baby quantity',
-                  \`timestamp\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Living date'
+                  \`timestamp\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Living date',
                   FOREIGN KEY (userId) REFERENCES users(id),
                   FOREIGN KEY (babyId) REFERENCES babys(id) ON DELETE CASCADE
                 );
